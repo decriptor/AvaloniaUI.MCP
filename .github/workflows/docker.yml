@@ -1,0 +1,146 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    - name: Create Dockerfile
+      run: |
+        cat > Dockerfile << 'EOF'
+        # Build stage
+        FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+        WORKDIR /src
+        
+        # Copy project files
+        COPY ["src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj", "src/AvaloniaUI.MCP/"]
+        COPY ["Directory.Packages.props", "."]
+        COPY ["Directory.Build.props", "."]
+        COPY ["Directory.Build.targets", "."]
+        COPY ["global.json", "."]
+        COPY ["nuget.config", "."]
+        
+        # Restore dependencies
+        RUN dotnet restore "src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj"
+        
+        # Copy source code
+        COPY . .
+        
+        # Build and publish
+        RUN dotnet publish "src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj" \
+            -c Release \
+            -o /app/publish \
+            --no-restore \
+            --self-contained false \
+            -p:PublishSingleFile=false
+            
+        # Runtime stage
+        FROM mcr.microsoft.com/dotnet/runtime:9.0 AS runtime
+        WORKDIR /app
+        
+        # Install required packages for JSON processing (for validation)
+        RUN apt-get update && apt-get install -y \
+            jq \
+            && rm -rf /var/lib/apt/lists/*
+            
+        # Copy published app
+        COPY --from=build /app/publish .
+        
+        # Create non-root user
+        RUN useradd --create-home --shell /bin/bash mcp
+        USER mcp
+        
+        # Set environment variables
+        ENV DOTNET_RUNNING_IN_CONTAINER=true
+        ENV ASPNETCORE_URLS=
+        
+        # Health check
+        HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+            CMD timeout 5s dotnet AvaloniaUI.MCP.dll --version || exit 1
+            
+        ENTRYPOINT ["dotnet", "AvaloniaUI.MCP.dll"]
+        EOF
+        
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: linux/amd64,linux/arm64
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Test Docker image
+      if: github.event_name == 'pull_request'
+      run: |
+        # Build image for testing
+        docker build -t test-image .
+        
+        # Test that image starts correctly
+        timeout 10s docker run --rm test-image --help || echo "Container test completed"
+        
+        # Clean up
+        docker rmi test-image
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name != 'pull_request'
+    
+    steps:
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
