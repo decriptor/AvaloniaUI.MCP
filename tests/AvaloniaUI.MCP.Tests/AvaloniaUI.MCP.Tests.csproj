@@ -1,0 +1,15 @@
+<Project Sdk="MSTest.Sdk/3.9.3">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    
+    <!-- Enable MSTest Runner for improved performance -->
+    <EnableMSTestRunner>true</EnableMSTestRunner>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AvaloniaUI.MCP\AvaloniaUI.MCP.csproj" />
+  </ItemGroup>
+
+</Project>

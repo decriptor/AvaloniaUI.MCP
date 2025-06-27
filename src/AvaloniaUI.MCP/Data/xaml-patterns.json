@@ -1,0 +1,133 @@
+{
+  "avalonia_xaml_patterns": {
+    "basic_window": {
+      "name": "Basic Window Structure",
+      "description": "Standard window with AvaloniaUI namespaces and basic structure",
+      "xaml": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"\n        x:Class=\"MyApp.MainWindow\"\n        Title=\"My Application\"\n        Width=\"800\"\n        Height=\"600\">\n    <!-- Content goes here -->\n</Window>",
+      "key_points": [
+        "Always include AvaloniaUI namespace as default",
+        "Include XAML namespace with 'x' prefix",
+        "Set appropriate Title, Width, and Height",
+        "Use x:Class for code-behind connection"
+      ]
+    },
+    "mvvm_window": {
+      "name": "MVVM Window with DataContext",
+      "description": "Window configured for MVVM pattern with ViewModel binding",
+      "xaml": "<Window xmlns=\"https://github.com/avaloniaui\"\n        xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"\n        xmlns:vm=\"using:MyApp.ViewModels\"\n        x:Class=\"MyApp.Views.MainWindow\"\n        x:DataType=\"vm:MainWindowViewModel\"\n        Title=\"{Binding Title}\"\n        Width=\"800\"\n        Height=\"600\">\n    \n    <Design.DataContext>\n        <vm:MainWindowViewModel/>\n    </Design.DataContext>\n    \n    <!-- Content with bindings -->\n</Window>",
+      "key_points": [
+        "Import ViewModels namespace",
+        "Use x:DataType for compiled bindings",
+        "Set Design.DataContext for design-time support",
+        "Bind window properties to ViewModel"
+      ]
+    },
+    "data_binding": {
+      "name": "Data Binding Patterns",
+      "description": "Common data binding scenarios in AvaloniaUI",
+      "xaml": "<!-- Simple Property Binding -->\n<TextBlock Text=\"{Binding UserName}\" />\n\n<!-- Two-Way Binding -->\n<TextBox Text=\"{Binding UserInput, Mode=TwoWay}\" />\n\n<!-- Command Binding -->\n<Button Content=\"Save\" Command=\"{Binding SaveCommand}\" />\n\n<!-- Converter Binding -->\n<TextBlock Text=\"{Binding Count, Converter={StaticResource CountToStringConverter}}\" />\n\n<!-- RelativeSource Binding -->\n<TextBlock Text=\"{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType=Window}}\" />",
+      "key_points": [
+        "Use {Binding PropertyName} for simple bindings",
+        "Specify Mode=TwoWay for input controls",
+        "Commands are bound using Command property",
+        "Use converters for data transformation",
+        "RelativeSource for ancestor bindings"
+      ]
+    },
+    "styles_and_resources": {
+      "name": "Styles and Resources",
+      "description": "Defining and using styles and resources in AvaloniaUI",
+      "xaml": "<Window.Resources>\n    <!-- Colors -->\n    <SolidColorBrush x:Key=\"PrimaryBrush\" Color=\"#FF0078D4\" />\n    \n    <!-- Styles -->\n    <Style Selector=\"Button.primary\">\n        <Setter Property=\"Background\" Value=\"{StaticResource PrimaryBrush}\" />\n        <Setter Property=\"Foreground\" Value=\"White\" />\n        <Setter Property=\"Padding\" Value=\"16,8\" />\n    </Style>\n    \n    <!-- Data Templates -->\n    <DataTemplate x:Key=\"PersonTemplate\" DataType=\"{x:Type vm:Person}\">\n        <StackPanel Orientation=\"Horizontal\">\n            <TextBlock Text=\"{Binding FirstName}\" />\n            <TextBlock Text=\"{Binding LastName}\" Margin=\"5,0,0,0\" />\n        </StackPanel>\n    </DataTemplate>\n</Window.Resources>\n\n<!-- Usage -->\n<Button Classes=\"primary\" Content=\"Primary Button\" />\n<ListBox ItemTemplate=\"{StaticResource PersonTemplate}\" />",
+      "key_points": [
+        "Define resources in Resources section",
+        "Use Selector syntax for styling",
+        "Apply styles using Classes property",
+        "DataTemplates for custom item presentation",
+        "StaticResource for resource references"
+      ]
+    },
+    "layout_grid": {
+      "name": "Grid Layout Pattern",
+      "description": "Using Grid for complex layouts",
+      "xaml": "<Grid>\n    <Grid.RowDefinitions>\n        <RowDefinition Height=\"Auto\" />\n        <RowDefinition Height=\"*\" />\n        <RowDefinition Height=\"Auto\" />\n    </Grid.RowDefinitions>\n    <Grid.ColumnDefinitions>\n        <ColumnDefinition Width=\"200\" />\n        <ColumnDefinition Width=\"*\" />\n    </Grid.ColumnDefinitions>\n    \n    <!-- Header spans all columns -->\n    <TextBlock Grid.Row=\"0\" Grid.ColumnSpan=\"2\" \n               Text=\"Application Header\" \n               Background=\"LightGray\" \n               Padding=\"10\" />\n    \n    <!-- Sidebar -->\n    <StackPanel Grid.Row=\"1\" Grid.Column=\"0\" \n                Background=\"LightBlue\" \n                Margin=\"5\">\n        <Button Content=\"Menu Item 1\" />\n        <Button Content=\"Menu Item 2\" />\n    </StackPanel>\n    \n    <!-- Main content -->\n    <ContentControl Grid.Row=\"1\" Grid.Column=\"1\" \n                    Content=\"{Binding CurrentView}\" \n                    Margin=\"5\" />\n    \n    <!-- Footer -->\n    <StatusBar Grid.Row=\"2\" Grid.ColumnSpan=\"2\">\n        <TextBlock Text=\"Ready\" />\n    </StatusBar>\n</Grid>",
+      "key_points": [
+        "Define rows and columns first",
+        "Use Auto for content-sized rows/columns",
+        "Use * for proportional sizing",
+        "Grid.ColumnSpan for spanning multiple columns",
+        "Grid.Row and Grid.Column for positioning"
+      ]
+    },
+    "user_control": {
+      "name": "Custom UserControl",
+      "description": "Creating reusable UserControl components",
+      "xaml": "<UserControl xmlns=\"https://github.com/avaloniaui\"\n             xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"\n             x:Class=\"MyApp.Controls.PersonCard\">\n    \n    <Border BorderBrush=\"Gray\" \n            BorderThickness=\"1\" \n            CornerRadius=\"5\" \n            Padding=\"10\">\n        <StackPanel>\n            <TextBlock Text=\"{Binding Name}\" \n                       FontWeight=\"Bold\" \n                       FontSize=\"16\" />\n            <TextBlock Text=\"{Binding Email}\" \n                       Foreground=\"Gray\" />\n            <TextBlock Text=\"{Binding Phone}\" \n                       Foreground=\"Gray\" />\n        </StackPanel>\n    </Border>\n</UserControl>",
+      "key_points": [
+        "UserControl for reusable components",
+        "Bind to properties of the DataContext",
+        "Use Border for visual boundaries",
+        "Style with appropriate colors and spacing"
+      ]
+    },
+    "container_queries": {
+      "name": "Container Queries (11.3+)",
+      "description": "CSS-like container queries for responsive styling based on container size",
+      "xaml": "<Border Name=\"ResponsiveContainer\" Background=\"LightBlue\">\n    <Border.Styles>\n        <Style Selector=\"Border\">\n            <Setter Property=\"Padding\" Value=\"10\" />\n        </Style>\n        \n        <!-- Container query: when container width > 300px -->\n        <Style Selector=\"@container(min-width: 300px) Border\">\n            <Setter Property=\"Padding\" Value=\"20\" />\n            <Setter Property=\"Background\" Value=\"LightGreen\" />\n        </Style>\n        \n        <!-- Container query: when container height > 200px -->\n        <Style Selector=\"@container(min-height: 200px) Border\">\n            <Setter Property=\"CornerRadius\" Value=\"10\" />\n        </Style>\n        \n        <!-- Named container queries -->\n        <Style Selector=\"@container card (min-width: 250px) Border\">\n            <Setter Property=\"BorderThickness\" Value=\"2\" />\n        </Style>\n    </Border.Styles>\n    \n    <StackPanel>\n        <TextBlock Text=\"Responsive Content\" FontWeight=\"Bold\" />\n        <TextBlock Text=\"Container adapts based on size\" />\n    </StackPanel>\n</Border>",
+      "key_points": [
+        "Container queries enable responsive design at component level",
+        "Use @container() selector syntax for size-based styling",
+        "Support min-width, max-width, min-height, max-height",
+        "Named containers allow targeting specific containers",
+        "Available in AvaloniaUI 11.3+ as a major new feature"
+      ]
+    },
+    "compiled_bindings": {
+      "name": "Compiled Bindings (Performance)",
+      "description": "High-performance compiled bindings using x:DataType",
+      "xaml": "<UserControl xmlns=\"https://github.com/avaloniaui\"\n             xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"\n             xmlns:vm=\"using:MyApp.ViewModels\"\n             x:Class=\"MyApp.Views.PersonView\"\n             x:DataType=\"vm:PersonViewModel\">\n    \n    <!-- Compiled bindings - faster performance -->\n    <StackPanel>\n        <TextBlock Text=\"{Binding Name}\" FontWeight=\"Bold\" />\n        <TextBlock Text=\"{Binding Email}\" />\n        <TextBlock Text=\"{Binding Age, StringFormat='Age: {0}'}\" />\n        \n        <!-- Compiled binding with converter -->\n        <Border Background=\"{Binding IsActive, Converter={StaticResource BoolToBrushConverter}}\">\n            <TextBlock Text=\"{Binding Status}\" />\n        </Border>\n        \n        <!-- Compiled command binding -->\n        <Button Content=\"Edit\" Command=\"{Binding EditCommand}\" />\n    </StackPanel>\n</UserControl>",
+      "key_points": [
+        "Use x:DataType for compile-time binding validation",
+        "Significantly better performance than reflection-based bindings",
+        "IntelliSense support for binding properties",
+        "Compile-time error checking for invalid bindings",
+        "Recommended for all new AvaloniaUI applications"
+      ]
+    },
+    "advanced_styling": {
+      "name": "Advanced Styling with CSS-like Selectors",
+      "description": "Modern styling using CSS-like selectors and pseudo-classes",
+      "xaml": "<Window.Styles>\n    <!-- Basic selector -->\n    <Style Selector=\"Button\">\n        <Setter Property=\"Padding\" Value=\"12,6\" />\n    </Style>\n    \n    <!-- Class-based selector -->\n    <Style Selector=\"Button.primary\">\n        <Setter Property=\"Background\" Value=\"#007ACC\" />\n        <Setter Property=\"Foreground\" Value=\"White\" />\n    </Style>\n    \n    <!-- Pseudo-class selectors -->\n    <Style Selector=\"Button:pointerover\">\n        <Setter Property=\"Background\" Value=\"#005A9E\" />\n    </Style>\n    \n    <Style Selector=\"Button:pressed\">\n        <Setter Property=\"Background\" Value=\"#004578\" />\n    </Style>\n    \n    <!-- Child combinator -->\n    <Style Selector=\"StackPanel > Button\">\n        <Setter Property=\"Margin\" Value=\"0,5\" />\n    </Style>\n    \n    <!-- Descendant combinator -->\n    <Style Selector=\"Grid TextBlock\">\n        <Setter Property=\"TextAlignment\" Value=\"Center\" />\n    </Style>\n    \n    <!-- Attribute selector -->\n    <Style Selector=\"Button[IsDefault=True]\">\n        <Setter Property=\"BorderBrush\" Value=\"Orange\" />\n        <Setter Property=\"BorderThickness\" Value=\"2\" />\n    </Style>\n    \n    <!-- Template selector -->\n    <Style Selector=\"Button /template/ ContentPresenter\">\n        <Setter Property=\"Opacity\" Value=\"0.9\" />\n    </Style>\n</Window.Styles>",
+      "key_points": [
+        "CSS-like selector syntax for powerful styling",
+        "Pseudo-classes for interactive states (:pointerover, :pressed, :focus)",
+        "Child (>) and descendant combinators for targeting",
+        "Attribute selectors for conditional styling",
+        "Template selectors for styling control templates"
+      ]
+    },
+    "spacing_enhancements": {
+      "name": "Enhanced Spacing Properties (11.3+)",
+      "description": "New spacing properties for layout containers",
+      "xaml": "<!-- DockPanel with spacing -->\n<DockPanel Spacing=\"10\">\n    <Button DockPanel.Dock=\"Top\" Content=\"Header\" />\n    <Button DockPanel.Dock=\"Bottom\" Content=\"Footer\" />\n    <TextBlock Text=\"Main content with proper spacing\" />\n</DockPanel>\n\n<!-- Grid with spacing -->\n<Grid RowSpacing=\"8\" ColumnSpacing=\"12\">\n    <Grid.RowDefinitions>\n        <RowDefinition Height=\"Auto\" />\n        <RowDefinition Height=\"*\" />\n    </Grid.RowDefinitions>\n    <Grid.ColumnDefinitions>\n        <ColumnDefinition Width=\"*\" />\n        <ColumnDefinition Width=\"Auto\" />\n    </Grid.ColumnDefinitions>\n    \n    <TextBlock Grid.Row=\"0\" Grid.Column=\"0\" Text=\"Item 1\" />\n    <Button Grid.Row=\"0\" Grid.Column=\"1\" Content=\"Action\" />\n    <TextBlock Grid.Row=\"1\" Grid.ColumnSpan=\"2\" Text=\"Content\" />\n</Grid>\n\n<!-- WrapPanel with spacing -->\n<WrapPanel Spacing=\"6\">\n    <Button Content=\"Tag 1\" />\n    <Button Content=\"Tag 2\" />\n    <Button Content=\"Tag 3\" />\n    <Button Content=\"Tag 4\" />\n</WrapPanel>",
+      "key_points": [
+        "DockPanel.Spacing property for automatic spacing",
+        "Grid.RowSpacing and Grid.ColumnSpacing properties",
+        "WrapPanel.Spacing for uniform item spacing",
+        "Eliminates need for manual Margin settings",
+        "Available in AvaloniaUI 11.3+ release"
+      ]
+    },
+    "popup_overlay": {
+      "name": "Popup with Overlay Layer (11.3+)",
+      "description": "Enhanced popup control with overlay layer support",
+      "xaml": "<StackPanel>\n    <Button Name=\"TriggerButton\" Content=\"Show Popup\" />\n    \n    <!-- Popup with overlay layer -->\n    <Popup PlacementTarget=\"{Binding ElementName=TriggerButton}\"\n           IsOpen=\"{Binding IsPopupOpen}\"\n           ShouldUseOverlayLayer=\"True\"\n           PlacementMode=\"Bottom\">\n        <Border Background=\"White\" \n                BorderBrush=\"Gray\" \n                BorderThickness=\"1\" \n                CornerRadius=\"4\"\n                BoxShadow=\"0 2 8 rgba(0,0,0,0.15)\">\n            <StackPanel Margin=\"12\">\n                <TextBlock Text=\"Popup Content\" FontWeight=\"Bold\" />\n                <TextBlock Text=\"This popup uses the overlay layer\" />\n                <Button Content=\"Close\" Command=\"{Binding ClosePopupCommand}\" />\n            </StackPanel>\n        </Border>\n    </Popup>\n</StackPanel>",
+      "key_points": [
+        "ShouldUseOverlayLayer property for better rendering",
+        "Improved popup positioning and clipping",
+        "Better support for shadows and effects",
+        "Enhanced popup behavior across platforms",
+        "New feature in AvaloniaUI 11.3+"
+      ]
+    }
+  }
+}

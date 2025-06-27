@@ -1,0 +1,193 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  contents: write
+  packages: write
+
+# Prevent multiple releases from running simultaneously
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  validate-release:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run all tests
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
+    - name: Validate version format
+      run: |
+        VERSION="${GITHUB_REF#refs/tags/}"
+        if [[ $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "✅ Valid version format: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        else
+          echo "❌ Invalid version format: $VERSION"
+          echo "Expected format: v1.0.0"
+          exit 1
+        fi
+
+  build-and-release:
+    name: Build and Release Docker Image
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: validate-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get version
+      run: |
+        VERSION="${GITHUB_REF#refs/tags/}"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "VERSION_NUMBER=${VERSION#v}" >> $GITHUB_ENV
+
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=raw,value=latest
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: build-and-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get version
+      run: |
+        VERSION="${GITHUB_REF#refs/tags/}"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+    - name: Generate release notes
+      run: |
+        cat > release-notes.md << 'EOF'
+        # AvaloniaUI MCP Server ${{ env.VERSION }}
+
+        A comprehensive Model Context Protocol server for AvaloniaUI development assistance.
+
+        ## 🚀 Features
+
+        - **Project Generation**: Create new AvaloniaUI projects with various templates
+        - **XAML Validation**: Validate and convert XAML files
+        - **WPF Migration**: Tools and guidance for migrating from WPF
+        - **Knowledge Base**: Comprehensive AvaloniaUI documentation and examples
+
+        ## 🐳 Docker Usage
+
+        Pull and run the latest version:
+
+        ```bash
+        docker pull ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:${{ env.VERSION }}
+        docker run -it ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:${{ env.VERSION }}
+        ```
+
+        Or use the latest tag:
+
+        ```bash
+        docker pull ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:latest
+        docker run -it ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:latest
+        ```
+
+        ## 🔧 MCP Client Configuration
+
+        For Claude Desktop, add this to your MCP configuration:
+
+        ```json
+        {
+          "mcpServers": {
+            "avaloniaui-mcp": {
+              "command": "docker",
+              "args": [
+                "run", 
+                "--rm", 
+                "-i",
+                "ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:${{ env.VERSION }}"
+              ]
+            }
+          }
+        }
+        ```
+
+        ## 📚 Documentation
+
+        - See README.md for complete setup and usage instructions
+        - Check the repository for the latest documentation
+
+        ---
+
+        **Available Docker Images:**
+        - `ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:${{ env.VERSION }}`
+        - `ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:latest`
+
+        Multi-platform support: linux/amd64, linux/arm64
+        EOF
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.VERSION }}
+        name: AvaloniaUI MCP Server ${{ env.VERSION }}
+        body_path: release-notes.md
+        draft: false
+        prerelease: ${{ contains(env.VERSION, '-') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,155 @@
+# GitHub Pages configuration for AvaloniaUI.MCP
+
+title: AvaloniaUI.MCP
+description: >-
+  A comprehensive Model Context Protocol (MCP) server for AvaloniaUI development.
+  Provides tools, resources, and guidance for building cross-platform applications with ease.
+
+url: "https://decriptor.github.io"
+baseurl: "/AvaloniaUI.MCP"
+repository: decriptor/AvaloniaUI.MCP
+
+# Theme configuration - using default Jekyll with custom styling
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-relative-links
+
+# Site settings
+author: 
+  name: AvaloniaUI.MCP Team
+  email: sshaw@decriptor.com
+  github: decriptor
+
+github:
+  repository_url: "https://github.com/decriptor/AvaloniaUI.MCP"
+  repository_nwo: "decriptor/AvaloniaUI.MCP"
+
+# Navigation structure
+navigation:
+  main:
+    - title: "Home"
+      url: "/"
+    - title: "Quick Start"
+      url: "/docs/quick-start/"
+    - title: "Tools"
+      url: "/docs/tools/"
+    - title: "API Reference"
+      url: "/docs/api/"
+    - title: "Examples"
+      url: "/docs/examples/"
+    - title: "Migration Guide"
+      url: "/docs/migration/"
+    - title: "Contributing"
+      url: "/CONTRIBUTING/"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: true
+
+# Sass configuration for custom styling
+sass:
+  style: compressed
+  sass_dir: _sass
+
+# Custom variables
+custom:
+  version: "1.0.0"
+  dotnet_version: "9.0"
+  mcp_version: "0.3.0"
+
+# Exclude from processing
+exclude:
+  - .gitignore
+  - .github/
+  - src/
+  - tests/
+  - bin/
+  - obj/
+  - "*.sln"
+  - "*.slnx"
+  - "*.csproj"
+  - nuget.config
+  - global.json
+  - "Directory.Build.*"
+  - vendor/
+  - node_modules/
+  - Gemfile
+  - Gemfile.lock
+  - package.json
+  - package-lock.json
+  - tailwind.config.js
+  - postcss.config.js
+
+# Include specific files
+include:
+  - docs/
+  - README.md
+  - CONTRIBUTING.md
+  - LICENSE
+  - _redirects
+
+# Collections
+collections:
+  tools:
+    output: true
+    permalink: /docs/tools/:name/
+  examples:
+    output: true
+    permalink: /docs/examples/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: "docs"
+      type: "pages"
+    values:
+      layout: "docs"
+      nav_section: "docs"
+  - scope:
+      path: "_tools"
+      type: "tools"
+    values:
+      layout: "tool"
+      nav_section: "tools"
+  - scope:
+      path: "_examples"
+      type: "examples"  
+    values:
+      layout: "example"
+      nav_section: "examples"
+
+# SEO and social
+twitter:
+  username: AvaloniaUI
+  card: summary_large_image
+
+social:
+  name: AvaloniaUI.MCP
+  links:
+    - https://github.com/decriptor/AvaloniaUI.MCP
+
+# Enable relative links processing
+relative_links:
+  enabled: true
+  collections: true
+
+# Feed configuration
+feed:
+  posts_limit: 10
+  excerpt_only: true

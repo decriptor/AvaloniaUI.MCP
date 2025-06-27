@@ -1,0 +1,215 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'index.md'
+      - '_config.yml'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'index.md'
+      - '_config.yml'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Create Gemfile
+        run: |
+          cat > Gemfile << EOF
+          source "https://rubygems.org"
+          gem "github-pages", group: :jekyll_plugins
+          gem "jekyll-include-cache", group: :jekyll_plugins
+          gem "jekyll-sitemap", group: :jekyll_plugins
+          gem "jekyll-seo-tag", group: :jekyll_plugins
+          gem "jekyll-feed", group: :jekyll_plugins
+          EOF
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
+
+      - name: Setup .NET for documentation generation
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Generate dynamic documentation
+        run: |
+          # Create documentation directories
+          mkdir -p docs/api docs/tools docs/examples docs/migration
+          
+          # Generate comprehensive tools documentation
+          cat > docs/tools/index.md << 'EOF'
+          ---
+          layout: docs
+          title: "Tools Reference"
+          description: "Complete reference for all AvaloniaUI.MCP development tools"
+          nav_section: tools
+          ---
+
+          # Tools Reference
+
+          AvaloniaUI.MCP provides a comprehensive suite of development tools designed to accelerate your AvaloniaUI development workflow. Each tool is built with enterprise-grade reliability and integrates seamlessly with your MCP client.
+
+          ## Core Development Tools
+
+          ### Project Generation
+          - **[ProjectGeneratorTool](./project-generator/)** - Create new AvaloniaUI projects with MVVM, basic, or cross-platform templates
+          - **[ArchitectureTemplateTool](./architecture-template/)** - Generate enterprise-ready architectural patterns and structures
+
+          ### Validation & Quality
+          - **[XamlValidationTool](./xaml-validation/)** - Validate AvaloniaUI XAML syntax and suggest improvements
+          - **[DiagnosticTool](./diagnostic/)** - Monitor server health, performance metrics, and system diagnostics
+          - **[SecurityPatternTool](./security/)** - Implement secure coding patterns and vulnerability assessments
+
+          ## UI Development Tools
+
+          ### Theming & Styling
+          - **[ThemingTool](./theming/)** - Create comprehensive theming systems with dark/light mode support
+          - **[CustomControlGenerator](./custom-controls/)** - Build reusable UI components with proper templating
+          - **[AnimationTool](./animation/)** - Create smooth animations and transitions
+
+          ### Design & Layout
+          - **[UIUXDesignTool](./ui-ux-design/)** - Design assistance for responsive layouts and user experience
+          - **[AccessibilityTool](./accessibility/)** - Ensure accessibility compliance and inclusive design
+
+          ## Enterprise & Integration
+
+          ### API & Data Integration
+          - **[APIIntegrationTool](./api-integration/)** - REST/GraphQL integration with authentication and error handling
+          - **[DataAccessPatternTool](./data-access/)** - Database integration patterns and ORM setup
+          - **[ServiceLayerTool](./service-layer/)** - Service architecture and dependency injection patterns
+
+          ### Localization & Testing
+          - **[LocalizationTool](./localization/)** - Multi-language support and resource management
+          - **[TestingIntegrationTool](./testing/)** - Unit testing, integration testing, and test automation
+          - **[PerformanceAnalysisTool](./performance/)** - Performance profiling and optimization recommendations
+
+          ## Usage Examples
+
+          ### Basic Commands
+          ```
+          "Create a new AvaloniaUI MVVM project called MyApp"
+          "Validate this XAML code for best practices"
+          "Generate a secure JWT authentication pattern"
+          "Create a dark theme for my application"
+          ```
+
+          ### Advanced Workflows
+          ```
+          "Set up a cross-platform app with API integration and localization"
+          "Generate a complete MVVM architecture with navigation and DI"
+          "Create accessibility-compliant forms with validation"
+          "Implement performance monitoring and telemetry"
+          ```
+
+          ## Tool Categories
+
+          | Category | Tools | Use Cases |
+          |----------|-------|-----------|
+          | **Core Development** | ProjectGenerator, XamlValidation, Diagnostic | Project setup, validation, monitoring |
+          | **UI/UX Design** | Theming, CustomControl, Animation, UIUXDesign | Visual design, user experience |
+          | **Enterprise** | Security, Performance, Testing, Architecture | Production-ready applications |
+          | **Integration** | API, DataAccess, ServiceLayer, Localization | External services and data |
+
+          ## Getting Started
+
+          1. **Choose your tool** based on your current need
+          2. **Review the tool documentation** for specific parameters and options
+          3. **Use natural language** to describe what you want to accomplish
+          4. **Iterate and refine** based on the tool's output and suggestions
+
+          ## Best Practices
+
+          - Start with **ProjectGeneratorTool** for new projects
+          - Use **XamlValidationTool** regularly during development
+          - Implement **SecurityPatternTool** early in the development cycle
+          - Leverage **DiagnosticTool** for performance monitoring
+          - Apply **AccessibilityTool** for inclusive design compliance
+
+          ---
+
+          Need help getting started? Check out our [Quick Start Guide]({{ '/docs/quick-start/' | relative_url }}) or explore [practical examples]({{ '/docs/examples/' | relative_url }}).
+          EOF
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Generate documentation metrics
+  metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Calculate documentation metrics
+        run: |
+          echo "## Documentation Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Documentation Files | $(find docs -name '*.md' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool Documentation Pages | $(find docs/tools -name '*.md' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Example Pages | $(find docs/examples -name '*.md' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Lines of Documentation | $(find docs -name '*.md' -exec wc -l {} + | tail -n 1 | awk '{print $1}') |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📖 **Documentation Site**: ${{ steps.deployment.outputs.page_url || 'Building...' }}" >> $GITHUB_STEP_SUMMARY

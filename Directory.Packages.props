@@ -1,0 +1,52 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- MCP SDK -->
+    <PackageVersion Include="ModelContextProtocol" Version="0.3.0-preview.1" />
+    <PackageVersion Include="ModelContextProtocol.Core" Version="0.3.0-preview.1" />
+    
+    <!-- Avalonia packages for project generation -->
+    <PackageVersion Include="Avalonia" Version="11.3.1" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.1" />
+    <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.1" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.1" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.1" />
+    
+    <!-- JSON handling -->
+    <PackageVersion Include="System.Text.Json" Version="9.0.6" />
+    
+    <!-- HTTP client for web requests -->
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.6" />
+    
+    <!-- Logging -->
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.6" />
+    
+    <!-- Telemetry and Observability -->
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="9.0.6" />
+    <PackageVersion Include="OpenTelemetry" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.12.0" />
+    
+    <!-- Dependency Injection -->
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+    
+    <!-- Configuration -->
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.6" />
+    
+    <!-- XML/XAML processing -->
+    <PackageVersion Include="System.Xml.XDocument" Version="4.3.0" />
+    
+    <!-- Sentry Error Tracking -->
+    <PackageVersion Include="Sentry" Version="5.11.2" />
+    <PackageVersion Include="Sentry.Extensions.Logging" Version="5.11.1" />
+    
+    <!-- Testing - Using MSTest SDK 3.9.3 for modern MSTest experience -->
+    <!-- MSTest.Sdk includes all necessary packages: TestFramework, TestAdapter, Analyzers, TRX, CodeCoverage -->
+  </ItemGroup>
+</Project>

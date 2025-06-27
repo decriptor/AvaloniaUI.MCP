@@ -1,0 +1,309 @@
+{
+  "wpf_to_avalonia_migration": {
+    "namespace_changes": {
+      "description": "Required namespace changes when migrating from WPF to AvaloniaUI",
+      "changes": [
+        {
+          "from": "http://schemas.microsoft.com/winfx/2006/xaml/presentation",
+          "to": "https://github.com/avaloniaui",
+          "description": "Replace WPF presentation namespace with AvaloniaUI"
+        },
+        {
+          "from": "xmlns:sys=\"clr-namespace:System;assembly=mscorlib\"",
+          "to": "xmlns:sys=\"clr-namespace:System\"",
+          "description": "Simplified system namespace reference"
+        }
+      ]
+    },
+    "file_extensions": {
+      "description": "File extension changes needed for AvaloniaUI",
+      "changes": [
+        {
+          "from": ".xaml",
+          "to": ".axaml",
+          "description": "AvaloniaUI uses .axaml extension for XAML files",
+          "note": "Both .xaml and .axaml work, but .axaml is recommended"
+        }
+      ]
+    },
+    "control_mappings": {
+      "description": "Control mappings from WPF to AvaloniaUI",
+      "available_controls": [
+        {
+          "wpf_control": "Button",
+          "avalonia_control": "Button",
+          "compatibility": "Full",
+          "notes": "Fully compatible, same properties and events"
+        },
+        {
+          "wpf_control": "TextBox",
+          "avalonia_control": "TextBox",
+          "compatibility": "Full",
+          "notes": "Fully compatible, same properties and events"
+        },
+        {
+          "wpf_control": "TextBlock",
+          "avalonia_control": "TextBlock",
+          "compatibility": "Full",
+          "notes": "Fully compatible, same properties and events"
+        },
+        {
+          "wpf_control": "Grid",
+          "avalonia_control": "Grid",
+          "compatibility": "Full",
+          "notes": "Fully compatible with same row/column definition syntax"
+        },
+        {
+          "wpf_control": "StackPanel",
+          "avalonia_control": "StackPanel",
+          "compatibility": "Full",
+          "notes": "Fully compatible, includes Spacing property"
+        },
+        {
+          "wpf_control": "Canvas",
+          "avalonia_control": "Canvas",
+          "compatibility": "Full",
+          "notes": "Fully compatible for absolute positioning"
+        },
+        {
+          "wpf_control": "DockPanel",
+          "avalonia_control": "DockPanel",
+          "compatibility": "Full",
+          "notes": "Fully compatible with same docking behavior"
+        },
+        {
+          "wpf_control": "Border",
+          "avalonia_control": "Border",
+          "compatibility": "Full",
+          "notes": "Fully compatible for borders and backgrounds"
+        },
+        {
+          "wpf_control": "ScrollViewer",
+          "avalonia_control": "ScrollViewer",
+          "compatibility": "Full",
+          "notes": "Fully compatible with scrolling functionality"
+        },
+        {
+          "wpf_control": "TabControl",
+          "avalonia_control": "TabControl",
+          "compatibility": "Full",
+          "notes": "Fully compatible with tab functionality"
+        },
+        {
+          "wpf_control": "ListBox",
+          "avalonia_control": "ListBox",
+          "compatibility": "Full",
+          "notes": "Fully compatible with selection and data binding"
+        },
+        {
+          "wpf_control": "ComboBox",
+          "avalonia_control": "ComboBox",
+          "compatibility": "Full",
+          "notes": "Fully compatible with dropdown functionality"
+        },
+        {
+          "wpf_control": "CheckBox",
+          "avalonia_control": "CheckBox",
+          "compatibility": "Full",
+          "notes": "Fully compatible with three-state support"
+        },
+        {
+          "wpf_control": "RadioButton",
+          "avalonia_control": "RadioButton",
+          "compatibility": "Full",
+          "notes": "Fully compatible with grouping functionality"
+        },
+        {
+          "wpf_control": "Image",
+          "avalonia_control": "Image",
+          "compatibility": "Full",
+          "notes": "Fully compatible with various image sources"
+        },
+        {
+          "wpf_control": "ProgressBar",
+          "avalonia_control": "ProgressBar",
+          "compatibility": "Full",
+          "notes": "Fully compatible with progress indication"
+        },
+        {
+          "wpf_control": "Slider",
+          "avalonia_control": "Slider",
+          "compatibility": "Full",
+          "notes": "Fully compatible with value selection"
+        },
+        {
+          "wpf_control": "DataGrid",
+          "avalonia_control": "DataGrid",
+          "compatibility": "Partial",
+          "notes": "Available but some advanced features may differ"
+        },
+        {
+          "wpf_control": "TreeView",
+          "avalonia_control": "TreeView",
+          "compatibility": "Full",
+          "notes": "Fully compatible with hierarchical data binding and TreeDataTemplate"
+        },
+        {
+          "wpf_control": "Calendar",
+          "avalonia_control": "Calendar",
+          "compatibility": "Full",
+          "notes": "Full calendar functionality with date selection and ranges"
+        },
+        {
+          "wpf_control": "DatePicker",
+          "avalonia_control": "DatePicker",
+          "compatibility": "Full",
+          "notes": "Spinner-based date selection with customizable format"
+        },
+        {
+          "wpf_control": "Menu",
+          "avalonia_control": "Menu",
+          "compatibility": "Full",
+          "notes": "Full menu functionality with MenuItem hierarchy"
+        },
+        {
+          "wpf_control": "ContextMenu",
+          "avalonia_control": "ContextMenu",
+          "compatibility": "Full",
+          "notes": "Right-click context menus with full functionality"
+        },
+        {
+          "wpf_control": "ToolTip",
+          "avalonia_control": "ToolTip",
+          "compatibility": "Full",
+          "notes": "Tooltip functionality with placement and timing options"
+        },
+        {
+          "wpf_control": "Popup",
+          "avalonia_control": "Popup",
+          "compatibility": "Enhanced",
+          "notes": "Enhanced in 11.3+ with ShouldUseOverlayLayer property"
+        }
+      ],
+      "unavailable_controls": [
+        {
+          "wpf_control": "RichTextBox",
+          "alternative": "TextBox with AcceptsReturn=True",
+          "notes": "No direct equivalent, use TextBox for simple rich text scenarios"
+        },
+        {
+          "wpf_control": "WebBrowser",
+          "alternative": "Use external web view component",
+          "notes": "No built-in web browser control"
+        },
+        {
+          "wpf_control": "DocumentViewer",
+          "alternative": "Custom implementation needed",
+          "notes": "Document viewing requires custom solution"
+        }
+      ]
+    },
+    "binding_changes": {
+      "description": "Data binding differences between WPF and AvaloniaUI",
+      "compatible_bindings": [
+        "{Binding PropertyName}",
+        "{Binding Path=PropertyName}",
+        "{Binding PropertyName, Mode=TwoWay}",
+        "{Binding PropertyName, Converter={StaticResource MyConverter}}",
+        "{Binding DataContext.PropertyName, RelativeSource={RelativeSource AncestorType=Window}}"
+      ],
+      "unsupported_bindings": [
+        {
+          "wpf_syntax": "{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}",
+          "avalonia_alternative": "{Binding $parent[UserControl].PropertyName}",
+          "notes": "Use $parent syntax instead of FindAncestor"
+        }
+      ],
+      "new_features": [
+        {
+          "feature": "Compiled Bindings",
+          "syntax": "x:DataType=\"vm:MyViewModel\"",
+          "description": "AvaloniaUI supports compiled bindings for better performance"
+        },
+        {
+          "feature": "Container Queries (11.3+)",
+          "syntax": "@container(min-width: 300px) Button",
+          "description": "CSS-like container queries for responsive component design"
+        },
+        {
+          "feature": "Enhanced Spacing (11.3+)",
+          "syntax": "Grid RowSpacing=\"8\" ColumnSpacing=\"12\"",
+          "description": "Built-in spacing properties for layout containers"
+        }
+      ]
+    },
+    "styling_changes": {
+      "description": "Styling system differences between WPF and AvaloniaUI",
+      "wpf_style": "<Style TargetType=\"Button\">",
+      "avalonia_style": "<Style Selector=\"Button\">",
+      "notes": "AvaloniaUI uses CSS-like selectors instead of TargetType",
+      "selector_examples": [
+        "Button - targets all buttons",
+        "Button.primary - buttons with 'primary' class",
+        "Button:pointerover - buttons on hover",
+        "#MyButton - button with Name='MyButton'",
+        "StackPanel > Button - direct child buttons of StackPanel"
+      ]
+    },
+    "dependency_properties": {
+      "description": "Dependency Property migration to AvaloniaProperty",
+      "wpf_example": "public static readonly DependencyProperty MyPropertyProperty = DependencyProperty.Register(\\\"MyProperty\\\", typeof(string), typeof(MyControl));",
+      "avalonia_example": "public static readonly StyledProperty<string> MyPropertyProperty = AvaloniaProperty.Register<MyControl, string>(nameof(MyProperty));",
+      "notes": "AvaloniaProperty system is similar but uses different syntax"
+    },
+    "platform_differences": {
+      "description": "Platform-specific considerations when migrating",
+      "windows": {
+        "compatibility": "High",
+        "notes": "Most features work as expected on Windows"
+      },
+      "macos": {
+        "compatibility": "High",
+        "notes": "Native look and feel on macOS",
+        "considerations": ["Menu handling differences", "Window chrome behavior"]
+      },
+      "linux": {
+        "compatibility": "High",
+        "notes": "Works well on various Linux distributions",
+        "considerations": ["Font rendering differences", "Theme integration"]
+      },
+      "mobile": {
+        "compatibility": "Partial",
+        "notes": "Mobile support available but requires adaptation",
+        "considerations": ["Touch input", "Screen size adaptation", "Platform-specific controls"]
+      }
+    },
+    "common_migration_steps": [
+      {
+        "step": 1,
+        "action": "Update project file",
+        "description": "Replace WPF references with AvaloniaUI packages"
+      },
+      {
+        "step": 2,
+        "action": "Update namespaces",
+        "description": "Change XAML namespaces from WPF to AvaloniaUI"
+      },
+      {
+        "step": 3,
+        "action": "Rename XAML files",
+        "description": "Change .xaml extensions to .axaml (optional but recommended)"
+      },
+      {
+        "step": 4,
+        "action": "Update styles",
+        "description": "Convert WPF styles to AvaloniaUI selector syntax"
+      },
+      {
+        "step": 5,
+        "action": "Test on target platforms",
+        "description": "Verify functionality on all target platforms"
+      },
+      {
+        "step": 6,
+        "action": "Optimize for cross-platform",
+        "description": "Adapt UI for different platform conventions"
+      }
+    ]
+  }
+}

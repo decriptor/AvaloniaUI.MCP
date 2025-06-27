@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Explicit security permissions (2025 best practice)
+permissions:
+  contents: read
+  packages: read
+  security-events: write
+  pull-requests: write
+
+# Environment variables
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+# Concurrency control to prevent multiple runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Single comprehensive job that combines build, test, and quality checks
+  build-and-test:
+    name: Build, Test & Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Required for better caching and analysis
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
+    # Advanced caching strategy
+    - name: Cache .NET packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.nuget/packages
+          ~/.dotnet
+        key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj', '**/*.props', '**/global.json') }}
+        restore-keys: |
+          ${{ runner.os }}-dotnet-
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    # Comprehensive test execution
+    - name: Run tests with coverage
+      run: |
+        dotnet test \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./TestResults \
+          --logger "trx;LogFileName=test-results.trx"
+
+    # Security and quality checks
+    - name: Security and quality analysis
+      run: |
+        echo "Running security checks..."
+        
+        # Vulnerability check
+        dotnet list package --vulnerable --include-transitive || echo "No vulnerabilities found"
+        
+        # Outdated packages check (non-blocking)
+        echo "Checking for outdated packages..."
+        dotnet list package --outdated || echo "Package check completed"
+
+    # Functional testing (only if core tests pass)
+    - name: Functional tests
+      run: |
+        echo "Testing MCP Server functionality..."
+        
+        # Test server startup with timeout
+        if timeout 5s dotnet run --project src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj > server_output.log 2>&1; then
+          echo "✅ Server ran without immediate errors"
+        else
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -eq 124 ]; then
+            echo "✅ Server started successfully (timeout reached as expected)"
+          else
+            echo "❌ Server failed with exit code: $EXIT_CODE"
+            cat server_output.log
+            exit 1
+          fi
+        fi
+        
+        # Validate JSON data files
+        for file in src/AvaloniaUI.MCP/Data/*.json; do
+          if [[ -f "$file" ]]; then
+            python3 -m json.tool "$file" > /dev/null || {
+              echo "❌ Invalid JSON in $file"
+              exit 1
+            }
+          fi
+        done
+        
+        echo "✅ Functional tests completed"
+
+    # Upload test results and coverage
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          ./TestResults/**/*.trx
+          ./TestResults/**/*.xml
+        retention-days: 7
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      if: success()
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./TestResults
+        fail_ci_if_error: false
+        verbose: false
+
+

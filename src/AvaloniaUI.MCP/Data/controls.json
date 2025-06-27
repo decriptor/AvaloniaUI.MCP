@@ -1,0 +1,224 @@
+{
+  "avaloniaui_controls": {
+    "layout_controls": {
+      "Grid": {
+        "description": "Arranges child elements in rows and columns",
+        "xaml_example": "<Grid><Grid.RowDefinitions><RowDefinition Height=\"*\"/><RowDefinition Height=\"Auto\"/></Grid.RowDefinitions><TextBlock Grid.Row=\"0\" Text=\"Content\"/><Button Grid.Row=\"1\" Content=\"Button\"/></Grid>",
+        "properties": ["RowDefinitions", "ColumnDefinitions", "ShowGridLines"],
+        "usage": "Best for complex layouts with multiple rows and columns"
+      },
+      "StackPanel": {
+        "description": "Arranges child elements in a single line horizontally or vertically",
+        "xaml_example": "<StackPanel Orientation=\"Vertical\" Spacing=\"10\"><TextBlock Text=\"Item 1\"/><TextBlock Text=\"Item 2\"/></StackPanel>",
+        "properties": ["Orientation", "Spacing"],
+        "usage": "Ideal for simple vertical or horizontal layouts"
+      },
+      "DockPanel": {
+        "description": "Arranges child elements around the edges of the panel",
+        "xaml_example": "<DockPanel><Button DockPanel.Dock=\"Top\" Content=\"Top\"/><Button DockPanel.Dock=\"Bottom\" Content=\"Bottom\"/><TextBlock Text=\"Fill\"/></DockPanel>",
+        "properties": ["LastChildFill"],
+        "usage": "Perfect for application layouts with headers, footers, and main content"
+      },
+      "Canvas": {
+        "description": "Positions child elements using explicit coordinates",
+        "xaml_example": "<Canvas><Button Canvas.Left=\"50\" Canvas.Top=\"30\" Content=\"Positioned\"/></Canvas>",
+        "properties": ["Left", "Top", "Right", "Bottom"],
+        "usage": "Use for absolute positioning scenarios"
+      },
+      "WrapPanel": {
+        "description": "Arranges child elements in sequential position, breaking content to the next line when no more room",
+        "xaml_example": "<WrapPanel><Button Content=\"Button 1\"/><Button Content=\"Button 2\"/><Button Content=\"Button 3\"/></WrapPanel>",
+        "properties": ["Orientation", "ItemWidth", "ItemHeight"],
+        "usage": "Good for tag-like layouts or flowing content"
+      }
+    },
+    "input_controls": {
+      "Button": {
+        "description": "Represents a clickable button control",
+        "xaml_example": "<Button Content=\"Click Me\" Command=\"{Binding MyCommand}\"/>",
+        "properties": ["Content", "Command", "CommandParameter", "IsDefault", "IsCancel"],
+        "usage": "Primary action trigger in user interfaces"
+      },
+      "TextBox": {
+        "description": "Allows users to enter and edit text",
+        "xaml_example": "<TextBox Text=\"{Binding UserInput}\" Watermark=\"Enter text here\"/>",
+        "properties": ["Text", "Watermark", "AcceptsReturn", "MaxLength", "IsReadOnly"],
+        "usage": "Text input for forms and data entry"
+      },
+      "CheckBox": {
+        "description": "Provides a way to select or deselect an option",
+        "xaml_example": "<CheckBox Content=\"Enable notifications\" IsChecked=\"{Binding IsEnabled}\"/>",
+        "properties": ["IsChecked", "Content", "IsThreeState"],
+        "usage": "Boolean choices and option selection"
+      },
+      "RadioButton": {
+        "description": "Allows users to select one option from a group",
+        "xaml_example": "<RadioButton Content=\"Option A\" GroupName=\"MyGroup\" IsChecked=\"{Binding SelectedOption}\"/>",
+        "properties": ["IsChecked", "Content", "GroupName"],
+        "usage": "Mutually exclusive choices"
+      },
+      "Slider": {
+        "description": "Allows users to select a numeric value from a range",
+        "xaml_example": "<Slider Minimum=\"0\" Maximum=\"100\" Value=\"{Binding SliderValue}\"/>",
+        "properties": ["Minimum", "Maximum", "Value", "TickFrequency", "IsSnapToTickEnabled"],
+        "usage": "Numeric value selection within a range"
+      }
+    },
+    "display_controls": {
+      "TextBlock": {
+        "description": "Displays read-only text",
+        "xaml_example": "<TextBlock Text=\"{Binding DisplayText}\" FontSize=\"16\" FontWeight=\"Bold\"/>",
+        "properties": ["Text", "FontSize", "FontWeight", "Foreground", "TextWrapping"],
+        "usage": "Displaying labels, titles, and read-only text"
+      },
+      "Image": {
+        "description": "Displays images from various sources",
+        "xaml_example": "<Image Source=\"/Assets/logo.png\" Width=\"100\" Height=\"100\"/>",
+        "properties": ["Source", "Stretch", "Width", "Height"],
+        "usage": "Displaying graphics and images"
+      },
+      "ProgressBar": {
+        "description": "Shows the progress of an operation",
+        "xaml_example": "<ProgressBar Value=\"{Binding Progress}\" Minimum=\"0\" Maximum=\"100\"/>",
+        "properties": ["Value", "Minimum", "Maximum", "IsIndeterminate"],
+        "usage": "Indicating progress of long-running operations"
+      }
+    },
+    "selection_controls": {
+      "ComboBox": {
+        "description": "Provides a dropdown list of items for selection",
+        "xaml_example": "<ComboBox ItemsSource=\"{Binding Items}\" SelectedItem=\"{Binding SelectedItem}\"/>",
+        "properties": ["ItemsSource", "SelectedItem", "SelectedIndex", "IsDropDownOpen"],
+        "usage": "Single selection from a list of options"
+      },
+      "ListBox": {
+        "description": "Displays a list of items that can be selected",
+        "xaml_example": "<ListBox ItemsSource=\"{Binding Items}\" SelectedItem=\"{Binding SelectedItem}\"/>",
+        "properties": ["ItemsSource", "SelectedItem", "SelectedItems", "SelectionMode"],
+        "usage": "Single or multiple selection from a visible list"
+      },
+      "DataGrid": {
+        "description": "Displays data in a tabular format with sorting and editing capabilities",
+        "xaml_example": "<DataGrid ItemsSource=\"{Binding TableData}\" AutoGenerateColumns=\"True\"/>",
+        "properties": ["ItemsSource", "Columns", "AutoGenerateColumns", "CanUserAddRows"],
+        "usage": "Displaying and editing tabular data"
+      }
+    },
+    "container_controls": {
+      "TabControl": {
+        "description": "Organizes content into tabs",
+        "xaml_example": "<TabControl><TabItem Header=\"Tab 1\"><TextBlock Text=\"Content 1\"/></TabItem><TabItem Header=\"Tab 2\"><TextBlock Text=\"Content 2\"/></TabItem></TabControl>",
+        "properties": ["SelectedIndex", "SelectedItem", "TabStripPlacement"],
+        "usage": "Organizing related content into tabs"
+      },
+      "Expander": {
+        "description": "Provides an expandable/collapsible content area",
+        "xaml_example": "<Expander Header=\"Details\" IsExpanded=\"{Binding ShowDetails}\"><TextBlock Text=\"Detailed information\"/></Expander>",
+        "properties": ["Header", "IsExpanded", "ExpandDirection"],
+        "usage": "Collapsible sections and progressive disclosure"
+      },
+      "ScrollViewer": {
+        "description": "Provides scrolling capabilities for content",
+        "xaml_example": "<ScrollViewer><StackPanel><!-- Long content here --></StackPanel></ScrollViewer>",
+        "properties": ["VerticalScrollBarVisibility", "HorizontalScrollBarVisibility", "ZoomMode"],
+        "usage": "Scrolling large content areas"
+      },
+      "Border": {
+        "description": "Draws a border, background, or both around a child element",
+        "xaml_example": "<Border BorderBrush=\"Black\" BorderThickness=\"2\" CornerRadius=\"5\" Background=\"LightGray\"><TextBlock Text=\"Bordered content\"/></Border>",
+        "properties": ["BorderBrush", "BorderThickness", "CornerRadius", "Background", "Padding"],
+        "usage": "Visual boundaries and backgrounds for other controls"
+      },
+      "Popup": {
+        "description": "Displays content on top of existing content, within the bounds of the application window",
+        "xaml_example": "<Popup IsOpen=\"{Binding ShowPopup}\" PlacementTarget=\"{Binding ElementName=MyButton}\"><Border Background=\"White\" BorderBrush=\"Black\" BorderThickness=\"1\"><TextBlock Text=\"Popup content\"/></Border></Popup>",
+        "properties": ["IsOpen", "PlacementTarget", "Placement", "ShouldUseOverlayLayer"],
+        "usage": "Tooltips, dropdown menus, and overlay content"
+      }
+    },
+    "navigation_controls": {
+      "TreeView": {
+        "description": "Displays hierarchical data in a tree structure with expanding/collapsing nodes",
+        "xaml_example": "<TreeView ItemsSource=\"{Binding TreeNodes}\"><TreeView.ItemTemplate><TreeDataTemplate ItemsSource=\"{Binding Children}\"><TextBlock Text=\"{Binding Name}\"/></TreeDataTemplate></TreeView.ItemTemplate></TreeView>",
+        "properties": ["ItemsSource", "SelectedItem", "AutoScrollToSelectedItem"],
+        "usage": "File explorers, organizational hierarchies, nested data structures"
+      },
+      "Menu": {
+        "description": "Represents a Windows menu control that enables hierarchical organization of menu items",
+        "xaml_example": "<Menu><MenuItem Header=\"File\"><MenuItem Header=\"New\" Command=\"{Binding NewCommand}\"/><MenuItem Header=\"Open\" Command=\"{Binding OpenCommand}\"/></MenuItem></Menu>",
+        "properties": ["Items", "IsMainMenu"],
+        "usage": "Application main menus and menu bars"
+      },
+      "ContextMenu": {
+        "description": "Represents a pop-up menu that enables a control to expose functionality specific to the context of the control",
+        "xaml_example": "<Button Content=\"Right-click me\"><Button.ContextMenu><ContextMenu><MenuItem Header=\"Copy\"/><MenuItem Header=\"Paste\"/></ContextMenu></Button.ContextMenu></Button>",
+        "properties": ["Items", "PlacementTarget", "IsOpen"],
+        "usage": "Right-click context menus for controls"
+      },
+      "MenuItem": {
+        "description": "Represents a selectable item inside a Menu or ContextMenu",
+        "xaml_example": "<MenuItem Header=\"Edit\" Command=\"{Binding EditCommand}\" InputGesture=\"Ctrl+E\"/>",
+        "properties": ["Header", "Command", "CommandParameter", "InputGesture", "Icon", "IsChecked"],
+        "usage": "Individual items within menus"
+      }
+    },
+    "date_time_controls": {
+      "Calendar": {
+        "description": "Represents a control that enables a user to select a date by using a visual calendar display",
+        "xaml_example": "<Calendar SelectedDate=\"{Binding SelectedDate}\" DisplayDateStart=\"{Binding MinDate}\" DisplayDateEnd=\"{Binding MaxDate}\"/>",
+        "properties": ["SelectedDate", "SelectedDates", "DisplayDate", "DisplayDateStart", "DisplayDateEnd", "SelectionMode", "BlackoutDates"],
+        "usage": "Date selection with visual calendar interface"
+      },
+      "DatePicker": {
+        "description": "Represents a control that allows the user to select a date by using a spinner control",
+        "xaml_example": "<DatePicker SelectedDate=\"{Binding BirthDate}\" DayVisible=\"True\" MonthVisible=\"True\" YearVisible=\"True\"/>",
+        "properties": ["SelectedDate", "DayVisible", "MonthVisible", "YearVisible", "DayFormat", "MonthFormat", "YearFormat"],
+        "usage": "Compact date selection with spinner interface"
+      },
+      "CalendarDatePicker": {
+        "description": "Represents a control that allows the user to pick a date from a calendar display or by entering text",
+        "xaml_example": "<CalendarDatePicker Date=\"{Binding SelectedDate}\" PlaceholderText=\"Select a date\" IsCalendarOpen=\"{Binding IsCalendarOpen}\"/>",
+        "properties": ["Date", "PlaceholderText", "IsCalendarOpen", "DateFormat", "MaxDate", "MinDate"],
+        "usage": "Flexible date selection with both text input and calendar popup"
+      },
+      "TimePicker": {
+        "description": "Represents a control that allows the user to select a time value",
+        "xaml_example": "<TimePicker SelectedTime=\"{Binding MeetingTime}\" MinuteIncrement=\"15\" ClockIdentifier=\"12HourClock\"/>",
+        "properties": ["SelectedTime", "MinuteIncrement", "ClockIdentifier"],
+        "usage": "Time selection with spinner or clock interface"
+      }
+    },
+    "advanced_controls": {
+      "AutoCompleteBox": {
+        "description": "Represents a control that provides a text box for user input and a drop-down that contains possible matches",
+        "xaml_example": "<AutoCompleteBox ItemsSource=\"{Binding Suggestions}\" Text=\"{Binding SearchText}\" MinimumPrefixLength=\"2\" FilterMode=\"StartsWith\"/>",
+        "properties": ["ItemsSource", "Text", "MinimumPrefixLength", "FilterMode", "IsTextCompletionEnabled"],
+        "usage": "Search boxes with auto-completion functionality"
+      },
+      "NumericUpDown": {
+        "description": "Represents a control for entering numeric values with up/down buttons",
+        "xaml_example": "<NumericUpDown Value=\"{Binding Quantity}\" Minimum=\"0\" Maximum=\"100\" Increment=\"1\" FormatString=\"N0\"/>",
+        "properties": ["Value", "Minimum", "Maximum", "Increment", "FormatString", "IsReadOnly"],
+        "usage": "Numeric input with increment/decrement buttons"
+      },
+      "ToolTip": {
+        "description": "Represents a control that creates a pop-up window that displays information for an element",
+        "xaml_example": "<Button Content=\"Hover me\"><ToolTip.Tip><ToolTip Content=\"This is a tooltip with additional information\"/></ToolTip.Tip></Button>",
+        "properties": ["Content", "Placement", "ShowDelay", "IsOpen"],
+        "usage": "Contextual help and additional information on hover"
+      },
+      "Flyout": {
+        "description": "Represents a control that displays lightweight UI that is either information, or requires user interaction",
+        "xaml_example": "<Button Content=\"Show Flyout\"><Button.Flyout><Flyout><StackPanel><TextBlock Text=\"Flyout content\"/><Button Content=\"Action\"/></StackPanel></Flyout></Button.Flyout></Button>",
+        "properties": ["Content", "Placement", "ShowMode", "IsOpen"],
+        "usage": "Lightweight dialogs and context-sensitive UI"
+      },
+      "SplitView": {
+        "description": "Represents a container with two views; one view for the main content and another view that is typically used for navigation commands",
+        "xaml_example": "<SplitView IsPaneOpen=\"{Binding IsPaneOpen}\" DisplayMode=\"Overlay\" PaneBackground=\"LightGray\"><SplitView.Pane><ListBox ItemsSource=\"{Binding NavigationItems}\"/></SplitView.Pane><SplitView.Content><ContentControl Content=\"{Binding CurrentView}\"/></SplitView.Content></SplitView>",
+        "properties": ["IsPaneOpen", "DisplayMode", "OpenPaneLength", "PaneBackground", "CompactPaneLength"],
+        "usage": "Navigation panes and master-detail layouts"
+      }
+    }
+  }
+}
