@@ -1,0 +1,128 @@
+{
+  "avaloniaui_controls": {
+    "layout_controls": {
+      "Grid": {
+        "description": "Arranges child elements in rows and columns",
+        "xaml_example": "<Grid><Grid.RowDefinitions><RowDefinition Height=\"*\"/><RowDefinition Height=\"Auto\"/></Grid.RowDefinitions><TextBlock Grid.Row=\"0\" Text=\"Content\"/><Button Grid.Row=\"1\" Content=\"Button\"/></Grid>",
+        "properties": ["RowDefinitions", "ColumnDefinitions", "ShowGridLines"],
+        "usage": "Best for complex layouts with multiple rows and columns"
+      },
+      "StackPanel": {
+        "description": "Arranges child elements in a single line horizontally or vertically",
+        "xaml_example": "<StackPanel Orientation=\"Vertical\" Spacing=\"10\"><TextBlock Text=\"Item 1\"/><TextBlock Text=\"Item 2\"/></StackPanel>",
+        "properties": ["Orientation", "Spacing"],
+        "usage": "Ideal for simple vertical or horizontal layouts"
+      },
+      "DockPanel": {
+        "description": "Arranges child elements around the edges of the panel",
+        "xaml_example": "<DockPanel><Button DockPanel.Dock=\"Top\" Content=\"Top\"/><Button DockPanel.Dock=\"Bottom\" Content=\"Bottom\"/><TextBlock Text=\"Fill\"/></DockPanel>",
+        "properties": ["LastChildFill"],
+        "usage": "Perfect for application layouts with headers, footers, and main content"
+      },
+      "Canvas": {
+        "description": "Positions child elements using explicit coordinates",
+        "xaml_example": "<Canvas><Button Canvas.Left=\"50\" Canvas.Top=\"30\" Content=\"Positioned\"/></Canvas>",
+        "properties": ["Left", "Top", "Right", "Bottom"],
+        "usage": "Use for absolute positioning scenarios"
+      },
+      "WrapPanel": {
+        "description": "Arranges child elements in sequential position, breaking content to the next line when no more room",
+        "xaml_example": "<WrapPanel><Button Content=\"Button 1\"/><Button Content=\"Button 2\"/><Button Content=\"Button 3\"/></WrapPanel>",
+        "properties": ["Orientation", "ItemWidth", "ItemHeight"],
+        "usage": "Good for tag-like layouts or flowing content"
+      }
+    },
+    "input_controls": {
+      "Button": {
+        "description": "Represents a clickable button control",
+        "xaml_example": "<Button Content=\"Click Me\" Command=\"{Binding MyCommand}\"/>",
+        "properties": ["Content", "Command", "CommandParameter", "IsDefault", "IsCancel"],
+        "usage": "Primary action trigger in user interfaces"
+      },
+      "TextBox": {
+        "description": "Allows users to enter and edit text",
+        "xaml_example": "<TextBox Text=\"{Binding UserInput}\" Watermark=\"Enter text here\"/>",
+        "properties": ["Text", "Watermark", "AcceptsReturn", "MaxLength", "IsReadOnly"],
+        "usage": "Text input for forms and data entry"
+      },
+      "CheckBox": {
+        "description": "Provides a way to select or deselect an option",
+        "xaml_example": "<CheckBox Content=\"Enable notifications\" IsChecked=\"{Binding IsEnabled}\"/>",
+        "properties": ["IsChecked", "Content", "IsThreeState"],
+        "usage": "Boolean choices and option selection"
+      },
+      "RadioButton": {
+        "description": "Allows users to select one option from a group",
+        "xaml_example": "<RadioButton Content=\"Option A\" GroupName=\"MyGroup\" IsChecked=\"{Binding SelectedOption}\"/>",
+        "properties": ["IsChecked", "Content", "GroupName"],
+        "usage": "Mutually exclusive choices"
+      },
+      "Slider": {
+        "description": "Allows users to select a numeric value from a range",
+        "xaml_example": "<Slider Minimum=\"0\" Maximum=\"100\" Value=\"{Binding SliderValue}\"/>",
+        "properties": ["Minimum", "Maximum", "Value", "TickFrequency", "IsSnapToTickEnabled"],
+        "usage": "Numeric value selection within a range"
+      }
+    },
+    "display_controls": {
+      "TextBlock": {
+        "description": "Displays read-only text",
+        "xaml_example": "<TextBlock Text=\"{Binding DisplayText}\" FontSize=\"16\" FontWeight=\"Bold\"/>",
+        "properties": ["Text", "FontSize", "FontWeight", "Foreground", "TextWrapping"],
+        "usage": "Displaying labels, titles, and read-only text"
+      },
+      "Image": {
+        "description": "Displays images from various sources",
+        "xaml_example": "<Image Source=\"/Assets/logo.png\" Width=\"100\" Height=\"100\"/>",
+        "properties": ["Source", "Stretch", "Width", "Height"],
+        "usage": "Displaying graphics and images"
+      },
+      "ProgressBar": {
+        "description": "Shows the progress of an operation",
+        "xaml_example": "<ProgressBar Value=\"{Binding Progress}\" Minimum=\"0\" Maximum=\"100\"/>",
+        "properties": ["Value", "Minimum", "Maximum", "IsIndeterminate"],
+        "usage": "Indicating progress of long-running operations"
+      }
+    },
+    "selection_controls": {
+      "ComboBox": {
+        "description": "Provides a dropdown list of items for selection",
+        "xaml_example": "<ComboBox ItemsSource=\"{Binding Items}\" SelectedItem=\"{Binding SelectedItem}\"/>",
+        "properties": ["ItemsSource", "SelectedItem", "SelectedIndex", "IsDropDownOpen"],
+        "usage": "Single selection from a list of options"
+      },
+      "ListBox": {
+        "description": "Displays a list of items that can be selected",
+        "xaml_example": "<ListBox ItemsSource=\"{Binding Items}\" SelectedItem=\"{Binding SelectedItem}\"/>",
+        "properties": ["ItemsSource", "SelectedItem", "SelectedItems", "SelectionMode"],
+        "usage": "Single or multiple selection from a visible list"
+      },
+      "DataGrid": {
+        "description": "Displays data in a tabular format with sorting and editing capabilities",
+        "xaml_example": "<DataGrid ItemsSource=\"{Binding TableData}\" AutoGenerateColumns=\"True\"/>",
+        "properties": ["ItemsSource", "Columns", "AutoGenerateColumns", "CanUserAddRows"],
+        "usage": "Displaying and editing tabular data"
+      }
+    },
+    "container_controls": {
+      "TabControl": {
+        "description": "Organizes content into tabs",
+        "xaml_example": "<TabControl><TabItem Header=\"Tab 1\"><TextBlock Text=\"Content 1\"/></TabItem><TabItem Header=\"Tab 2\"><TextBlock Text=\"Content 2\"/></TabItem></TabControl>",
+        "properties": ["SelectedIndex", "SelectedItem", "TabStripPlacement"],
+        "usage": "Organizing related content into tabs"
+      },
+      "Expander": {
+        "description": "Provides an expandable/collapsible content area",
+        "xaml_example": "<Expander Header=\"Details\" IsExpanded=\"{Binding ShowDetails}\"><TextBlock Text=\"Detailed information\"/></Expander>",
+        "properties": ["Header", "IsExpanded", "ExpandDirection"],
+        "usage": "Collapsible sections and progressive disclosure"
+      },
+      "ScrollViewer": {
+        "description": "Provides scrolling capabilities for content",
+        "xaml_example": "<ScrollViewer><StackPanel><!-- Long content here --></StackPanel></ScrollViewer>",
+        "properties": ["VerticalScrollBarVisibility", "HorizontalScrollBarVisibility", "ZoomMode"],
+        "usage": "Scrolling large content areas"
+      }
+    }
+  }
+}

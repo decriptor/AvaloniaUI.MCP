@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet --version)",
+      "Bash(dotnet build:*)",
+      "WebFetch(domain:avaloniaui.net)",
+      "WebFetch(domain:docs.avaloniaui.net)",
+      "WebFetch(domain:github.com)",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:devblogs.microsoft.com)",
+      "Bash(dotnet test)",
+      "Bash(dotnet test:*)"
+    ],
+    "deny": []
+  }
+}

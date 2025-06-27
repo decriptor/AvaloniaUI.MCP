@@ -4,5 +4,34 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <!-- MCP SDK -->
+    <PackageVersion Include="ModelContextProtocol" Version="0.3.0-preview.1" />
+    <PackageVersion Include="ModelContextProtocol.Core" Version="0.3.0-preview.1" />
+    
+    <!-- JSON handling -->
+    <PackageVersion Include="System.Text.Json" Version="9.0.0" />
+    
+    <!-- HTTP client for web requests -->
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.0" />
+    
+    <!-- Logging -->
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+    
+    <!-- Dependency Injection -->
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    
+    <!-- Configuration -->
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    
+    <!-- XML/XAML processing -->
+    <PackageVersion Include="System.Xml.XDocument" Version="4.3.0" />
+    
+    <!-- Testing -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
 </Project>
