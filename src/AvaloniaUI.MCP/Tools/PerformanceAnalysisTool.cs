@@ -331,7 +331,7 @@ public static partial class PerformanceAnalysisTool
             recommendations.Add("✅ Consider using ObservableCollection for data-bound collections");
         }
 
-        bool hasLinqInLoop = Regex.IsMatch(content, @"(for|foreach|while).*\{[^}]*\.(Where|Select|First|Single)");
+        bool hasLinqInLoop = MyRegex2().IsMatch(content);
         if (hasLinqInLoop)
         {
             issues.Add("⚠️ LINQ operations inside loops detected");
@@ -647,4 +647,6 @@ using (collection.DeferRefresh())
     private static partial Regex MyRegex();
     [GeneratedRegex(@"async\s+void\s+(?!.*EventArgs)")]
     private static partial Regex MyRegex1();
+    [GeneratedRegex(@"(for|foreach|while).*\{[^}]*\.(Where|Select|First|Single)")]
+    private static partial Regex MyRegex2();
 }

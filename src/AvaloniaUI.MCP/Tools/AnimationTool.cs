@@ -404,7 +404,7 @@ public class ReactiveAnimator
     private static string GenerateAnimationXaml(AnimationConfiguration config)
     {
         string easingFunction = GetEasingFunction(config.Easing);
-        string animationProperties = GetAnimationProperties(config.Type);
+        _ = GetAnimationProperties(config.Type);
 
         return config.Type switch
         {

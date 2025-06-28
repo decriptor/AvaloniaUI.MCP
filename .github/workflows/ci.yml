@@ -228,7 +228,7 @@ jobs:
           echo "✅ README.md exists"
           
           # Check for essential sections
-          if grep -q "# AvaloniaUI MCP Server" README.md; then
+          if grep -q "# AvaloniaUI.MCP" README.md; then
             echo "✅ README has proper title"
           else
             echo "❌ README missing proper title"
