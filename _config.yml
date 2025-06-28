@@ -56,12 +56,12 @@ exclude:
   - tests/
   - bin/
   - obj/
-  - *.sln
-  - *.slnx
-  - *.csproj
+  - "*.sln"
+  - "*.slnx"
+  - "*.csproj"
   - nuget.config
   - global.json
-  - Directory.Build.*
+  - "Directory.Build.*"
   - vendor/
   - node_modules/
 
