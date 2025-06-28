@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using System.Text.Json;
-using ModelContextProtocol.Server;
+
 using AvaloniaUI.MCP.Services;
+
+using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Resources;
 
@@ -15,10 +17,10 @@ public static class AvaloniaControlsResource
         return await ErrorHandlingService.SafeExecuteAsync("GetControlsReference", async () =>
         {
             var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "controls.json");
-            
+
             // Use cache for both the JSON data and the formatted result
             var cacheKey = "formatted_controls_reference";
-            
+
             return await ResourceCacheService.GetOrLoadResourceAsync(cacheKey, async () =>
             {
                 var controlsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
@@ -40,7 +42,7 @@ public static class AvaloniaControlsResource
 
             var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "controls.json");
             var cacheKey = $"control_info_{controlName.ToLowerInvariant()}";
-            
+
             return await ResourceCacheService.GetOrLoadResourceAsync(cacheKey, async () =>
             {
                 var controlsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
@@ -71,7 +73,7 @@ public static class AvaloniaControlsResource
         return result;
     }
 
-    private static string FindControlInfo(JsonElement controlsData, string controlName)
+    private static string? FindControlInfo(JsonElement controlsData, string controlName)
     {
         if (controlsData.TryGetProperty("avaloniaui_controls", out var controls))
         {

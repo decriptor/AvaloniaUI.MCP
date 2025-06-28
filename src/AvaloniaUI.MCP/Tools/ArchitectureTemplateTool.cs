@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -1237,7 +1238,7 @@ public class UserDetailsViewModel : ViewModelBase
     private static string GenerateServiceTemplates(List<string> services, string communicationPattern)
     {
         var firstService = services.First();
-        
+
         return communicationPattern.ToLowerInvariant() switch
         {
             "rest" => GenerateRestServiceTemplate(firstService),
@@ -1250,7 +1251,7 @@ public class UserDetailsViewModel : ViewModelBase
     private static string GenerateRestServiceTemplate(string serviceName)
     {
         var className = serviceName.ToTitleCase();
-        
+
         return $@"// {className}Service REST API
 [ApiController]
 [Route(""api/[controller]"")]
@@ -1305,7 +1306,7 @@ public class {className}Controller : ControllerBase
     private static string GenerateGrpcServiceTemplate(string serviceName)
     {
         var className = serviceName.ToTitleCase();
-        
+
         return $@"// {className}Service gRPC implementation
 public class {className}GrpcService : {className}Service.{className}ServiceBase
 {{
@@ -1393,7 +1394,7 @@ message Delete{className}Request {{
     private static string GenerateMessageBusServiceTemplate(string serviceName)
     {
         var className = serviceName.ToTitleCase();
-        
+
         return $@"// {className}Service Message Bus implementation
 public class {className}MessageHandler : 
     IConsumer<Create{className}Command>,
@@ -1707,13 +1708,13 @@ services.AddMassTransit(x =>
 │   │   │   ├── Aggregates/
 │   │   │   ├── Services/
 │   │   │   ├── Repositories/";
-            
+
             if (domainEvents)
             {
                 structure += $@"
 │   │   │   ├── Events/";
             }
-            
+
             structure += $@"
 │   │   │   └── Specifications/";
         }

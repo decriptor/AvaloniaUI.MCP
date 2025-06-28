@@ -1,19 +1,13 @@
 using AvaloniaUI.MCP.Tools;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace AvaloniaUI.MCP.Tests;
 
+[TestClass]
 public class XamlValidationDebugTest
 {
-    private readonly ITestOutputHelper _output;
+    public TestContext TestContext { get; set; } = null!;
 
-    public XamlValidationDebugTest(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
-    [Fact]
+    [TestMethod]
     public void Debug_XamlValidation_Result()
     {
         // Arrange
@@ -21,15 +15,15 @@ public class XamlValidationDebugTest
                                  xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
                              <TextBlock Text=""Hello World"" />
                           </Window>";
-        
+
         // Act
         var result = XamlValidationTool.ValidateXaml(validXaml);
-        
+
         // Assert
-        _output.WriteLine($"Validation result: {result}");
-        
+        TestContext.WriteLine($"Validation result: {result}");
+
         // Just verify it doesn't crash
-        Assert.NotNull(result);
-        Assert.NotEmpty(result);
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Length > 0, "Result should not be empty");
     }
 }

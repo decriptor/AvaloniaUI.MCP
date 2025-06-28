@@ -20,7 +20,7 @@ public static class AsyncFileService
                 {
                     Directory.CreateDirectory(directory);
                 }
-                
+
                 // Write file asynchronously
                 await File.WriteAllTextAsync(file.FilePath, file.Content);
             }
@@ -29,10 +29,10 @@ public static class AsyncFileService
                 throw new InvalidOperationException($"Failed to write file '{file.FilePath}': {ex.Message}", ex);
             }
         });
-        
+
         await Task.WhenAll(writeTasks);
     }
-    
+
     /// <summary>
     /// Writes a single file asynchronously
     /// </summary>
@@ -46,7 +46,7 @@ public static class AsyncFileService
             {
                 Directory.CreateDirectory(directory);
             }
-            
+
             await File.WriteAllTextAsync(filePath, content);
         }
         catch (Exception ex)
@@ -54,7 +54,7 @@ public static class AsyncFileService
             throw new InvalidOperationException($"Failed to write file '{filePath}': {ex.Message}", ex);
         }
     }
-    
+
     /// <summary>
     /// Reads multiple files asynchronously in parallel
     /// </summary>
@@ -66,7 +66,7 @@ public static class AsyncFileService
             {
                 if (!File.Exists(filePath))
                     throw new FileNotFoundException($"File not found: {filePath}");
-                    
+
                 var content = await File.ReadAllTextAsync(filePath);
                 return new KeyValuePair<string, string>(filePath, content);
             }
@@ -75,11 +75,11 @@ public static class AsyncFileService
                 throw new InvalidOperationException($"Failed to read file '{filePath}': {ex.Message}", ex);
             }
         });
-        
+
         var results = await Task.WhenAll(readTasks);
         return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
-    
+
     /// <summary>
     /// Reads a single file asynchronously
     /// </summary>
@@ -89,7 +89,7 @@ public static class AsyncFileService
         {
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"File not found: {filePath}");
-                
+
             return await File.ReadAllTextAsync(filePath);
         }
         catch (Exception ex)
@@ -97,7 +97,7 @@ public static class AsyncFileService
             throw new InvalidOperationException($"Failed to read file '{filePath}': {ex.Message}", ex);
         }
     }
-    
+
     /// <summary>
     /// Checks if multiple files exist asynchronously
     /// </summary>
@@ -108,11 +108,11 @@ public static class AsyncFileService
             await Task.Yield(); // Allow for async behavior even though File.Exists is sync
             return new KeyValuePair<string, bool>(filePath, File.Exists(filePath));
         });
-        
+
         var results = await Task.WhenAll(checkTasks);
         return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
-    
+
     /// <summary>
     /// Creates a directory structure asynchronously
     /// </summary>
@@ -126,7 +126,7 @@ public static class AsyncFileService
             }
         });
     }
-    
+
     /// <summary>
     /// Creates multiple directories asynchronously
     /// </summary>
@@ -135,7 +135,7 @@ public static class AsyncFileService
         var createTasks = directoryPaths.Select(CreateDirectoryAsync);
         await Task.WhenAll(createTasks);
     }
-    
+
     /// <summary>
     /// Copies files asynchronously in parallel
     /// </summary>
@@ -151,7 +151,7 @@ public static class AsyncFileService
                 {
                     Directory.CreateDirectory(destinationDirectory);
                 }
-                
+
                 // Copy file asynchronously
                 using var sourceStream = new FileStream(copy.SourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true);
                 using var destinationStream = new FileStream(copy.DestinationPath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true);
@@ -162,10 +162,10 @@ public static class AsyncFileService
                 throw new InvalidOperationException($"Failed to copy file from '{copy.SourcePath}' to '{copy.DestinationPath}': {ex.Message}", ex);
             }
         });
-        
+
         await Task.WhenAll(copyTasks);
     }
-    
+
     /// <summary>
     /// Gets file info asynchronously for multiple files
     /// </summary>
@@ -188,11 +188,11 @@ public static class AsyncFileService
             }
             return new KeyValuePair<string, FileInfo?>(filePath, info);
         });
-        
+
         var results = await Task.WhenAll(infoTasks);
         return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
-    
+
     /// <summary>
     /// Validates file paths asynchronously
     /// </summary>
@@ -204,11 +204,11 @@ public static class AsyncFileService
             var validation = InputValidationService.ValidateFilePath(filePath, mustExist: false);
             return new KeyValuePair<string, ValidationResult>(filePath, validation);
         });
-        
+
         var results = await Task.WhenAll(validationTasks);
         return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
-    
+
     /// <summary>
     /// Processes files in batches to avoid overwhelming the system
     /// </summary>
@@ -219,14 +219,14 @@ public static class AsyncFileService
         int delayBetweenBatches = 100)
     {
         var itemsList = items.ToList();
-        
+
         for (int i = 0; i < itemsList.Count; i += batchSize)
         {
             var batch = itemsList.Skip(i).Take(batchSize);
             var batchTasks = batch.Select(processor);
-            
+
             await Task.WhenAll(batchTasks);
-            
+
             // Add a small delay between batches to prevent overwhelming the system
             if (i + batchSize < itemsList.Count && delayBetweenBatches > 0)
             {
@@ -234,7 +234,7 @@ public static class AsyncFileService
             }
         }
     }
-    
+
     /// <summary>
     /// Safely deletes files asynchronously
     /// </summary>
@@ -260,7 +260,7 @@ public static class AsyncFileService
                 }
             }
         });
-        
+
         await Task.WhenAll(deleteTasks);
     }
 }

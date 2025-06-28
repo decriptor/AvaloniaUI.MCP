@@ -1,81 +1,81 @@
 using AvaloniaUI.MCP.Tools;
-using Xunit;
 
 namespace AvaloniaUI.MCP.Tests;
 
+[TestClass]
 public class ToolsTests
 {
-    [Fact]
+    [TestMethod]
     public void EchoTool_ReturnsCorrectMessage()
     {
         // Arrange
         var message = "Hello World";
-        
+
         // Act
         var result = EchoTool.Echo(message);
-        
+
         // Assert
-        Assert.Contains("Hello from AvaloniaUI MCP Server", result);
-        Assert.Contains(message, result);
+        StringAssert.Contains(result, "Hello from AvaloniaUI MCP Server", "Result should contain server greeting");
+        StringAssert.Contains(result, message, "Result should contain the original message");
     }
 
-    [Fact]
+    [TestMethod]
     public void EchoTool_GetServerInfo_ReturnsServerInformation()
     {
         // Act
         var result = EchoTool.GetServerInfo();
-        
+
         // Assert
-        Assert.Contains("AvaloniaUI MCP Server", result);
-        Assert.Contains("project generation", result);
-        Assert.Contains("XAML validation", result);
+        StringAssert.Contains(result, "AvaloniaUI MCP Server", "Result should contain server name");
+        StringAssert.Contains(result, "project generation", "Result should mention project generation capabilities");
+        StringAssert.Contains(result, "XAML validation", "Result should mention XAML validation capabilities");
     }
 
-    [Fact]
+    [TestMethod]
     public void ProjectGeneratorTool_CreateAvaloniaProject_ValidatesProjectName()
     {
         // Arrange
         var emptyProjectName = "";
-        
+
         // Act
         var result = ProjectGeneratorTool.CreateAvaloniaProject(emptyProjectName);
-        
+
         // Assert
-        Assert.Contains("# ❌ Error", result);
-        Assert.Contains("Project name cannot be empty", result);
+        StringAssert.Contains(result, "# ❌ Error", "Result should contain error header");
+        StringAssert.Contains(result, "Project name cannot be empty", "Result should contain specific validation error message");
     }
 
-    [Fact]
+    [TestMethod]
     public void ProjectGeneratorTool_CreateAvaloniaProject_ValidatesTemplate()
     {
         // Arrange
         var projectName = "TestProject";
         var invalidTemplate = "invalid";
-        
+
         // Act
         var result = ProjectGeneratorTool.CreateAvaloniaProject(projectName, invalidTemplate);
-        
+
         // Assert
-        Assert.Contains("# ❌ Error", result);
-        Assert.Contains("Invalid template type", result);
-        Assert.Contains("invalid", result);
+        StringAssert.Contains(result, "# ❌ Error", "Result should contain error header");
+        StringAssert.Contains(result, "Invalid template type", "Result should contain template validation error");
+        StringAssert.Contains(result, "invalid", "Result should contain the invalid template name");
     }
 
-    [Fact]
+    [TestMethod]
     public void XamlValidationTool_ValidateXaml_RejectsEmptyContent()
     {
         // Arrange
         var emptyXaml = "";
-        
+
         // Act
         var result = XamlValidationTool.ValidateXaml(emptyXaml);
-        
+
         // Assert
-        Assert.Contains("# ❌ Error", result);
-        Assert.Contains("XAML content cannot be empty", result);
+        StringAssert.Contains(result, "# ❌ Error", "Result should contain error header");
+        StringAssert.Contains(result, "XAML content cannot be empty", "Result should contain empty content validation error");
     }
 
-    [Fact]
+    [TestMethod]
     public void XamlValidationTool_ValidateXaml_AcceptsValidXaml()
     {
         // Arrange
@@ -83,29 +83,29 @@ public class ToolsTests
                                  xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
                              <TextBlock Text=""Hello World"" />
                           </Window>";
-        
+
         // Act
         var result = XamlValidationTool.ValidateXaml(validXaml);
-        
+
         // Assert
-        Assert.Contains("✅ XAML Validation Passed", result);
-        Assert.Contains("✓ XML syntax is valid", result);
+        StringAssert.Contains(result, "✅ XAML Validation Passed", "Result should contain validation success message");
+        StringAssert.Contains(result, "✓ XML syntax is valid", "Result should confirm XML syntax validity");
     }
 
-    [Fact]
+    [TestMethod]
     public void XamlValidationTool_ConvertWpfXamlToAvalonia_RejectsEmptyContent()
     {
         // Arrange
         var emptyXaml = "";
-        
+
         // Act
         var result = XamlValidationTool.ConvertWpfXamlToAvalonia(emptyXaml);
-        
+
         // Assert
-        Assert.Contains("Error: WPF XAML content cannot be empty", result);
+        StringAssert.Contains(result, "Error: WPF XAML content cannot be empty", "Result should contain empty content error message");
     }
 
-    [Fact]
+    [TestMethod]
     public void XamlValidationTool_ConvertWpfXamlToAvalonia_ConvertsNamespaces()
     {
         // Arrange
@@ -113,13 +113,13 @@ public class ToolsTests
                                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
                            <TextBlock Text=""Hello World"" />
                         </Window>";
-        
+
         // Act
         var result = XamlValidationTool.ConvertWpfXamlToAvalonia(wpfXaml);
-        
+
         // Assert
-        Assert.Contains("🔄 WPF to AvaloniaUI XAML Conversion Complete", result);
-        Assert.Contains("https://github.com/avaloniaui", result);
-        Assert.Contains("✓ Replaced WPF presentation namespace", result);
+        StringAssert.Contains(result, "🔄 WPF to AvaloniaUI XAML Conversion Complete", "Result should contain conversion completion message");
+        StringAssert.Contains(result, "https://github.com/avaloniaui", "Result should contain AvaloniaUI namespace");
+        StringAssert.Contains(result, "✓ Replaced WPF presentation namespace", "Result should confirm namespace replacement");
     }
 }

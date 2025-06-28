@@ -1,9 +1,12 @@
 using System.ComponentModel;
 using System.Diagnostics;
+
+using AvaloniaUI.MCP.Services;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using ModelContextProtocol.Server;
-using AvaloniaUI.MCP.Services;
 
 namespace AvaloniaUI.MCP.Tools;
 
@@ -21,14 +24,14 @@ public static class DiagnosticTool
             // Try to get telemetry service from DI container if available
             var serviceProvider = GetServiceProvider();
             var telemetry = serviceProvider?.GetService<ITelemetryService>();
-            
+
             if (telemetry == null)
             {
                 return "# ⚠️ Server Metrics Unavailable\n\nTelemetry service is not configured or available.";
             }
-            
+
             var metrics = telemetry.GetMetricsSnapshot();
-            
+
             return $@"# 📊 AvaloniaUI MCP Server Metrics
 
 ## Tool Execution Statistics
@@ -69,13 +72,13 @@ public static class DiagnosticTool
         try
         {
             var healthStatus = new List<(string Component, bool IsHealthy, string Details)>();
-            
+
             // Check telemetry service
             var serviceProvider = GetServiceProvider();
             var telemetry = serviceProvider?.GetService<ITelemetryService>();
-            healthStatus.Add(("Telemetry Service", telemetry != null, 
+            healthStatus.Add(("Telemetry Service", telemetry != null,
                 telemetry != null ? "✅ Available" : "❌ Not configured"));
-            
+
             // Check validation service (static class)
             bool validationAvailable = false;
             string validationDetails = "";
@@ -90,7 +93,7 @@ public static class DiagnosticTool
                 validationDetails = $"❌ Error: {ex.Message}";
             }
             healthStatus.Add(("Validation Service", validationAvailable, validationDetails));
-            
+
             // Check error handling service (static class)
             bool errorHandlingAvailable = false;
             string errorHandlingDetails = "";
@@ -105,7 +108,7 @@ public static class DiagnosticTool
                 errorHandlingDetails = $"❌ Error: {ex.Message}";
             }
             healthStatus.Add(("Error Handling Service", errorHandlingAvailable, errorHandlingDetails));
-            
+
             // Check resource cache
             bool cacheHealthy = false;
             string cacheDetails = "";
@@ -116,7 +119,7 @@ public static class DiagnosticTool
                 var testResult = ResourceCacheService.GetOrLoadResource("health_check_test", () => "fallback");
                 cacheHealthy = testResult == "test_value";
                 cacheDetails = cacheHealthy ? "✅ Operational" : "⚠️ Cache not working as expected";
-                
+
                 // Clean up test entry
                 ResourceCacheService.RemoveFromCache("health_check_test");
             }
@@ -125,13 +128,13 @@ public static class DiagnosticTool
                 cacheDetails = $"❌ Error: {ex.Message}";
             }
             healthStatus.Add(("Resource Cache", cacheHealthy, cacheDetails));
-            
+
             // Check memory pressure
             var totalMemory = GC.GetTotalMemory(false);
             var memoryPressure = totalMemory > 500 * 1024 * 1024; // 500MB threshold
             healthStatus.Add(("Memory Usage", !memoryPressure,
                 memoryPressure ? $"⚠️ High: {totalMemory / 1024 / 1024:F2} MB" : $"✅ Normal: {totalMemory / 1024 / 1024:F2} MB"));
-            
+
             // Check file system access
             bool fileSystemHealthy = false;
             string fileSystemDetails = "";
@@ -148,29 +151,29 @@ public static class DiagnosticTool
                 fileSystemDetails = $"❌ Error: {ex.Message}";
             }
             healthStatus.Add(("File System", fileSystemHealthy, fileSystemDetails));
-            
+
             var overallHealthy = healthStatus.All(h => h.IsHealthy);
             var healthIcon = overallHealthy ? "✅" : "⚠️";
-            
+
             var result = $@"# {healthIcon} AvaloniaUI MCP Server Health Check
 
 ## Overall Status: {(overallHealthy ? "HEALTHY" : "DEGRADED")}
 
 ## Component Health
 ";
-            
+
             foreach (var (component, isHealthy, details) in healthStatus)
             {
                 result += $"- **{component}**: {details}\n";
             }
-            
+
             result += $@"
 
 ## Recommendations
 {(overallHealthy ? "✅ All systems operational" : GenerateHealthRecommendations(healthStatus))}
 
 **Checked at**: {DateTimeOffset.UtcNow:yyyy-MM-dd HH:mm:ss UTC}";
-            
+
             return result;
         }
         catch (Exception ex)
@@ -190,12 +193,12 @@ public static class DiagnosticTool
             var loggerFactory = serviceProvider?.GetService<ILoggerFactory>();
             var logger = loggerFactory?.CreateLogger("DiagnosticTool");
             var telemetry = serviceProvider?.GetService<ITelemetryService>();
-            
+
             if (logger == null)
             {
                 return "# ❌ Logging Test Failed\n\nLogger service not available";
             }
-            
+
             // Test logging at specified level
             var level = logLevel.ToLowerInvariant() switch
             {
@@ -206,10 +209,10 @@ public static class DiagnosticTool
                 "error" => LogLevel.Error,
                 _ => LogLevel.Information
             };
-            
+
             var testMessage = $"Logging test - {message}";
             logger.Log(level, testMessage);
-            
+
             // Test telemetry if available
             string telemetryResult = "";
             if (telemetry != null)
@@ -227,7 +230,7 @@ public static class DiagnosticTool
             {
                 telemetryResult = "\n- ⚠️ Telemetry service not available";
             }
-            
+
             return $@"# ✅ Logging Test Completed
 
 ## Test Results
@@ -252,19 +255,19 @@ public static class DiagnosticTool
             var beforeGen0 = GC.CollectionCount(0);
             var beforeGen1 = GC.CollectionCount(1);
             var beforeGen2 = GC.CollectionCount(2);
-            
+
             // Force garbage collection
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            
+
             var afterMemory = GC.GetTotalMemory(false);
             var afterGen0 = GC.CollectionCount(0);
             var afterGen1 = GC.CollectionCount(1);
             var afterGen2 = GC.CollectionCount(2);
-            
+
             var memoryFreed = beforeMemory - afterMemory;
-            
+
             return $@"# 🧹 Garbage Collection Completed
 
 ## Memory Statistics
@@ -303,7 +306,7 @@ public static class DiagnosticTool
     private static string GenerateHealthRecommendations(List<(string Component, bool IsHealthy, string Details)> healthStatus)
     {
         var recommendations = new List<string>();
-        
+
         foreach (var (component, isHealthy, details) in healthStatus.Where(h => !h.IsHealthy))
         {
             var recommendation = component switch
@@ -318,7 +321,7 @@ public static class DiagnosticTool
             };
             recommendations.Add(recommendation);
         }
-        
+
         return string.Join("\n", recommendations);
     }
 }

@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using System.Text.Json;
-using ModelContextProtocol.Server;
+
 using AvaloniaUI.MCP.Services;
+
+using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Resources;
 
@@ -16,7 +18,7 @@ public static class XamlPatternsResource
         {
             var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "xaml-patterns.json");
             var cacheKey = "formatted_xaml_patterns";
-            
+
             return await ResourceCacheService.GetOrLoadResourceAsync(cacheKey, async () =>
             {
                 var patternsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
@@ -90,7 +92,7 @@ public static class XamlPatternsResource
         return result;
     }
 
-    private static string FindXamlPattern(JsonElement patternsData, string patternName)
+    private static string? FindXamlPattern(JsonElement patternsData, string patternName)
     {
         if (patternsData.TryGetProperty("avalonia_xaml_patterns", out var patterns))
         {

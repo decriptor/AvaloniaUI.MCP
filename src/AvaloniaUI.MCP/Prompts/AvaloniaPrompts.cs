@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Prompts;
@@ -284,7 +285,7 @@ Please provide more details about your specific issue for targeted assistance.";
         <ColumnDefinition Width=""*"" MinWidth=""200"" />
         <ColumnDefinition Width=""2*"" />
     </Grid.ColumnDefinitions>
-    
+
     <!-- Adaptive content here -->
 </Grid>
 ```
@@ -468,7 +469,7 @@ Please proceed with implementing responsive design following these guidelines.";
         [Description("Breakpoints for responsive behavior (comma-separated widths in px)")] string breakpoints = "300,600,900")
     {
         var breakpointList = breakpoints.Split(',').Select(b => b.Trim()).ToList();
-        
+
         var prompt = $@"# Implement Container Queries for {componentName}
 
 ## Responsive Design with Container Queries (AvaloniaUI 11.3+)
@@ -483,10 +484,10 @@ Please proceed with implementing responsive design following these guidelines.";
         <Style Selector=""Border"">
             <Setter Property=""Padding"" Value=""8"" />
         </Style>
-        
+
 {string.Join("\n", breakpointList.Select(bp => $"        <Style Selector=\"@container(min-width: {bp}px) Border\">\n            <Setter Property=\"Padding\" Value=\"{Math.Max(8, int.Parse(bp) / 25)}\" />\n        </Style>"))}
     </Border.Styles>
-    
+
     <StackPanel>
         <TextBlock Text=""{componentName}"" FontWeight=""Bold"" />
         <TextBlock Text=""Responsive content"" />

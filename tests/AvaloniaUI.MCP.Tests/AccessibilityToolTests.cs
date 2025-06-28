@@ -1,307 +1,307 @@
 using AvaloniaUI.MCP.Tools;
-using Xunit;
 
 namespace AvaloniaUI.MCP.Tests;
 
+[TestClass]
 public class AccessibilityToolTests
 {
-    [Theory]
-    [InlineData("form")]
-    [InlineData("navigation")]
-    [InlineData("data-table")]
-    [InlineData("modal")]
-    [InlineData("notification")]
+    [DataTestMethod]
+    [DataRow("form")]
+    [DataRow("navigation")]
+    [DataRow("data-table")]
+    [DataRow("modal")]
+    [DataRow("notification")]
     public void GenerateAccessibleComponent_ValidComponentTypes_ReturnsPattern(string componentType)
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent(componentType);
-        
+
         // Assert
-        Assert.Contains($"# Accessible Component: {componentType}", result);
-        Assert.Contains("## Configuration", result);
-        Assert.Contains("## Accessible Component XAML", result);
-        Assert.Contains("## Accessibility Helper Classes", result);
-        Assert.Contains("## Accessibility Testing Checklist", result);
-        Assert.Contains("## WCAG AA Compliance Notes", result);
-        Assert.DoesNotContain("Error generating accessible component", result);
+        StringAssert.Contains(result, $"# Accessible Component: {componentType}", $"Result should contain component type header for {componentType}");
+        StringAssert.Contains(result, "## Configuration", "Result should contain Configuration section");
+        StringAssert.Contains(result, "## Accessible Component XAML", "Result should contain XAML section");
+        StringAssert.Contains(result, "## Accessibility Helper Classes", "Result should contain Helper Classes section");
+        StringAssert.Contains(result, "## Accessibility Testing Checklist", "Result should contain Testing Checklist section");
+        StringAssert.Contains(result, "## WCAG AA Compliance Notes", "Result should contain WCAG Compliance Notes section");
+        Assert.IsFalse(result.Contains("Error generating accessible component"), "Result should not contain error messages");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_FormType_ContainsFormElements()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", "true", "true");
-        
+
         // Assert
-        Assert.Contains("User Registration Form", result);
-        Assert.Contains("AutomationProperties.Name", result);
-        Assert.Contains("AutomationProperties.Description", result);
-        Assert.Contains("Create Account", result);
-        Assert.Contains("WCAG AA", result);
-        Assert.Contains("true", result); // keyboard navigation
-        Assert.Contains("true", result); // screen reader support
+        StringAssert.Contains(result, "User Registration Form", "Result should contain User Registration Form text");
+        StringAssert.Contains(result, "AutomationProperties.Name", "Result should contain AutomationProperties.Name");
+        StringAssert.Contains(result, "AutomationProperties.Description", "Result should contain AutomationProperties.Description");
+        StringAssert.Contains(result, "Create Account", "Result should contain Create Account text");
+        StringAssert.Contains(result, "WCAG AA", "Result should contain WCAG AA reference");
+        StringAssert.Contains(result, "true", "Result should contain keyboard navigation setting");
+        StringAssert.Contains(result, "true", "Result should contain screen reader support setting");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_NavigationType_ContainsNavigationElements()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("navigation");
-        
+
         // Assert
-        Assert.Contains("navigation", result);
-        Assert.Contains("AutomationProperties", result);
-        Assert.Contains("XAML", result);
+        StringAssert.Contains(result, "navigation", "Result should contain navigation text");
+        StringAssert.Contains(result, "AutomationProperties", "Result should contain AutomationProperties");
+        StringAssert.Contains(result, "XAML", "Result should contain XAML content");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_DataTableType_ContainsTableElements()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("data-table");
-        
+
         // Assert
-        Assert.Contains("data-table", result);
-        Assert.Contains("XAML", result);
-        Assert.Contains("AutomationProperties", result);
+        StringAssert.Contains(result, "data-table", "Result should contain data-table text");
+        StringAssert.Contains(result, "XAML", "Result should contain XAML content");
+        StringAssert.Contains(result, "AutomationProperties", "Result should contain AutomationProperties");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_ModalType_ContainsModalElements()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("modal");
-        
+
         // Assert
-        Assert.Contains("modal", result);
-        Assert.Contains("XAML", result);
-        Assert.Contains("AutomationProperties", result);
+        StringAssert.Contains(result, "modal", "Result should contain modal text");
+        StringAssert.Contains(result, "XAML", "Result should contain XAML content");
+        StringAssert.Contains(result, "AutomationProperties", "Result should contain AutomationProperties");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_NotificationType_ContainsNotificationElements()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("notification");
-        
+
         // Assert
-        Assert.Contains("notification", result);
-        Assert.Contains("XAML", result);
-        Assert.Contains("AutomationProperties", result);
+        StringAssert.Contains(result, "notification", "Result should contain notification text");
+        StringAssert.Contains(result, "XAML", "Result should contain XAML content");
+        StringAssert.Contains(result, "AutomationProperties", "Result should contain AutomationProperties");
     }
 
-    [Theory]
-    [InlineData("AA")]
-    [InlineData("AAA")]
+    [DataTestMethod]
+    [DataRow("AA")]
+    [DataRow("AAA")]
     public void GenerateAccessibleComponent_DifferentWCAGLevels_ReturnsCorrectLevel(string wcagLevel)
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form", wcagLevel);
-        
+
         // Assert
-        Assert.Contains($"**WCAG Level**: {wcagLevel}", result);
-        Assert.Contains($"## WCAG {wcagLevel} Compliance Notes", result);
+        StringAssert.Contains(result, $"**WCAG Level**: {wcagLevel}", $"Result should contain WCAG Level: {wcagLevel}");
+        StringAssert.Contains(result, $"## WCAG {wcagLevel} Compliance Notes", $"Result should contain WCAG {wcagLevel} Compliance Notes section");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_WithKeyboardNavigation_IncludesKeyboardHandler()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", "true", "true");
-        
+
         // Assert
-        Assert.Contains("**Keyboard Navigation**: True", result);
-        Assert.Contains("## Keyboard Navigation Handler", result);
-        Assert.Contains("Keyboard Navigation", result);
+        StringAssert.Contains(result, "**Keyboard Navigation**: True", "Result should contain keyboard navigation setting as True");
+        StringAssert.Contains(result, "## Keyboard Navigation Handler", "Result should contain Keyboard Navigation Handler section");
+        StringAssert.Contains(result, "Keyboard Navigation", "Result should contain keyboard navigation references");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_WithoutKeyboardNavigation_ExcludesKeyboardHandler()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", "false", "true");
-        
+
         // Assert
-        Assert.Contains("**Keyboard Navigation**: False", result);
-        Assert.DoesNotContain("## Keyboard Navigation Handler", result);
+        StringAssert.Contains(result, "**Keyboard Navigation**: False", "Result should contain keyboard navigation setting as False");
+        Assert.IsFalse(result.Contains("## Keyboard Navigation Handler"), "Result should not contain Keyboard Navigation Handler section when disabled");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_WithScreenReader_IncludesScreenReaderSupport()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", "true", "true");
-        
+
         // Assert
-        Assert.Contains("**Screen Reader Support**: True", result);
-        Assert.Contains("AutomationProperties", result);
-        Assert.Contains("screen reader", result);
+        StringAssert.Contains(result, "**Screen Reader Support**: True", "Result should contain screen reader support setting as True");
+        StringAssert.Contains(result, "AutomationProperties", "Result should contain AutomationProperties for screen reader support");
+        StringAssert.Contains(result, "screen reader", "Result should contain screen reader references");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_WithoutScreenReader_ConfiguresCorrectly()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", "true", "false");
-        
+
         // Assert
-        Assert.Contains("**Screen Reader Support**: False", result);
+        StringAssert.Contains(result, "**Screen Reader Support**: False", "Result should contain screen reader support setting as False");
         // Should still contain basic accessibility markup
-        Assert.Contains("XAML", result);
+        StringAssert.Contains(result, "XAML", "Result should still contain XAML content even without screen reader support");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_ContainsWCAGComplianceGuidelines()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form");
-        
+
         // Assert
-        Assert.Contains("Contrast Ratio", result);
-        Assert.Contains("4.5:1 for normal text", result);
-        Assert.Contains("3:1 for large text", result);
-        Assert.Contains("Keyboard Navigation", result);
-        Assert.Contains("keyboard accessible", result);
-        Assert.Contains("Screen Reader", result);
-        Assert.Contains("ARIA labels", result);
-        Assert.Contains("Focus Management", result);
-        Assert.Contains("visual focus indicators", result);
+        StringAssert.Contains(result, "Contrast Ratio", "Result should contain Contrast Ratio guidelines");
+        StringAssert.Contains(result, "4.5:1 for normal text", "Result should contain contrast ratio for normal text");
+        StringAssert.Contains(result, "3:1 for large text", "Result should contain contrast ratio for large text");
+        StringAssert.Contains(result, "Keyboard Navigation", "Result should contain Keyboard Navigation guidelines");
+        StringAssert.Contains(result, "keyboard accessible", "Result should contain keyboard accessibility requirements");
+        StringAssert.Contains(result, "Screen Reader", "Result should contain Screen Reader guidelines");
+        StringAssert.Contains(result, "ARIA labels", "Result should contain ARIA labels information");
+        StringAssert.Contains(result, "Focus Management", "Result should contain Focus Management guidelines");
+        StringAssert.Contains(result, "visual focus indicators", "Result should contain visual focus indicators requirements");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_IncludesAccessibilityTestingChecklist()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form");
-        
+
         // Assert
-        Assert.Contains("## Accessibility Testing Checklist", result);
-        Assert.Contains("Testing", result);
+        StringAssert.Contains(result, "## Accessibility Testing Checklist", "Result should contain Accessibility Testing Checklist section");
+        StringAssert.Contains(result, "Testing", "Result should contain testing information");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_IncludesAccessibilityHelperClasses()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form");
-        
+
         // Assert
-        Assert.Contains("## Accessibility Helper Classes", result);
-        Assert.Contains("Helper", result);
+        StringAssert.Contains(result, "## Accessibility Helper Classes", "Result should contain Accessibility Helper Classes section");
+        StringAssert.Contains(result, "Helper", "Result should contain helper class information");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_InvalidComponentType_ReturnsGenericComponent()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("invalid-type");
-        
+
         // Assert
-        Assert.Contains("# Accessible Component: invalid-type", result);
+        StringAssert.Contains(result, "# Accessible Component: invalid-type", "Result should contain component type header even for invalid types");
         // Should fallback to generic component without generation error
-        Assert.DoesNotContain("Error generating accessible component", result);
+        Assert.IsFalse(result.Contains("Error generating accessible component"), "Result should not contain error messages for invalid component types");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_CaseInsensitiveComponentType_Works()
     {
         // Act
         var result1 = AccessibilityTool.GenerateAccessibleComponent("FORM");
         var result2 = AccessibilityTool.GenerateAccessibleComponent("Form");
         var result3 = AccessibilityTool.GenerateAccessibleComponent("form");
-        
+
         // Assert - All should work the same way
-        Assert.Contains("**Component Type**: form", result1);
-        Assert.Contains("**Component Type**: form", result2);
-        Assert.Contains("**Component Type**: form", result3);
+        StringAssert.Contains(result1, "**Component Type**: form", "Result should normalize FORM to lowercase form");
+        StringAssert.Contains(result2, "**Component Type**: form", "Result should normalize Form to lowercase form");
+        StringAssert.Contains(result3, "**Component Type**: form", "Result should handle lowercase form correctly");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_CaseInsensitiveWCAGLevel_Works()
     {
         // Act
         var result1 = AccessibilityTool.GenerateAccessibleComponent("form", "aa");
         var result2 = AccessibilityTool.GenerateAccessibleComponent("form", "AA");
         var result3 = AccessibilityTool.GenerateAccessibleComponent("form", "aA");
-        
+
         // Assert - All should normalize to uppercase
-        Assert.Contains("**WCAG Level**: AA", result1);
-        Assert.Contains("**WCAG Level**: AA", result2);
-        Assert.Contains("**WCAG Level**: AA", result3);
+        StringAssert.Contains(result1, "**WCAG Level**: AA", "Result should normalize lowercase aa to uppercase AA");
+        StringAssert.Contains(result2, "**WCAG Level**: AA", "Result should handle uppercase AA correctly");
+        StringAssert.Contains(result3, "**WCAG Level**: AA", "Result should normalize mixed case aA to uppercase AA");
     }
 
-    [Theory]
-    [InlineData("true", true)]
-    [InlineData("True", true)]
-    [InlineData("TRUE", true)]
-    [InlineData("false", false)]
-    [InlineData("False", false)]
-    [InlineData("FALSE", false)]
+    [DataTestMethod]
+    [DataRow("true", true)]
+    [DataRow("True", true)]
+    [DataRow("TRUE", true)]
+    [DataRow("false", false)]
+    [DataRow("False", false)]
+    [DataRow("FALSE", false)]
     public void GenerateAccessibleComponent_BooleanParameters_ParseCorrectly(string input, bool expected)
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", input, input);
-        
+
         // Assert
-        Assert.Contains($"**Keyboard Navigation**: {expected}", result);
-        Assert.Contains($"**Screen Reader Support**: {expected}", result);
+        StringAssert.Contains(result, $"**Keyboard Navigation**: {expected}", $"Result should contain keyboard navigation setting as {expected} for input '{input}'");
+        StringAssert.Contains(result, $"**Screen Reader Support**: {expected}", $"Result should contain screen reader support setting as {expected} for input '{input}'");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_DefaultParameters_UseCorrectDefaults()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form");
-        
+
         // Assert
-        Assert.Contains("**WCAG Level**: AA", result);
-        Assert.Contains("**Keyboard Navigation**: True", result);
-        Assert.Contains("**Screen Reader Support**: True", result);
+        StringAssert.Contains(result, "**WCAG Level**: AA", "Result should use AA as default WCAG level");
+        StringAssert.Contains(result, "**Keyboard Navigation**: True", "Result should use True as default keyboard navigation setting");
+        StringAssert.Contains(result, "**Screen Reader Support**: True", "Result should use True as default screen reader support setting");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_InvalidBooleanParameter_HandlesGracefully()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", "invalid", "invalid");
-        
+
         // Assert
-        Assert.Contains("Error generating accessible component", result);
+        StringAssert.Contains(result, "Error generating accessible component", "Result should contain error message for invalid boolean parameters");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_EmptyComponentType_HandlesGracefully()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("");
-        
+
         // Assert
-        Assert.Contains("# Accessible Component:", result);
+        StringAssert.Contains(result, "# Accessible Component:", "Result should contain component header even for empty component type");
         // Should handle empty component type without crashing
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_NullParameters_HandlesGracefully()
     {
         // Act & Assert - Should not throw exceptions
         var result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", "true", "true");
-        
+
         // Should handle parameters gracefully
-        Assert.NotNull(result);
-        Assert.Contains("# Accessible Component: form", result);
+        Assert.IsNotNull(result, "Result should not be null");
+        StringAssert.Contains(result, "# Accessible Component: form", "Result should contain form component header");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAccessibleComponent_ContainsProperAutomationProperties()
     {
         // Act
         var result = AccessibilityTool.GenerateAccessibleComponent("form");
-        
+
         // Assert
-        Assert.Contains("AutomationProperties.Name", result);
-        Assert.Contains("AutomationProperties.Description", result);
+        StringAssert.Contains(result, "AutomationProperties.Name", "Result should contain AutomationProperties.Name");
+        StringAssert.Contains(result, "AutomationProperties.Description", "Result should contain AutomationProperties.Description");
         // Verify XAML structure
-        Assert.Contains("xmlns=\"https://github.com/avaloniaui\"", result);
-        Assert.Contains("xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"", result);
+        StringAssert.Contains(result, "xmlns=\"https://github.com/avaloniaui\"", "Result should contain proper AvaloniaUI namespace");
+        StringAssert.Contains(result, "xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"", "Result should contain proper XAML namespace");
     }
 }

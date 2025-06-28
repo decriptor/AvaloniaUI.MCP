@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -90,9 +91,9 @@ public string WelcomeText => _localizationService.GetString(""WelcomeMessage"");
             var cultureList = cultures.Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(c => c.Trim()).ToList();
 
-            var formattingService = GenerateFormattingService(cultureList, 
-                bool.Parse(includeDateTimeFormatting), 
-                bool.Parse(includeNumberFormatting), 
+            var formattingService = GenerateFormattingService(cultureList,
+                bool.Parse(includeDateTimeFormatting),
+                bool.Parse(includeNumberFormatting),
                 bool.Parse(includeCurrencyFormatting));
 
             var validators = GenerateCultureValidators(cultureList);

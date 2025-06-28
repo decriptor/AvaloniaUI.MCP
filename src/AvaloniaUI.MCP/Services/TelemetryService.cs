@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+
 using Microsoft.Extensions.Logging;
 
 namespace AvaloniaUI.MCP.Services;
@@ -13,27 +14,27 @@ public interface ITelemetryService
     /// Records a tool execution event
     /// </summary>
     void RecordToolExecution(string toolName, bool success, TimeSpan duration, string? errorMessage = null);
-    
+
     /// <summary>
     /// Records a resource access event
     /// </summary>
     void RecordResourceAccess(string resourceName, bool cacheHit);
-    
+
     /// <summary>
     /// Records a validation event
     /// </summary>
     void RecordValidation(string validationType, bool success, string? errorDetails = null);
-    
+
     /// <summary>
     /// Records server startup/shutdown events
     /// </summary>
     void RecordServerEvent(string eventType, Dictionary<string, object>? properties = null);
-    
+
     /// <summary>
     /// Creates an activity for distributed tracing
     /// </summary>
     Activity? StartActivity(string activityName, string? parentId = null);
-    
+
     /// <summary>
     /// Gets current metrics snapshot
     /// </summary>
@@ -45,16 +46,16 @@ public class TelemetryService : ITelemetryService
     private readonly ILogger<TelemetryService> _logger;
     private readonly Meter _meter;
     private readonly ActivitySource _activitySource;
-    
+
     // Counters
     private readonly Counter<long> _toolExecutionCounter;
     private readonly Counter<long> _resourceAccessCounter;
     private readonly Counter<long> _validationCounter;
     private readonly Counter<long> _errorCounter;
-    
+
     // Histograms
     private readonly Histogram<double> _toolExecutionDuration;
-    
+
     // Tracking metrics
     private long _totalToolExecutions;
     private long _successfulToolExecutions;
@@ -67,28 +68,28 @@ public class TelemetryService : ITelemetryService
     public TelemetryService(ILogger<TelemetryService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        
+
         // Initialize OpenTelemetry components
         _meter = new Meter("AvaloniaUI.MCP", "1.0.0");
         _activitySource = new ActivitySource("AvaloniaUI.MCP");
-        
+
         // Initialize counters
         _toolExecutionCounter = _meter.CreateCounter<long>(
-            "mcp_tool_executions_total", 
+            "mcp_tool_executions_total",
             description: "Total number of tool executions");
-            
+
         _resourceAccessCounter = _meter.CreateCounter<long>(
             "mcp_resource_accesses_total",
             description: "Total number of resource accesses");
-            
+
         _validationCounter = _meter.CreateCounter<long>(
             "mcp_validations_total",
             description: "Total number of validations performed");
-            
+
         _errorCounter = _meter.CreateCounter<long>(
             "mcp_errors_total",
             description: "Total number of errors encountered");
-        
+
         // Initialize histograms
         _toolExecutionDuration = _meter.CreateHistogram<double>(
             "mcp_tool_execution_duration_ms",
@@ -103,16 +104,16 @@ public class TelemetryService : ITelemetryService
             _totalToolExecutions++;
             if (success) _successfulToolExecutions++;
         }
-        
+
         var tags = new KeyValuePair<string, object?>[]
         {
             new("tool_name", toolName),
             new("success", success)
         };
-        
+
         _toolExecutionCounter.Add(1, tags);
         _toolExecutionDuration.Record(duration.TotalMilliseconds, tags);
-        
+
         if (!success && !string.IsNullOrEmpty(errorMessage))
         {
             _errorCounter.Add(1, new KeyValuePair<string, object?>[]
@@ -121,10 +122,10 @@ public class TelemetryService : ITelemetryService
                 new("error_type", "tool_execution")
             });
         }
-        
+
         _logger.LogInformation("Tool execution: {ToolName} - Success: {Success}, Duration: {Duration}ms",
             toolName, success, duration.TotalMilliseconds);
-            
+
         if (!success && !string.IsNullOrEmpty(errorMessage))
         {
             _logger.LogWarning("Tool execution failed: {ToolName} - Error: {ErrorMessage}",
@@ -139,15 +140,15 @@ public class TelemetryService : ITelemetryService
             _totalResourceAccesses++;
             if (cacheHit) _cacheHits++;
         }
-        
+
         var tags = new KeyValuePair<string, object?>[]
         {
             new("resource_name", resourceName),
             new("cache_hit", cacheHit)
         };
-        
+
         _resourceAccessCounter.Add(1, tags);
-        
+
         _logger.LogDebug("Resource access: {ResourceName} - Cache hit: {CacheHit}",
             resourceName, cacheHit);
     }
@@ -159,15 +160,15 @@ public class TelemetryService : ITelemetryService
             _totalValidations++;
             if (success) _successfulValidations++;
         }
-        
+
         var tags = new KeyValuePair<string, object?>[]
         {
             new("validation_type", validationType),
             new("success", success)
         };
-        
+
         _validationCounter.Add(1, tags);
-        
+
         if (!success)
         {
             _errorCounter.Add(1, new KeyValuePair<string, object?>[]
@@ -176,10 +177,10 @@ public class TelemetryService : ITelemetryService
                 new("error_type", "validation")
             });
         }
-        
+
         _logger.LogDebug("Validation: {ValidationType} - Success: {Success}",
             validationType, success);
-            
+
         if (!success && !string.IsNullOrEmpty(errorDetails))
         {
             _logger.LogWarning("Validation failed: {ValidationType} - Details: {ErrorDetails}",
@@ -197,7 +198,7 @@ public class TelemetryService : ITelemetryService
             "warning" => LogLevel.Warning,
             _ => LogLevel.Debug
         };
-        
+
         if (properties?.Any() == true)
         {
             _logger.Log(logLevel, "Server event: {EventType} - Properties: {@Properties}",
@@ -212,15 +213,15 @@ public class TelemetryService : ITelemetryService
     public Activity? StartActivity(string activityName, string? parentId = null)
     {
         var activity = _activitySource.StartActivity(activityName);
-        
+
         if (activity != null && !string.IsNullOrEmpty(parentId))
         {
             activity.SetParentId(parentId);
         }
-        
+
         _logger.LogTrace("Started activity: {ActivityName} - TraceId: {TraceId}",
             activityName, activity?.TraceId);
-            
+
         return activity;
     }
 
@@ -228,18 +229,18 @@ public class TelemetryService : ITelemetryService
     {
         lock (_metricsLock)
         {
-            var cacheHitRate = _totalResourceAccesses > 0 
-                ? (double)_cacheHits / _totalResourceAccesses 
+            var cacheHitRate = _totalResourceAccesses > 0
+                ? (double)_cacheHits / _totalResourceAccesses
                 : 0.0;
-                
+
             var toolSuccessRate = _totalToolExecutions > 0
                 ? (double)_successfulToolExecutions / _totalToolExecutions
                 : 0.0;
-                
+
             var validationSuccessRate = _totalValidations > 0
                 ? (double)_successfulValidations / _totalValidations
                 : 0.0;
-            
+
             return new Dictionary<string, object>
             {
                 ["total_tool_executions"] = _totalToolExecutions,
@@ -275,7 +276,7 @@ public static class TelemetryExtensions
     {
         return new ToolExecutionScope(telemetry, toolName);
     }
-    
+
     /// <summary>
     /// Creates a telemetry scope that automatically records validation metrics
     /// </summary>

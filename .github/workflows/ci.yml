@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 env:
-  DOTNET_VERSION: '9.0.x'
+  DOTNET_VERSION: '9.0.300'
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
@@ -111,21 +111,32 @@ jobs:
       
     - name: Test MCP Server Startup
       run: |
-        # Start the MCP server in background
-        timeout 10s dotnet run --project src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj &
-        SERVER_PID=$!
+        # Test server startup with timeout to prevent hanging
+        echo "Testing MCP Server startup..."
         
-        # Wait a moment for startup
-        sleep 2
-        
-        # Check if server is still running (didn't crash)
-        if kill -0 $SERVER_PID 2>/dev/null; then
-          echo "✅ MCP Server started successfully"
-          kill $SERVER_PID
+        # Run server with timeout and capture output
+        if timeout 5s dotnet run --project src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj > server_output.log 2>&1; then
+          echo "✅ Server ran without immediate errors"
         else
-          echo "❌ MCP Server failed to start"
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -eq 124 ]; then
+            echo "✅ Server started and ran for expected duration (timeout reached)"
+          else
+            echo "❌ Server failed with exit code: $EXIT_CODE"
+            echo "Server output:"
+            cat server_output.log
+            exit 1
+          fi
+        fi
+        
+        # Check for any critical errors in the output
+        if grep -qi "unhandled exception\|fatal error" server_output.log; then
+          echo "❌ Server encountered fatal errors:"
+          cat server_output.log
           exit 1
         fi
+        
+        echo "✅ MCP Server startup test completed successfully"
         
     - name: Validate Data Files
       run: |

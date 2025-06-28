@@ -1,6 +1,8 @@
 using System.ComponentModel;
-using ModelContextProtocol.Server;
+
 using AvaloniaUI.MCP.Services;
+
+using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
 
@@ -21,7 +23,7 @@ public static class ProjectGeneratorTool
                 projectName: projectName,
                 templateType: template.ToLowerInvariant()
             );
-            
+
             if (!validation.IsValid)
                 return ErrorHandlingService.CreateValidationError("CreateAvaloniaProject", validation);
 
@@ -75,7 +77,7 @@ public static class ProjectGeneratorTool
 
         // Create ViewModels directory
         var viewModelsDir = Path.Combine(projectPath, "ViewModels");
-        
+
         // Add ViewModel files
         filesToCreate.AddRange(new[]
         {
@@ -167,7 +169,7 @@ public static class ProjectGeneratorTool
         // Create ViewModels
         var viewModelsDir = Path.Combine(projectPath, "ViewModels");
         Directory.CreateDirectory(viewModelsDir);
-        
+
         var mainViewModel = GenerateMainWindowViewModel(projectName);
         File.WriteAllText(Path.Combine(viewModelsDir, "MainWindowViewModel.cs"), mainViewModel);
 

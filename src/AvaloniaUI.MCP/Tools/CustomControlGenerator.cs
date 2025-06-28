@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -607,7 +608,7 @@ public partial class {config.Name} : UserControl
     private static string InferPropertyType(string propertyName)
     {
         var lowerName = propertyName.ToLowerInvariant();
-        
+
         if (lowerName.Contains("text") || lowerName.Contains("title") || lowerName.Contains("name"))
             return "string";
         if (lowerName.Contains("count") || lowerName.Contains("index") || lowerName.Contains("number"))
@@ -618,7 +619,7 @@ public partial class {config.Name} : UserControl
             return "double";
         if (lowerName.Contains("color") || lowerName.Contains("brush"))
             return "IBrush";
-        
+
         return "object";
     }
 
@@ -640,7 +641,7 @@ public partial class {config.Name} : UserControl
     private static string GenerateComplexControlTemplate(string targetControl, string templateName, List<string> states, bool animations)
     {
         var stateGroups = GenerateVisualStateGroups(states, animations);
-        
+
         return $@"<ControlTemplate x:Key=""{templateName}"" TargetType=""{targetControl}"">
     <Border Name=""PART_Border""
             Background=""{{TemplateBinding Background}}""
@@ -667,7 +668,7 @@ public partial class {config.Name} : UserControl
     private static string GenerateVisualStateGroups(List<string> states, bool animations)
     {
         var stateDefinitions = string.Join("\n", states.Select(state => GenerateVisualState(state, animations)));
-        
+
         return $@"            <VisualStateGroup x:Name=""CommonStates"">
 {stateDefinitions}
             </VisualStateGroup>";
@@ -676,7 +677,7 @@ public partial class {config.Name} : UserControl
     private static string GenerateVisualState(string stateName, bool animations)
     {
         var storyboard = animations ? GenerateStateStoryboard(stateName) : "";
-        
+
         return $@"                <VisualState x:Name=""{stateName}"">
 {storyboard}
                 </VisualState>";
@@ -691,7 +692,7 @@ public partial class {config.Name} : UserControl
                                          Storyboard.TargetProperty=""Opacity""
                                          To=""0.8"" Duration=""0:0:0.1"" />
                     </Storyboard>",
-            
+
             "pressed" => @"                    <Storyboard>
                         <DoubleAnimation Storyboard.TargetName=""PART_Border""
                                          Storyboard.TargetProperty=""(ScaleTransform.ScaleX)""
@@ -700,7 +701,7 @@ public partial class {config.Name} : UserControl
                                          Storyboard.TargetProperty=""(ScaleTransform.ScaleY)""
                                          To=""0.95"" Duration=""0:0:0.05"" />
                     </Storyboard>",
-            
+
             _ => ""
         };
     }
@@ -799,7 +800,7 @@ public static class {propertyName}Extensions
 
     private static string GenerateAttachedPropertyUsage(string propertyName, string propertyType, List<string> targets)
     {
-        var examples = string.Join("\n", targets.Select(target => 
+        var examples = string.Join("\n", targets.Select(target =>
             $"<{target} local:{propertyName}=\"{GetExampleValue(propertyType)}\" />"));
 
         return $@"<!-- Basic usage -->

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -108,7 +109,7 @@ public static class PerformanceAnalysisTool
         if (root != null)
         {
             var hasDataType = root.Attributes().Any(a => a.Name.LocalName == "DataType");
-            var hasBindings = doc.Descendants().Any(e => 
+            var hasBindings = doc.Descendants().Any(e =>
                 e.Attributes().Any(a => a.Value.Contains("{Binding")));
 
             if (hasBindings && !hasDataType)
@@ -126,7 +127,7 @@ public static class PerformanceAnalysisTool
 
     private static void CheckBindingPatterns(XDocument doc, List<string> issues, List<string> recommendations)
     {
-        var elementsWithBindings = doc.Descendants().Where(e => 
+        var elementsWithBindings = doc.Descendants().Where(e =>
             e.Attributes().Any(a => a.Value.Contains("{Binding")));
 
         foreach (var element in elementsWithBindings)
@@ -163,7 +164,7 @@ public static class PerformanceAnalysisTool
     {
         // Check for nested layout containers
         var layoutControls = new[] { "Grid", "StackPanel", "DockPanel", "Canvas", "WrapPanel" };
-        var nestedLayouts = doc.Descendants().Where(e => 
+        var nestedLayouts = doc.Descendants().Where(e =>
             layoutControls.Contains(e.Name.LocalName) &&
             e.Descendants().Any(child => layoutControls.Contains(child.Name.LocalName)));
 
@@ -175,14 +176,14 @@ public static class PerformanceAnalysisTool
         }
 
         // Check for Grid without explicit row/column definitions
-        var gridsWithoutDefinitions = doc.Descendants("Grid").Where(g => 
+        var gridsWithoutDefinitions = doc.Descendants("Grid").Where(g =>
             !g.Elements().Any(e => e.Name.LocalName.Contains("Definition")));
 
         foreach (var grid in gridsWithoutDefinitions)
         {
-            var hasGridProperties = grid.Descendants().Any(e => 
+            var hasGridProperties = grid.Descendants().Any(e =>
                 e.Attributes().Any(a => a.Name.LocalName.StartsWith("Grid.")));
-            
+
             if (hasGridProperties)
             {
                 issues.Add("⚠️ Grid with Grid.Row/Column but no RowDefinitions/ColumnDefinitions");
@@ -226,13 +227,13 @@ public static class PerformanceAnalysisTool
 
     private static void CheckVirtualization(XDocument doc, List<string> issues, List<string> recommendations)
     {
-        var listControls = doc.Descendants().Where(e => 
+        var listControls = doc.Descendants().Where(e =>
             new[] { "ListBox", "ListView", "DataGrid", "TreeView" }.Contains(e.Name.LocalName));
 
         foreach (var control in listControls)
         {
-            var hasVirtualization = control.Attributes().Any(a => 
-                a.Name.LocalName.Contains("Virtualization") || 
+            var hasVirtualization = control.Attributes().Any(a =>
+                a.Name.LocalName.Contains("Virtualization") ||
                 a.Value.Contains("VirtualizingStackPanel"));
 
             if (!hasVirtualization)
@@ -246,7 +247,7 @@ public static class PerformanceAnalysisTool
     private static void CheckStylingPerformance(XDocument doc, List<string> issues, List<string> recommendations)
     {
         var styles = doc.Descendants("Style");
-        var complexSelectors = styles.Where(s => 
+        var complexSelectors = styles.Where(s =>
         {
             var selector = s.Attribute("Selector")?.Value ?? "";
             return selector.Count(c => c == ' ') > 3 || selector.Contains(">");
@@ -259,7 +260,7 @@ public static class PerformanceAnalysisTool
         }
 
         // Check for inline styles
-        var inlineStyles = doc.Descendants().Where(e => 
+        var inlineStyles = doc.Descendants().Where(e =>
             e.Attributes().Any(a => new[] { "Background", "Foreground", "FontSize", "FontWeight" }.Contains(a.Name.LocalName)));
 
         if (inlineStyles.Count() > 10)
@@ -321,7 +322,7 @@ public static class PerformanceAnalysisTool
 
         var hasConfigureAwaitFalse = content.Contains("ConfigureAwait(false)");
         var hasAwait = content.Contains("await");
-        
+
         if (hasAwait && !hasConfigureAwaitFalse && !content.Contains("UI") && !content.Contains("Dispatcher"))
         {
             recommendations.Add("✅ Consider using ConfigureAwait(false) for non-UI async operations");

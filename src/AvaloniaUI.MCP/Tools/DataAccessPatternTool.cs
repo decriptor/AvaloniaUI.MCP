@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -208,7 +209,7 @@ public class {config.EntityName}Configuration : IEntityTypeConfiguration<{config
     private static string GenerateRepositoryInterface(RepositoryConfiguration config)
     {
         var specificationsCode = config.IncludeSpecifications ? GenerateSpecificationsInterface(config.EntityName) : "";
-        
+
         return $@"public interface I{config.EntityName}Repository : IRepository<{config.EntityName}>
 {{
     Task<{config.EntityName}?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
@@ -435,7 +436,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
     private static string GenerateDbContext(RepositoryConfiguration config)
     {
         var connectionString = GetConnectionString(config.DatabaseProvider);
-        
+
         return $@"public class ApplicationDbContext : DbContext
 {{
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {{ }}
@@ -539,7 +540,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
     private static string GenerateEFSetupInstructions(RepositoryConfiguration config)
     {
         var packageReference = GetPackageReference(config.DatabaseProvider);
-        
+
         return $@"### 1. Install Required Packages
 ```xml
 <PackageReference Include=""Microsoft.EntityFrameworkCore"" Version=""8.0.0"" />
@@ -774,7 +775,7 @@ dotnet ef database update
         {
             "memory" => "_cache.TryGetValue",
             "redis" => "_cache.GetAsync",
-            "distributed" => "_cache.GetAsync", 
+            "distributed" => "_cache.GetAsync",
             _ => "_cache.TryGetValue"
         };
     }
@@ -880,14 +881,14 @@ public class CachingService : ICachingService
                 return typedValue;
             }
             return default;",
-            
+
             "redis" or "distributed" => @"var json = await _cache.GetStringAsync(key, cancellationToken);
             if (!string.IsNullOrEmpty(json))
             {
                 return JsonSerializer.Deserialize<T>(json);
             }
             return default;",
-            
+
             _ => "return default;"
         };
     }
@@ -897,14 +898,14 @@ public class CachingService : ICachingService
         return provider switch
         {
             "memory" => "_cache.Set(key, value, expiration);",
-            
+
             "redis" or "distributed" => @"var json = JsonSerializer.Serialize(value);
             var options = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = expiration
             };
             await _cache.SetStringAsync(key, json, options, cancellationToken);",
-            
+
             _ => "// No implementation"
         };
     }

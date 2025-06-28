@@ -1,354 +1,354 @@
 using AvaloniaUI.MCP.Tools;
-using Xunit;
 
 namespace AvaloniaUI.MCP.Tests;
 
+[TestClass]
 public class CustomControlGeneratorTests
 {
-    [Theory]
-    [InlineData("templated")]
-    [InlineData("usercontrol")]
-    [InlineData("panel")]
+    [DataTestMethod]
+    [DataRow("templated")]
+    [DataRow("usercontrol")]
+    [DataRow("panel")]
     public void GenerateCustomControl_ValidControlTypes_ReturnsCorrectPattern(string controlType)
     {
         // Arrange
         var controlName = "TestControl";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateCustomControl(controlType, controlName);
-        
+
         // Assert
-        Assert.DoesNotContain("Error generating custom control", result);
-        Assert.Contains(controlName, result);
+        Assert.IsFalse(result.Contains("Error generating custom control"), "Result should not contain error message");
+        StringAssert.Contains(result, controlName, "Result should contain the control name");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_AttachedProperty_RequiresPropertyName()
     {
         // Arrange
         var controlName = "TestControl";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("attached-property", controlName, "Control", "TestProperty");
-        
+
         // Assert
-        Assert.Contains("TestProperty", result);
-        Assert.Contains("Attached Property", result);
+        StringAssert.Contains(result, "TestProperty", "Result should contain the property name");
+        StringAssert.Contains(result, "Attached Property", "Result should contain 'Attached Property' text");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_TemplatedControl_ContainsExpectedElements()
     {
         // Arrange
         var controlName = "MyTemplatedControl";
         var properties = "Title,IsEnabled,Value";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("templated", controlName, "Control", properties, "true");
-        
+
         // Assert
-        Assert.Contains($"# Templated Control: {controlName}", result);
-        Assert.Contains("## Control Implementation", result);
-        Assert.Contains("## Default Template", result);
-        Assert.Contains("## Control Style", result);
-        Assert.Contains("## Usage Example", result);
-        Assert.Contains("## Template Parts", result);
-        Assert.Contains("## Visual States", result);
-        Assert.Contains("PART_Border", result);
-        Assert.Contains("PART_ContentPresenter", result);
-        Assert.Contains("StyledProperty", result);
-        Assert.Contains("OnApplyTemplate", result);
+        StringAssert.Contains(result, $"# Templated Control: {controlName}", "Result should contain templated control header");
+        StringAssert.Contains(result, "## Control Implementation", "Result should contain Control Implementation section");
+        StringAssert.Contains(result, "## Default Template", "Result should contain Default Template section");
+        StringAssert.Contains(result, "## Control Style", "Result should contain Control Style section");
+        StringAssert.Contains(result, "## Usage Example", "Result should contain Usage Example section");
+        StringAssert.Contains(result, "## Template Parts", "Result should contain Template Parts section");
+        StringAssert.Contains(result, "## Visual States", "Result should contain Visual States section");
+        StringAssert.Contains(result, "PART_Border", "Result should contain PART_Border template part");
+        StringAssert.Contains(result, "PART_ContentPresenter", "Result should contain PART_ContentPresenter template part");
+        StringAssert.Contains(result, "StyledProperty", "Result should contain StyledProperty implementation");
+        StringAssert.Contains(result, "OnApplyTemplate", "Result should contain OnApplyTemplate method");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_UserControl_ContainsExpectedElements()
     {
         // Arrange
         var controlName = "MyUserControl";
         var properties = "Header,Content";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("usercontrol", controlName, "UserControl", properties);
-        
+
         // Assert
-        Assert.Contains($"# User Control: {controlName}", result);
-        Assert.Contains("## XAML Definition", result);
-        Assert.Contains("## Code-Behind", result);
-        Assert.Contains("## Usage Example", result);
-        Assert.Contains("## Data Binding Integration", result);
-        Assert.Contains("## Styling", result);
-        Assert.Contains("xmlns=\"https://github.com/avaloniaui\"", result);
-        Assert.Contains("InitializeComponent", result);
+        StringAssert.Contains(result, $"# User Control: {controlName}", "Result should contain user control header");
+        StringAssert.Contains(result, "## XAML Definition", "Result should contain XAML Definition section");
+        StringAssert.Contains(result, "## Code-Behind", "Result should contain Code-Behind section");
+        StringAssert.Contains(result, "## Usage Example", "Result should contain Usage Example section");
+        StringAssert.Contains(result, "## Data Binding Integration", "Result should contain Data Binding Integration section");
+        StringAssert.Contains(result, "## Styling", "Result should contain Styling section");
+        StringAssert.Contains(result, "xmlns=\"https://github.com/avaloniaui\"", "Result should contain AvaloniaUI namespace");
+        StringAssert.Contains(result, "InitializeComponent", "Result should contain InitializeComponent call");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_Panel_ReturnsLayoutPanelPattern()
     {
         // Arrange
         var controlName = "MyCustomPanel";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("panel", controlName);
-        
+
         // Assert
-        Assert.Contains($"# Custom Layout Panel: {controlName}", result);
-        Assert.Contains("## Panel Implementation", result);
-        Assert.Contains("MeasureOverride", result);
-        Assert.Contains("ArrangeOverride", result);
-        Assert.Contains("Layout Strategy: custom", result);
+        StringAssert.Contains(result, $"# Custom Layout Panel: {controlName}", "Result should contain panel header");
+        StringAssert.Contains(result, "## Panel Implementation", "Result should contain Panel Implementation section");
+        StringAssert.Contains(result, "MeasureOverride", "Result should contain MeasureOverride method");
+        StringAssert.Contains(result, "ArrangeOverride", "Result should contain ArrangeOverride method");
+        StringAssert.Contains(result, "Layout Strategy: custom", "Result should contain custom layout strategy");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_AttachedProperty_ContainsExpectedElements()
     {
         // Arrange
         var controlName = "MyAttachedProperty";
         var properties = "IsSpecial";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("attached-property", controlName, "Control", properties);
-        
+
         // Assert
-        Assert.Contains($"# Attached Property: {properties}", result);
-        Assert.Contains("## Property Definition", result);
-        Assert.Contains("## Usage Examples", result);
-        Assert.Contains("## Styling Integration", result);
-        Assert.Contains("AttachedProperty", result);
-        Assert.Contains("Get" + properties, result);
-        Assert.Contains("Set" + properties, result);
+        StringAssert.Contains(result, $"# Attached Property: {properties}", "Result should contain attached property header");
+        StringAssert.Contains(result, "## Property Definition", "Result should contain Property Definition section");
+        StringAssert.Contains(result, "## Usage Examples", "Result should contain Usage Examples section");
+        StringAssert.Contains(result, "## Styling Integration", "Result should contain Styling Integration section");
+        StringAssert.Contains(result, "AttachedProperty", "Result should contain AttachedProperty declaration");
+        StringAssert.Contains(result, "Get" + properties, "Result should contain getter method");
+        StringAssert.Contains(result, "Set" + properties, "Result should contain setter method");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_WithoutTemplate_ExcludesTemplateSection()
     {
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("templated", "TestControl", "Control", "", "false");
-        
+
         // Assert
-        Assert.DoesNotContain("## Default Template", result);
-        Assert.Contains("## Control Style", result);
+        Assert.IsFalse(result.Contains("## Default Template"), "Result should not contain Default Template section when template is disabled");
+        StringAssert.Contains(result, "## Control Style", "Result should still contain Control Style section");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_WithProperties_IncludesPropertyBindings()
     {
         // Arrange
         var properties = "Title,Value,IsEnabled";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("templated", "TestControl", "Control", properties);
-        
+
         // Assert
-        Assert.Contains("Title=\"{Binding Title}\"", result);
-        Assert.Contains("Value=\"{Binding Value}\"", result);
-        Assert.Contains("IsEnabled=\"{Binding IsEnabled}\"", result);
+        StringAssert.Contains(result, "Title=\"{Binding Title}\"", "Result should contain Title property binding");
+        StringAssert.Contains(result, "Value=\"{Binding Value}\"", "Result should contain Value property binding");
+        StringAssert.Contains(result, "IsEnabled=\"{Binding IsEnabled}\"", "Result should contain IsEnabled property binding");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateControlTemplate_ValidInputs_ReturnsTemplate()
     {
         // Arrange
         var targetControl = "Button";
         var templateName = "CustomButtonTemplate";
         var visualStates = "Normal,PointerOver,Pressed";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateControlTemplate(targetControl, templateName, visualStates, "true");
-        
+
         // Assert
-        Assert.Contains($"# Custom Control Template: {templateName} for {targetControl}", result);
-        Assert.Contains("## Template Definition", result);
-        Assert.Contains("## Style Integration", result);
-        Assert.Contains("## Usage Example", result);
-        Assert.Contains("## Visual State Management", result);
-        Assert.Contains("ControlTemplate", result);
-        Assert.Contains("VisualStateGroup", result);
-        Assert.Contains("Normal", result);
-        Assert.Contains("PointerOver", result);
-        Assert.Contains("Pressed", result);
+        StringAssert.Contains(result, $"# Custom Control Template: {templateName} for {targetControl}", "Result should contain template header");
+        StringAssert.Contains(result, "## Template Definition", "Result should contain Template Definition section");
+        StringAssert.Contains(result, "## Style Integration", "Result should contain Style Integration section");
+        StringAssert.Contains(result, "## Usage Example", "Result should contain Usage Example section");
+        StringAssert.Contains(result, "## Visual State Management", "Result should contain Visual State Management section");
+        StringAssert.Contains(result, "ControlTemplate", "Result should contain ControlTemplate definition");
+        StringAssert.Contains(result, "VisualStateGroup", "Result should contain VisualStateGroup");
+        StringAssert.Contains(result, "Normal", "Result should contain Normal visual state");
+        StringAssert.Contains(result, "PointerOver", "Result should contain PointerOver visual state");
+        StringAssert.Contains(result, "Pressed", "Result should contain Pressed visual state");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateControlTemplate_WithAnimations_IncludesStoryboards()
     {
         // Act
         var result = CustomControlGenerator.GenerateControlTemplate("Button", "AnimatedTemplate", "PointerOver,Pressed", "true");
-        
+
         // Assert
-        Assert.Contains("Storyboard", result);
-        Assert.Contains("DoubleAnimation", result);
-        Assert.Contains("Duration", result);
+        StringAssert.Contains(result, "Storyboard", "Result should contain Storyboard for animations");
+        StringAssert.Contains(result, "DoubleAnimation", "Result should contain DoubleAnimation");
+        StringAssert.Contains(result, "Duration", "Result should contain Duration property");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateControlTemplate_WithoutAnimations_ExcludesStoryboards()
     {
         // Act
         var result = CustomControlGenerator.GenerateControlTemplate("Button", "StaticTemplate", "Normal,Pressed", "false");
-        
+
         // Assert
-        Assert.Contains("VisualState x:Name=\"Normal\"", result);
-        Assert.Contains("VisualState x:Name=\"Pressed\"", result);
+        StringAssert.Contains(result, "VisualState x:Name=\"Normal\"", "Result should contain Normal visual state");
+        StringAssert.Contains(result, "VisualState x:Name=\"Pressed\"", "Result should contain Pressed visual state");
         // Should not contain storyboard content for static template
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAttachedProperty_ValidInputs_ReturnsPattern()
     {
         // Arrange
         var propertyName = "IsSpecial";
         var propertyType = "bool";
         var targetControls = "Button,TextBox";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateAttachedProperty(propertyName, propertyType, targetControls, "true");
-        
+
         // Assert
-        Assert.Contains($"# Attached Property: {propertyName}", result);
-        Assert.Contains("## Property Definition", result);
-        Assert.Contains("## Usage Examples", result);
-        Assert.Contains("## Styling Integration", result);
-        Assert.Contains("## Advanced Usage Patterns", result);
-        Assert.Contains($"Get{propertyName}", result);
-        Assert.Contains($"Set{propertyName}", result);
-        Assert.Contains("AttachedProperty<bool>", result);
-        Assert.Contains("Button", result);
-        Assert.Contains("TextBox", result);
+        StringAssert.Contains(result, $"# Attached Property: {propertyName}", "Result should contain property header");
+        StringAssert.Contains(result, "## Property Definition", "Result should contain Property Definition section");
+        StringAssert.Contains(result, "## Usage Examples", "Result should contain Usage Examples section");
+        StringAssert.Contains(result, "## Styling Integration", "Result should contain Styling Integration section");
+        StringAssert.Contains(result, "## Advanced Usage Patterns", "Result should contain Advanced Usage Patterns section");
+        StringAssert.Contains(result, $"Get{propertyName}", "Result should contain getter method");
+        StringAssert.Contains(result, $"Set{propertyName}", "Result should contain setter method");
+        StringAssert.Contains(result, "AttachedProperty<bool>", "Result should contain AttachedProperty type declaration");
+        StringAssert.Contains(result, "Button", "Result should contain Button target control");
+        StringAssert.Contains(result, "TextBox", "Result should contain TextBox target control");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAttachedProperty_WithHandler_IncludesChangeHandler()
     {
         // Act
         var result = CustomControlGenerator.GenerateAttachedProperty("CustomProperty", "string", "Control", "true");
-        
+
         // Assert
-        Assert.Contains("coerce:", result);
-        Assert.Contains("CoerceCustomProperty", result);
-        Assert.Contains("OnCustomPropertyChanged", result);
+        StringAssert.Contains(result, "coerce:", "Result should contain coerce callback");
+        StringAssert.Contains(result, "CoerceCustomProperty", "Result should contain coerce method");
+        StringAssert.Contains(result, "OnCustomPropertyChanged", "Result should contain change handler method");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAttachedProperty_WithoutHandler_ExcludesChangeHandler()
     {
         // Act
         var result = CustomControlGenerator.GenerateAttachedProperty("SimpleProperty", "int", "Control", "false");
-        
+
         // Assert
-        Assert.DoesNotContain("coerce:", result);
-        Assert.DoesNotContain("Coerce", result);
-        Assert.DoesNotContain("Changed", result);
+        Assert.IsFalse(result.Contains("coerce:"), "Result should not contain coerce callback when handler is disabled");
+        Assert.IsFalse(result.Contains("Coerce"), "Result should not contain Coerce methods when handler is disabled");
+        Assert.IsFalse(result.Contains("Changed"), "Result should not contain Changed methods when handler is disabled");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateLayoutPanel_ValidInputs_ReturnsPanel()
     {
         // Arrange
         var panelName = "FlowPanel";
         var layoutStrategy = "flow";
-        
+
         // Act
         var result = CustomControlGenerator.GenerateLayoutPanel(panelName, layoutStrategy, "false", "true");
-        
+
         // Assert
-        Assert.Contains($"# Custom Layout Panel: {panelName}", result);
-        Assert.Contains("## Panel Implementation", result);
-        Assert.Contains("## Attached Properties", result);
-        Assert.Contains("## Usage Example", result);
-        Assert.Contains("## Layout Strategy: flow", result);
-        Assert.Contains("MeasureOverride", result);
-        Assert.Contains("ArrangeOverride", result);
-        Assert.Contains("BreakLineProperty", result);
+        StringAssert.Contains(result, $"# Custom Layout Panel: {panelName}", "Result should contain panel header");
+        StringAssert.Contains(result, "## Panel Implementation", "Result should contain Panel Implementation section");
+        StringAssert.Contains(result, "## Attached Properties", "Result should contain Attached Properties section");
+        StringAssert.Contains(result, "## Usage Example", "Result should contain Usage Example section");
+        StringAssert.Contains(result, "## Layout Strategy: flow", "Result should contain flow layout strategy");
+        StringAssert.Contains(result, "MeasureOverride", "Result should contain MeasureOverride method");
+        StringAssert.Contains(result, "ArrangeOverride", "Result should contain ArrangeOverride method");
+        StringAssert.Contains(result, "BreakLineProperty", "Result should contain BreakLineProperty for flow layout");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateLayoutPanel_CircularStrategy_IncludesCircularProperties()
     {
         // Act
         var result = CustomControlGenerator.GenerateLayoutPanel("CircularPanel", "circular", "false", "true");
-        
+
         // Assert
-        Assert.Contains("RadiusOffsetProperty", result);
-        Assert.Contains("GetRadiusOffset", result);
-        Assert.Contains("SetRadiusOffset", result);
-        Assert.Contains("CalculateCircularPosition", result);
+        StringAssert.Contains(result, "RadiusOffsetProperty", "Result should contain RadiusOffsetProperty for circular layout");
+        StringAssert.Contains(result, "GetRadiusOffset", "Result should contain GetRadiusOffset method");
+        StringAssert.Contains(result, "SetRadiusOffset", "Result should contain SetRadiusOffset method");
+        StringAssert.Contains(result, "CalculateCircularPosition", "Result should contain CalculateCircularPosition method");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateLayoutPanel_MasonryStrategy_IncludesMasonryProperties()
     {
         // Act
         var result = CustomControlGenerator.GenerateLayoutPanel("MasonryPanel", "masonry", "false", "true");
-        
+
         // Assert
-        Assert.Contains("ColumnSpanProperty", result);
-        Assert.Contains("GetColumnSpan", result);
-        Assert.Contains("SetColumnSpan", result);
-        Assert.Contains("CalculateMasonryPosition", result);
+        StringAssert.Contains(result, "ColumnSpanProperty", "Result should contain ColumnSpanProperty for masonry layout");
+        StringAssert.Contains(result, "GetColumnSpan", "Result should contain GetColumnSpan method");
+        StringAssert.Contains(result, "SetColumnSpan", "Result should contain SetColumnSpan method");
+        StringAssert.Contains(result, "CalculateMasonryPosition", "Result should contain CalculateMasonryPosition method");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateLayoutPanel_WithVirtualization_IncludesVirtualizationCode()
     {
         // Act
         var result = CustomControlGenerator.GenerateLayoutPanel("VirtualPanel", "flow", "true", "false");
-        
+
         // Assert
-        Assert.Contains("VirtualizingPanel", result);
-        Assert.Contains("_realizedChildren", result);
-        Assert.Contains("_recycledChildren", result);
-        Assert.Contains("GetOrCreateChild", result);
-        Assert.Contains("Virtualization Implementation", result);
+        StringAssert.Contains(result, "VirtualizingPanel", "Result should contain VirtualizingPanel base class");
+        StringAssert.Contains(result, "_realizedChildren", "Result should contain _realizedChildren field");
+        StringAssert.Contains(result, "_recycledChildren", "Result should contain _recycledChildren field");
+        StringAssert.Contains(result, "GetOrCreateChild", "Result should contain GetOrCreateChild method");
+        StringAssert.Contains(result, "Virtualization Implementation", "Result should contain virtualization implementation section");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateLayoutPanel_WithoutVirtualization_ExcludesVirtualizationCode()
     {
         // Act
         var result = CustomControlGenerator.GenerateLayoutPanel("SimplePanel", "flow", "false", "false");
-        
+
         // Assert
-        Assert.DoesNotContain("VirtualizingPanel", result);
-        Assert.DoesNotContain("_realizedChildren", result);
-        Assert.Contains("Panel", result);
-        Assert.Contains("Virtualization not enabled", result);
+        Assert.IsFalse(result.Contains("VirtualizingPanel"), "Result should not contain VirtualizingPanel when virtualization is disabled");
+        Assert.IsFalse(result.Contains("_realizedChildren"), "Result should not contain virtualization fields when disabled");
+        StringAssert.Contains(result, "Panel", "Result should contain base Panel class");
+        StringAssert.Contains(result, "Virtualization not enabled", "Result should indicate virtualization is not enabled");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_InvalidControlType_ReturnsError()
     {
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("invalid-type", "TestControl");
-        
+
         // Assert
-        Assert.Contains("Error generating custom control", result);
-        Assert.Contains("Unknown control type", result);
+        StringAssert.Contains(result, "Error generating custom control", "Result should contain error message for invalid control type");
+        StringAssert.Contains(result, "Unknown control type", "Result should contain specific error about unknown control type");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateCustomControl_EmptyControlName_HandlesGracefully()
     {
         // Act
         var result = CustomControlGenerator.GenerateCustomControl("templated", "");
-        
+
         // Assert
         // Should handle empty name gracefully without crashing
-        Assert.Contains("Templated Control:", result);
+        StringAssert.Contains(result, "Templated Control:", "Result should contain templated control header even with empty name");
     }
 
-    [Theory]
-    [InlineData("string", "Example")]
-    [InlineData("bool", "true")]
-    [InlineData("int", "42")]
-    [InlineData("double", "3.14")]
-    [InlineData("object", "SomeValue")]
+    [DataTestMethod]
+    [DataRow("string", "Example")]
+    [DataRow("bool", "true")]
+    [DataRow("int", "42")]
+    [DataRow("double", "3.14")]
+    [DataRow("object", "SomeValue")]
     public void GenerateAttachedProperty_DifferentPropertyTypes_ReturnsCorrectExamples(string propertyType, string expectedExample)
     {
         // Act
         var result = CustomControlGenerator.GenerateAttachedProperty("TestProperty", propertyType, "Control", "false");
-        
+
         // Assert
-        Assert.Contains($"AttachedProperty<{propertyType}>", result);
-        Assert.Contains(expectedExample, result);
+        StringAssert.Contains(result, $"AttachedProperty<{propertyType}>", "Result should contain correct AttachedProperty type declaration");
+        StringAssert.Contains(result, expectedExample, "Result should contain expected example value for property type");
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -1113,7 +1114,7 @@ public class {targetInterface}MockSetup
     private static string GenerateTestDataBuilder(string targetInterface)
     {
         var className = targetInterface.StartsWith("I") ? targetInterface.Substring(1) : targetInterface;
-        
+
         return $@"public class {className}TestDataBuilder
 {{
     private string _id = Guid.NewGuid().ToString();

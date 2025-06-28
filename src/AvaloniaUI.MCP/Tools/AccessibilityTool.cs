@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -261,7 +262,7 @@ public static class AccessibilityTool
                             <MenuItem.Icon>
                                 <TextBlock Text=""📁"" AutomationProperties.Name=""Projects Icon"" />
                             </MenuItem.Icon>
-                            
+
                             <!-- Sub-menu -->
                             <MenuItem Header=""All Projects""
                                      AutomationProperties.Name=""All Projects""
@@ -329,7 +330,7 @@ public static class AccessibilityTool
                                                AutomationProperties.Name=""{Binding AccessibleName}""
                                                Classes=""breadcrumb-item""
                                                Command=""{Binding NavigateCommand}"" />
-                                        <TextBlock Text="">"" 
+                                        <TextBlock Text="">""
                                                   IsVisible=""{Binding !IsLast}""
                                                   Classes=""breadcrumb-separator""
                                                   AutomationProperties.Name=""Navigate to"" />
@@ -443,7 +444,7 @@ public static class AccessibilityTool
                 </DataGridTextColumn>
 
                 <DataGridTextColumn Header=""Last Login""
-                                  Binding=""{Binding LastLogin, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}"" 
+                                  Binding=""{Binding LastLogin, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}""
                                   Width=""150""
                                   CanUserSort=""True""
                                   SortMemberPath=""LastLogin"">
@@ -466,13 +467,13 @@ public static class AccessibilityTool
                         <DataTemplate>
                             <StackPanel Orientation=""Horizontal"" Spacing=""4"">
                                 <Button Content=""Edit""
-                                       AutomationProperties.Name=""{Binding ., StringFormat='Edit user {0}'}"" 
+                                       AutomationProperties.Name=""{Binding ., StringFormat='Edit user {0}'}""
                                        AutomationProperties.HelpText=""Edit this user's information""
                                        Classes=""small secondary""
                                        Command=""{Binding $parent[UserControl].DataContext.EditUserCommand}""
                                        CommandParameter=""{Binding}"" />
                                 <Button Content=""Delete""
-                                       AutomationProperties.Name=""{Binding ., StringFormat='Delete user {0}'}"" 
+                                       AutomationProperties.Name=""{Binding ., StringFormat='Delete user {0}'}""
                                        AutomationProperties.HelpText=""Remove this user from the system""
                                        Classes=""small danger""
                                        Command=""{Binding $parent[UserControl].DataContext.DeleteUserCommand}""
@@ -522,7 +523,7 @@ public static class AccessibilityTool
 
     <!-- Modal Overlay -->
     <Border Background=""Black"" Opacity=""0.5"" />
-    
+
     <!-- Modal Content -->
     <Border Background=""{StaticResource DialogBrush}""
            CornerRadius=""8""
@@ -535,7 +536,7 @@ public static class AccessibilityTool
            AutomationProperties.Role=""Dialog""
            AutomationProperties.Name=""Confirmation Dialog""
            AutomationProperties.Description=""Please confirm your action"">
-        
+
         <StackPanel Spacing=""16"" Margin=""24"">
             <!-- Dialog Header -->
             <Grid ColumnDefinitions=""*,Auto"">
@@ -544,7 +545,7 @@ public static class AccessibilityTool
                           Classes=""heading2""
                           AutomationProperties.HeadingLevel=""1""
                           AutomationProperties.Name=""Dialog Title"" />
-                
+
                 <Button Grid.Column=""1""
                        Content=""✕""
                        AutomationProperties.Name=""Close Dialog""
@@ -552,12 +553,12 @@ public static class AccessibilityTool
                        Classes=""icon close""
                        Command=""{Binding CloseCommand}"" />
             </Grid>
-            
+
             <!-- Dialog Content -->
             <TextBlock Text=""Are you sure you want to perform this action? This cannot be undone.""
                       TextWrapping=""Wrap""
                       AutomationProperties.Description=""Warning about permanent action"" />
-            
+
             <!-- Dialog Actions -->
             <StackPanel Orientation=""Horizontal""
                        HorizontalAlignment=""Right""
@@ -594,7 +595,7 @@ public static class AccessibilityTool
            Padding=""16""
            AutomationProperties.Role=""Alert""
            AutomationProperties.LiveSetting=""Assertive"">
-        
+
         <Grid ColumnDefinitions=""Auto,*,Auto"">
             <!-- Notification Icon -->
             <Border Grid.Column=""0""
@@ -609,7 +610,7 @@ public static class AccessibilityTool
                           VerticalAlignment=""Center""
                           AutomationProperties.Name=""{Binding IconDescription}"" />
             </Border>
-            
+
             <!-- Notification Content -->
             <StackPanel Grid.Column=""1"" Spacing=""8"">
                 <TextBlock Text=""{Binding Title}""
@@ -617,12 +618,12 @@ public static class AccessibilityTool
                           FontWeight=""Bold""
                           AutomationProperties.HeadingLevel=""2""
                           IsVisible=""{Binding HasTitle}"" />
-                
+
                 <TextBlock Text=""{Binding Message}""
                           Classes=""notification-message""
                           TextWrapping=""Wrap""
                           AutomationProperties.Description=""{Binding Message}"" />
-                
+
                 <!-- Action Buttons -->
                 <StackPanel Orientation=""Horizontal""
                            Spacing=""8""
@@ -632,7 +633,7 @@ public static class AccessibilityTool
                            Classes=""notification-action primary""
                            Command=""{Binding PrimaryActionCommand}""
                            IsVisible=""{Binding HasPrimaryAction}"" />
-                    
+
                     <Button Content=""{Binding SecondaryActionText}""
                            AutomationProperties.Name=""{Binding SecondaryActionDescription}""
                            Classes=""notification-action secondary""
@@ -640,7 +641,7 @@ public static class AccessibilityTool
                            IsVisible=""{Binding HasSecondaryAction}"" />
                 </StackPanel>
             </StackPanel>
-            
+
             <!-- Dismiss Button -->
             <Button Grid.Column=""2""
                    Content=""✕""
@@ -784,13 +785,13 @@ public static class AccessibilityHelpers
 
         // Hide error message initially
         errorMessage.IsVisible = false;
-        
+
         // Set up live region for error announcements
         AutomationProperties.SetLiveSetting(errorMessage, AutomationLiveSetting.Assertive);
-        
+
         // Associate error with input
         AutomationProperties.SetDescribedBy(input, errorMessage);
-        
+
         // Set accessible name for error
         AutomationProperties.SetName(errorMessage, $""{fieldName} error message"");
     }
@@ -804,7 +805,7 @@ public static class AccessibilityHelpers
 
         control.KeyDown += keyHandler;
         control.Focusable = true;
-        
+
         // Ensure control is included in tab order
         if (control.TabIndex == 0)
         {
@@ -819,7 +820,7 @@ public static class AccessibilityHelpers
     {
         var contrastRatio = CalculateContrastRatio(foreground, background);
         var minimumRatio = isLargeText ? 3.0 : 4.5; // WCAG AA standards
-        
+
         return contrastRatio >= minimumRatio;
     }
 
@@ -827,10 +828,10 @@ public static class AccessibilityHelpers
     {
         var l1 = GetRelativeLuminance(foreground);
         var l2 = GetRelativeLuminance(background);
-        
+
         var lighter = Math.Max(l1, l2);
         var darker = Math.Min(l1, l2);
-        
+
         return (lighter + 0.05) / (darker + 0.05);
     }
 
@@ -839,14 +840,14 @@ public static class AccessibilityHelpers
         var r = GetLuminanceComponent(color.R / 255.0);
         var g = GetLuminanceComponent(color.G / 255.0);
         var b = GetLuminanceComponent(color.B / 255.0);
-        
+
         return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     }
 
     private static double GetLuminanceComponent(double component)
     {
-        return component <= 0.03928 
-            ? component / 12.92 
+        return component <= 0.03928
+            ? component / 12.92
             : Math.Pow((component + 0.055) / 1.055, 2.4);
     }
 }";

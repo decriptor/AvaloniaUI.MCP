@@ -1,271 +1,271 @@
 using AvaloniaUI.MCP.Tools;
-using Xunit;
 
 namespace AvaloniaUI.MCP.Tests;
 
+[TestClass]
 public class SecurityPatternToolTests
 {
-    [Theory]
-    [InlineData("jwt")]
-    [InlineData("oauth")]
-    [InlineData("basic")]
-    [InlineData("multi-factor")]
+    [DataTestMethod]
+    [DataRow("jwt")]
+    [DataRow("oauth")]
+    [DataRow("basic")]
+    [DataRow("multi-factor")]
     public void GenerateAuthenticationPattern_ValidAuthTypes_ReturnsSecurePattern(string authType)
     {
         // Act
         var result = SecurityPatternTool.GenerateAuthenticationPattern(authType);
-        
+
         // Assert
-        Assert.Contains($"# Security Pattern: {authType}", result);
-        Assert.Contains("SECURITY NOTICE", result);
-        Assert.Contains("DEFENSIVE security patterns", result);
-        Assert.Contains("PREVENT vulnerabilities", result);
-        Assert.Contains("Security Best Practices", result);
-        Assert.Contains("Never store passwords in plain text", result);
-        Assert.Contains("Use HTTPS for all authentication endpoints", result);
+        StringAssert.Contains(result, $"# Security Pattern: {authType}", "Result should contain security pattern header for the auth type");
+        StringAssert.Contains(result, "SECURITY NOTICE", "Result should contain security notice");
+        StringAssert.Contains(result, "DEFENSIVE security patterns", "Result should contain defensive security patterns mention");
+        StringAssert.Contains(result, "PREVENT vulnerabilities", "Result should contain vulnerability prevention mention");
+        StringAssert.Contains(result, "Security Best Practices", "Result should contain security best practices section");
+        StringAssert.Contains(result, "Never store passwords in plain text", "Result should contain password storage best practice");
+        StringAssert.Contains(result, "Use HTTPS for all authentication endpoints", "Result should contain HTTPS enforcement best practice");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAuthenticationPattern_JWT_ContainsJWTSpecificElements()
     {
         // Act
         var result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "standard");
-        
+
         // Assert
-        Assert.Contains("JWT Authentication Service", result);
-        Assert.Contains("IJwtAuthenticationService", result);
-        Assert.Contains("AuthenticateAsync", result);
-        Assert.Contains("RefreshTokenAsync", result);
-        Assert.Contains("ValidateTokenAsync", result);
-        Assert.Contains("RevokeTokenAsync", result);
-        Assert.Contains("Rate limiting", result);
+        StringAssert.Contains(result, "JWT Authentication Service", "Result should contain JWT authentication service");
+        StringAssert.Contains(result, "IJwtAuthenticationService", "Result should contain JWT authentication service interface");
+        StringAssert.Contains(result, "AuthenticateAsync", "Result should contain authenticate method");
+        StringAssert.Contains(result, "RefreshTokenAsync", "Result should contain refresh token method");
+        StringAssert.Contains(result, "ValidateTokenAsync", "Result should contain validate token method");
+        StringAssert.Contains(result, "RevokeTokenAsync", "Result should contain revoke token method");
+        StringAssert.Contains(result, "Rate limiting", "Result should contain rate limiting mention");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAuthenticationPattern_OAuth_ContainsOAuthSpecificElements()
     {
         // Act
         var result = SecurityPatternTool.GenerateAuthenticationPattern("oauth");
-        
+
         // Assert
-        Assert.Contains("OAuth 2.0 Authentication Service", result);
-        Assert.Contains("IOAuthAuthenticationService", result);
-        Assert.Contains("GetAuthorizationUrlAsync", result);
-        Assert.Contains("ExchangeCodeForTokenAsync", result);
-        Assert.Contains("PKCE", result);
-        Assert.Contains("state parameter for CSRF protection", result);
+        StringAssert.Contains(result, "OAuth 2.0 Authentication Service", "Result should contain OAuth 2.0 authentication service");
+        StringAssert.Contains(result, "IOAuthAuthenticationService", "Result should contain OAuth authentication service interface");
+        StringAssert.Contains(result, "GetAuthorizationUrlAsync", "Result should contain get authorization URL method");
+        StringAssert.Contains(result, "ExchangeCodeForTokenAsync", "Result should contain code exchange method");
+        StringAssert.Contains(result, "PKCE", "Result should contain PKCE security feature");
+        StringAssert.Contains(result, "state parameter for CSRF protection", "Result should contain CSRF protection mention");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAuthenticationPattern_BasicAuth_ContainsTimingAttackPrevention()
     {
         // Act
         var result = SecurityPatternTool.GenerateAuthenticationPattern("basic");
-        
+
         // Assert
-        Assert.Contains("Basic Authentication Service", result);
-        Assert.Contains("consistent timing to prevent username enumeration", result);
-        Assert.Contains("dummy", result);
+        StringAssert.Contains(result, "Basic Authentication Service", "Result should contain basic authentication service");
+        StringAssert.Contains(result, "consistent timing to prevent username enumeration", "Result should contain timing attack prevention");
+        StringAssert.Contains(result, "dummy", "Result should contain dummy operation for timing consistency");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAuthenticationPattern_MultiFactor_ContainsMFAElements()
     {
         // Act
         var result = SecurityPatternTool.GenerateAuthenticationPattern("multi-factor");
-        
+
         // Assert
-        Assert.Contains("Multi-Factor Authentication Service", result);
-        Assert.Contains("IMultiFactorAuthenticationService", result);
-        Assert.Contains("SetupMfaAsync", result);
-        Assert.Contains("VerifyMfaAsync", result);
-        Assert.Contains("GenerateBackupCodesAsync", result);
-        Assert.Contains("TOTP", result);
+        StringAssert.Contains(result, "Multi-Factor Authentication Service", "Result should contain multi-factor authentication service");
+        StringAssert.Contains(result, "IMultiFactorAuthenticationService", "Result should contain MFA service interface");
+        StringAssert.Contains(result, "SetupMfaAsync", "Result should contain MFA setup method");
+        StringAssert.Contains(result, "VerifyMfaAsync", "Result should contain MFA verification method");
+        StringAssert.Contains(result, "GenerateBackupCodesAsync", "Result should contain backup codes generation method");
+        StringAssert.Contains(result, "TOTP", "Result should contain TOTP authentication");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAuthenticationPattern_WithEncryption_IncludesEncryptionService()
     {
         // Act
         var result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true");
-        
+
         // Assert
-        Assert.Contains("## Encryption Service", result);
-        Assert.Contains("IEncryptionService", result);
-        Assert.Contains("EncryptString", result);
-        Assert.Contains("DecryptString", result);
-        Assert.Contains("GenerateKey", result);
-        Assert.Contains("HashPassword", result);
-        Assert.Contains("BCrypt", result);
+        StringAssert.Contains(result, "## Encryption Service", "Result should contain encryption service section");
+        StringAssert.Contains(result, "IEncryptionService", "Result should contain encryption service interface");
+        StringAssert.Contains(result, "EncryptString", "Result should contain string encryption method");
+        StringAssert.Contains(result, "DecryptString", "Result should contain string decryption method");
+        StringAssert.Contains(result, "GenerateKey", "Result should contain key generation method");
+        StringAssert.Contains(result, "HashPassword", "Result should contain password hashing method");
+        StringAssert.Contains(result, "BCrypt", "Result should contain BCrypt implementation");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAuthenticationPattern_WithValidation_IncludesInputValidation()
     {
         // Act
         var result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "false", "true");
-        
+
         // Assert
-        Assert.Contains("## Input Validation", result);
-        Assert.Contains("IInputValidationService", result);
-        Assert.Contains("ValidateEmail", result);
-        Assert.Contains("ValidatePassword", result);
-        Assert.Contains("SanitizeInput", result);
-        Assert.Contains("IsValidSqlInput", result);
+        StringAssert.Contains(result, "## Input Validation", "Result should contain input validation section");
+        StringAssert.Contains(result, "IInputValidationService", "Result should contain input validation service interface");
+        StringAssert.Contains(result, "ValidateEmail", "Result should contain email validation method");
+        StringAssert.Contains(result, "ValidatePassword", "Result should contain password validation method");
+        StringAssert.Contains(result, "SanitizeInput", "Result should contain input sanitization method");
+        StringAssert.Contains(result, "IsValidSqlInput", "Result should contain SQL injection validation method");
     }
 
-    [Theory]
-    [InlineData("personal")]
-    [InlineData("financial")]
-    [InlineData("medical")]
-    [InlineData("general")]
+    [DataTestMethod]
+    [DataRow("personal")]
+    [DataRow("financial")]
+    [DataRow("medical")]
+    [DataRow("general")]
     public void GenerateDataSecurityPattern_ValidDataTypes_ReturnsSecurePattern(string dataType)
     {
         // Act
         var result = SecurityPatternTool.GenerateDataSecurityPattern(dataType);
-        
+
         // Assert
-        Assert.Contains($"# Data Security Pattern: {dataType}", result);
-        Assert.Contains("DEFENSIVE SECURITY TOOL", result);
-        Assert.Contains("PROTECT against threats", result);
-        Assert.Contains("industry best practices", result);
-        Assert.Contains("compliance requirements", result);
+        StringAssert.Contains(result, $"# Data Security Pattern: {dataType}", "Result should contain data security pattern header for the data type");
+        StringAssert.Contains(result, "DEFENSIVE SECURITY TOOL", "Result should contain defensive security tool mention");
+        StringAssert.Contains(result, "PROTECT against threats", "Result should contain threat protection mention");
+        StringAssert.Contains(result, "industry best practices", "Result should contain industry best practices mention");
+        StringAssert.Contains(result, "compliance requirements", "Result should contain compliance requirements mention");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateDataSecurityPattern_PersonalData_IncludesGDPRCompliance()
     {
         // Act
         var result = SecurityPatternTool.GenerateDataSecurityPattern("personal");
-        
+
         // Assert
-        Assert.Contains("GDPR Compliance Requirements", result);
-        Assert.Contains("Data Subject Rights", result);
-        Assert.Contains("Privacy by Design", result);
-        Assert.Contains("Breach Notification", result);
-        Assert.Contains("72 hours", result);
+        StringAssert.Contains(result, "GDPR Compliance Requirements", "Result should contain GDPR compliance requirements");
+        StringAssert.Contains(result, "Data Subject Rights", "Result should contain data subject rights");
+        StringAssert.Contains(result, "Privacy by Design", "Result should contain privacy by design principle");
+        StringAssert.Contains(result, "Breach Notification", "Result should contain breach notification requirements");
+        StringAssert.Contains(result, "72 hours", "Result should contain 72 hours notification timeframe");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateDataSecurityPattern_FinancialData_IncludesPCIDSSCompliance()
     {
         // Act
         var result = SecurityPatternTool.GenerateDataSecurityPattern("financial");
-        
+
         // Assert
-        Assert.Contains("PCI DSS Compliance Requirements", result);
-        Assert.Contains("Cardholder Data Protection", result);
-        Assert.Contains("SOX Compliance Requirements", result);
-        Assert.Contains("Internal Controls", result);
-        Assert.Contains("Audit Trails", result);
+        StringAssert.Contains(result, "PCI DSS Compliance Requirements", "Result should contain PCI DSS compliance requirements");
+        StringAssert.Contains(result, "Cardholder Data Protection", "Result should contain cardholder data protection");
+        StringAssert.Contains(result, "SOX Compliance Requirements", "Result should contain SOX compliance requirements");
+        StringAssert.Contains(result, "Internal Controls", "Result should contain internal controls");
+        StringAssert.Contains(result, "Audit Trails", "Result should contain audit trails");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateDataSecurityPattern_MedicalData_IncludesHIPAACompliance()
     {
         // Act
         var result = SecurityPatternTool.GenerateDataSecurityPattern("medical");
-        
+
         // Assert
-        Assert.Contains("HIPAA Compliance Requirements", result);
-        Assert.Contains("Administrative Safeguards", result);
-        Assert.Contains("Physical Safeguards", result);
-        Assert.Contains("Technical Safeguards", result);
-        Assert.Contains("Business Associate Agreements", result);
-        Assert.Contains("PHI", result);
+        StringAssert.Contains(result, "HIPAA Compliance Requirements", "Result should contain HIPAA compliance requirements");
+        StringAssert.Contains(result, "Administrative Safeguards", "Result should contain administrative safeguards");
+        StringAssert.Contains(result, "Physical Safeguards", "Result should contain physical safeguards");
+        StringAssert.Contains(result, "Technical Safeguards", "Result should contain technical safeguards");
+        StringAssert.Contains(result, "Business Associate Agreements", "Result should contain business associate agreements");
+        StringAssert.Contains(result, "PHI", "Result should contain PHI (Protected Health Information)");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateDataSecurityPattern_WithSanitization_IncludesDataSanitization()
     {
         // Act
         var result = SecurityPatternTool.GenerateDataSecurityPattern("general", "aes", "true");
-        
+
         // Assert
-        Assert.Contains("## Data Sanitization", result);
-        Assert.Contains("IDataSanitizationService", result);
-        Assert.Contains("SanitizeHtml", result);
-        Assert.Contains("SanitizeSqlInput", result);
-        Assert.Contains("SanitizeFileName", result);
-        Assert.Contains("Remove script tags", result);
-        Assert.Contains("SQL injection", result);
+        StringAssert.Contains(result, "## Data Sanitization", "Result should contain data sanitization section");
+        StringAssert.Contains(result, "IDataSanitizationService", "Result should contain data sanitization service interface");
+        StringAssert.Contains(result, "SanitizeHtml", "Result should contain HTML sanitization method");
+        StringAssert.Contains(result, "SanitizeSqlInput", "Result should contain SQL input sanitization method");
+        StringAssert.Contains(result, "SanitizeFileName", "Result should contain filename sanitization method");
+        StringAssert.Contains(result, "Remove script tags", "Result should contain script tag removal");
+        StringAssert.Contains(result, "SQL injection", "Result should contain SQL injection prevention");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateDataSecurityPattern_WithAuditLog_IncludesAuditLogging()
     {
         // Act
         var result = SecurityPatternTool.GenerateDataSecurityPattern("general", "aes", "false", "true");
-        
+
         // Assert
-        Assert.Contains("## Audit Logging", result);
-        Assert.Contains("IAuditLogger", result);
-        Assert.Contains("LogDataAccessAsync", result);
-        Assert.Contains("LogSecurityEventAsync", result);
-        Assert.Contains("LogLoginAttemptAsync", result);
-        Assert.Contains("LogPermissionChangeAsync", result);
+        StringAssert.Contains(result, "## Audit Logging", "Result should contain audit logging section");
+        StringAssert.Contains(result, "IAuditLogger", "Result should contain audit logger interface");
+        StringAssert.Contains(result, "LogDataAccessAsync", "Result should contain data access logging method");
+        StringAssert.Contains(result, "LogSecurityEventAsync", "Result should contain security event logging method");
+        StringAssert.Contains(result, "LogLoginAttemptAsync", "Result should contain login attempt logging method");
+        StringAssert.Contains(result, "LogPermissionChangeAsync", "Result should contain permission change logging method");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateDataSecurityPattern_IncludesSecureDataService()
     {
         // Act
         var result = SecurityPatternTool.GenerateDataSecurityPattern("general");
-        
+
         // Assert
-        Assert.Contains("## Secure Data Service", result);
-        Assert.Contains("ISecureDataService", result);
-        Assert.Contains("EncryptEntity", result);
-        Assert.Contains("DecryptEntity", result);
-        Assert.Contains("SanitizeEntity", result);
-        Assert.Contains("EncryptAttribute", result);
-        Assert.Contains("SanitizeAttribute", result);
+        StringAssert.Contains(result, "## Secure Data Service", "Result should contain secure data service section");
+        StringAssert.Contains(result, "ISecureDataService", "Result should contain secure data service interface");
+        StringAssert.Contains(result, "EncryptEntity", "Result should contain entity encryption method");
+        StringAssert.Contains(result, "DecryptEntity", "Result should contain entity decryption method");
+        StringAssert.Contains(result, "SanitizeEntity", "Result should contain entity sanitization method");
+        StringAssert.Contains(result, "EncryptAttribute", "Result should contain attribute encryption");
+        StringAssert.Contains(result, "SanitizeAttribute", "Result should contain attribute sanitization");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAuthenticationPattern_InvalidAuthType_ReturnsGenericPattern()
     {
         // Act
         var result = SecurityPatternTool.GenerateAuthenticationPattern("invalid-type");
-        
+
         // Assert
-        Assert.Contains("# Security Pattern: invalid-type", result);
-        Assert.Contains("Generic Authentication Service", result);
+        StringAssert.Contains(result, "# Security Pattern: invalid-type", "Result should contain security pattern header for invalid auth type");
+        StringAssert.Contains(result, "Generic Authentication Service", "Result should contain generic authentication service for invalid type");
     }
 
-    [Theory]
-    [InlineData("aes")]
-    [InlineData("rsa")]
-    [InlineData("hybrid")]
+    [DataTestMethod]
+    [DataRow("aes")]
+    [DataRow("rsa")]
+    [DataRow("hybrid")]
     public void GenerateDataSecurityPattern_ValidEncryptionMethods_ReturnsPattern(string encryptionMethod)
     {
         // Act
         var result = SecurityPatternTool.GenerateDataSecurityPattern("general", encryptionMethod);
-        
+
         // Assert
-        Assert.Contains($"**Encryption Method**: {encryptionMethod}", result);
-        Assert.Contains("Secure Data Service", result);
+        StringAssert.Contains(result, $"**Encryption Method**: {encryptionMethod}", "Result should contain the encryption method specification");
+        StringAssert.Contains(result, "Secure Data Service", "Result should contain secure data service");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateAuthenticationPattern_ContainsSecurityLevelRequirements()
     {
         // Act
         var basicResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "basic");
         var standardResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "standard");
         var highResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "high");
-        
+
         // Assert - Basic level
-        Assert.Contains("Password complexity requirements", basicResult);
-        Assert.Contains("HTTPS enforcement", basicResult);
-        
+        StringAssert.Contains(basicResult, "Password complexity requirements", "Basic level result should contain password complexity requirements");
+        StringAssert.Contains(basicResult, "HTTPS enforcement", "Basic level result should contain HTTPS enforcement");
+
         // Assert - Standard level
-        Assert.Contains("Multi-factor authentication recommended", standardResult);
-        Assert.Contains("Rate limiting and account lockout", standardResult);
-        
+        StringAssert.Contains(standardResult, "Multi-factor authentication recommended", "Standard level result should contain MFA recommendation");
+        StringAssert.Contains(standardResult, "Rate limiting and account lockout", "Standard level result should contain rate limiting and lockout");
+
         // Assert - High level
-        Assert.Contains("Mandatory multi-factor authentication", highResult);
-        Assert.Contains("Zero-trust architecture", highResult);
-        Assert.Contains("Advanced threat detection", highResult);
+        StringAssert.Contains(highResult, "Mandatory multi-factor authentication", "High level result should contain mandatory MFA");
+        StringAssert.Contains(highResult, "Zero-trust architecture", "High level result should contain zero-trust architecture");
+        StringAssert.Contains(highResult, "Advanced threat detection", "High level result should contain advanced threat detection");
     }
 }

@@ -1,430 +1,430 @@
 using AvaloniaUI.MCP.Tools;
-using Xunit;
 
 namespace AvaloniaUI.MCP.Tests;
 
+[TestClass]
 public class ThemingToolTests
 {
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_ValidInputs_ReturnsTheme()
     {
         // Arrange
         var themeName = "BlueTheme";
         var primaryColor = "#007ACC";
         var secondaryColor = "#FF6B35";
-        
+
         // Act
         var result = ThemingTool.GenerateTheme(themeName, primaryColor, secondaryColor);
-        
+
         // Assert
-        Assert.Contains($"# Custom AvaloniaUI Theme: {themeName}", result);
-        Assert.Contains("## Theme Configuration", result);
-        Assert.Contains("## Implementation Files", result);
-        Assert.Contains($"### 1. {themeName}Theme.axaml", result);
-        Assert.Contains($"### 2. {themeName}Theme.cs", result);
-        Assert.Contains("## Usage Instructions", result);
-        Assert.Contains("## Color Palette Generated", result);
-        Assert.Contains("## Customization Tips", result);
-        Assert.DoesNotContain("Error generating theme", result);
+        Assert.IsTrue(result.Contains($"# Custom AvaloniaUI Theme: {themeName}"), "Should contain theme name in title");
+        Assert.IsTrue(result.Contains("## Theme Configuration"), "Should contain theme configuration section");
+        Assert.IsTrue(result.Contains("## Implementation Files"), "Should contain implementation files section");
+        Assert.IsTrue(result.Contains($"### 1. {themeName}Theme.axaml"), "Should contain AXAML file reference");
+        Assert.IsTrue(result.Contains($"### 2. {themeName}Theme.cs"), "Should contain C# file reference");
+        Assert.IsTrue(result.Contains("## Usage Instructions"), "Should contain usage instructions");
+        Assert.IsTrue(result.Contains("## Color Palette Generated"), "Should contain color palette section");
+        Assert.IsTrue(result.Contains("## Customization Tips"), "Should contain customization tips");
+        Assert.IsFalse(result.Contains("Error generating theme"), "Should not contain error message");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_ContainsThemeConfiguration()
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "#FF6B35", "#FFFFFF", "light", "true");
-        
+
         // Assert
-        Assert.Contains("**Type**: light", result);
-        Assert.Contains("**Primary Color**: #007ACC", result);
-        Assert.Contains("**Secondary Color**: #FF6B35", result);
-        Assert.Contains("**Background Color**: #FFFFFF", result);
-        Assert.Contains("**Modern Effects**: True", result);
+        Assert.IsTrue(result.Contains("**Type**: light"), "Should contain theme type");
+        Assert.IsTrue(result.Contains("**Primary Color**: #007ACC"), "Should contain primary color");
+        Assert.IsTrue(result.Contains("**Secondary Color**: #FF6B35"), "Should contain secondary color");
+        Assert.IsTrue(result.Contains("**Background Color**: #FFFFFF"), "Should contain background color");
+        Assert.IsTrue(result.Contains("**Modern Effects**: True"), "Should contain modern effects setting");
     }
 
-    [Theory]
-    [InlineData("light")]
-    [InlineData("dark")]
-    [InlineData("auto")]
+    [DataTestMethod]
+    [DataRow("light")]
+    [DataRow("dark")]
+    [DataRow("auto")]
     public void GenerateTheme_DifferentThemeTypes_ReturnsCorrectType(string themeType)
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", themeType);
-        
+
         // Assert
-        Assert.Contains($"**Type**: {themeType}", result);
+        Assert.IsTrue(result.Contains($"**Type**: {themeType}"), $"Should contain correct theme type: {themeType}");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_LightTheme_ContainsLightColors()
     {
         // Act
         var result = ThemingTool.GenerateTheme("LightTheme", "#007ACC", "", "#FFFFFF", "light");
-        
+
         // Assert
-        Assert.Contains("**Text**: #000000", result);
-        Assert.Contains("**Surface**: #F5F5F5", result);
-        Assert.Contains("**Border**: #CCCCCC", result);
+        Assert.IsTrue(result.Contains("**Text**: #000000"), "Should contain light theme text color");
+        Assert.IsTrue(result.Contains("**Surface**: #F5F5F5"), "Should contain light theme surface color");
+        Assert.IsTrue(result.Contains("**Border**: #CCCCCC"), "Should contain light theme border color");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_DarkTheme_ContainsDarkColors()
     {
         // Act
         var result = ThemingTool.GenerateTheme("DarkTheme", "#007ACC", "", "#2D2D30", "dark");
-        
+
         // Assert
-        Assert.Contains("**Text**: #FFFFFF", result);
-        Assert.Contains("**Surface**: #2D2D30", result);
-        Assert.Contains("**Border**: #464647", result);
+        Assert.IsTrue(result.Contains("**Text**: #FFFFFF"), "Should contain dark theme text color");
+        Assert.IsTrue(result.Contains("**Surface**: #2D2D30"), "Should contain dark theme surface color");
+        Assert.IsTrue(result.Contains("**Border**: #464647"), "Should contain dark theme border color");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_EmptySecondaryColor_GeneratesSecondaryColor()
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "");
-        
+
         // Assert
-        Assert.Contains("**Secondary Color**:", result);
+        Assert.IsTrue(result.Contains("**Secondary Color**:"), "Should contain secondary color field");
         // Should contain a generated secondary color with a hex value
-        Assert.Contains("**Secondary Color**: #", result);
+        Assert.IsTrue(result.Contains("**Secondary Color**: #"), "Should contain generated secondary color with hex value");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_ContainsXAMLImplementation()
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC");
-        
+
         // Assert
-        Assert.Contains("xmlns=\"https://github.com/avaloniaui\"", result);
-        Assert.Contains("xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"", result);
-        Assert.Contains("<Styles", result);
-        Assert.Contains("ThemePrimaryBrush", result);
-        Assert.Contains("ThemeSecondaryBrush", result);
-        Assert.Contains("ThemeBackgroundBrush", result);
-        Assert.Contains("ThemeTextBrush", result);
-        Assert.Contains("ThemeSurfaceBrush", result);
-        Assert.Contains("ThemeBorderBrush", result);
-        Assert.Contains("ThemeCornerRadius", result);
-        Assert.Contains("ThemePadding", result);
-        Assert.Contains("ThemeMargin", result);
+        Assert.IsTrue(result.Contains("xmlns=\"https://github.com/avaloniaui\""), "Should contain AvaloniaUI namespace");
+        Assert.IsTrue(result.Contains("xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\""), "Should contain XAML namespace");
+        Assert.IsTrue(result.Contains("<Styles"), "Should contain Styles element");
+        Assert.IsTrue(result.Contains("ThemePrimaryBrush"), "Should contain theme primary brush");
+        Assert.IsTrue(result.Contains("ThemeSecondaryBrush"), "Should contain theme secondary brush");
+        Assert.IsTrue(result.Contains("ThemeBackgroundBrush"), "Should contain theme background brush");
+        Assert.IsTrue(result.Contains("ThemeTextBrush"), "Should contain theme text brush");
+        Assert.IsTrue(result.Contains("ThemeSurfaceBrush"), "Should contain theme surface brush");
+        Assert.IsTrue(result.Contains("ThemeBorderBrush"), "Should contain theme border brush");
+        Assert.IsTrue(result.Contains("ThemeCornerRadius"), "Should contain theme corner radius");
+        Assert.IsTrue(result.Contains("ThemePadding"), "Should contain theme padding");
+        Assert.IsTrue(result.Contains("ThemeMargin"), "Should contain theme margin");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_ContainsCSharpImplementation()
     {
         // Arrange
         var themeName = "CustomTheme";
-        
+
         // Act
         var result = ThemingTool.GenerateTheme(themeName, "#007ACC");
-        
+
         // Assert
-        Assert.Contains("using Avalonia.Styling;", result);
-        Assert.Contains($"public class {themeName}Theme : Styles", result);
-        Assert.Contains($"public {themeName}Theme()", result);
-        Assert.Contains("StyleInclude", result);
-        Assert.Contains($"/Themes/{themeName}Theme.axaml", result);
-        Assert.Contains("public static void Apply()", result);
-        Assert.Contains("Application.Current.Styles", result);
+        Assert.IsTrue(result.Contains("using Avalonia.Styling;"), "Should contain Avalonia.Styling using statement");
+        Assert.IsTrue(result.Contains($"public class {themeName}Theme : Styles"), "Should contain theme class definition");
+        Assert.IsTrue(result.Contains($"public {themeName}Theme()"), "Should contain theme constructor");
+        Assert.IsTrue(result.Contains("StyleInclude"), "Should contain StyleInclude");
+        Assert.IsTrue(result.Contains($"/Themes/{themeName}Theme.axaml"), "Should contain theme AXAML path");
+        Assert.IsTrue(result.Contains("public static void Apply()"), "Should contain Apply method");
+        Assert.IsTrue(result.Contains("Application.Current.Styles"), "Should contain application styles reference");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_ContainsUsageInstructions()
     {
         // Arrange
         var themeName = "MyTheme";
-        
+
         // Act
         var result = ThemingTool.GenerateTheme(themeName, "#007ACC");
-        
+
         // Assert
-        Assert.Contains("## Usage Instructions", result);
-        Assert.Contains("Add to your project", result);
-        Assert.Contains("Apply the theme in App.axaml", result);
-        Assert.Contains($"<local:{themeName}Theme />", result);
-        Assert.Contains("Or apply programmatically", result);
-        Assert.Contains($"new {themeName}Theme()", result);
+        Assert.IsTrue(result.Contains("## Usage Instructions"), "Should contain usage instructions section");
+        Assert.IsTrue(result.Contains("Add to your project"), "Should contain project addition instructions");
+        Assert.IsTrue(result.Contains("Apply the theme in App.axaml"), "Should contain App.axaml instructions");
+        Assert.IsTrue(result.Contains($"<local:{themeName}Theme />"), "Should contain XAML usage example");
+        Assert.IsTrue(result.Contains("Or apply programmatically"), "Should contain programmatic usage instructions");
+        Assert.IsTrue(result.Contains($"new {themeName}Theme()"), "Should contain constructor usage example");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_ContainsColorPalette()
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "#FF6B35", "#FFFFFF", "light");
-        
+
         // Assert
-        Assert.Contains("## Color Palette Generated", result);
-        Assert.Contains("### Primary Colors", result);
-        Assert.Contains("**Primary**: #007ACC", result);
-        Assert.Contains("**Secondary**: #FF6B35", result);
-        Assert.Contains("### Neutral Colors", result);
-        Assert.Contains("**Background**: #FFFFFF", result);
+        Assert.IsTrue(result.Contains("## Color Palette Generated"), "Should contain color palette section");
+        Assert.IsTrue(result.Contains("### Primary Colors"), "Should contain primary colors section");
+        Assert.IsTrue(result.Contains("**Primary**: #007ACC"), "Should contain primary color");
+        Assert.IsTrue(result.Contains("**Secondary**: #FF6B35"), "Should contain secondary color");
+        Assert.IsTrue(result.Contains("### Neutral Colors"), "Should contain neutral colors section");
+        Assert.IsTrue(result.Contains("**Background**: #FFFFFF"), "Should contain background color");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_ContainsCustomizationTips()
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC");
-        
+
         // Assert
-        Assert.Contains("## Customization Tips", result);
-        Assert.Contains("Modify color values", result);
-        Assert.Contains("Adjust corner radius", result);
-        Assert.Contains("Add custom animations", result);
-        Assert.Contains("Create variants", result);
+        Assert.IsTrue(result.Contains("## Customization Tips"), "Should contain customization tips section");
+        Assert.IsTrue(result.Contains("Modify color values"), "Should contain color modification tip");
+        Assert.IsTrue(result.Contains("Adjust corner radius"), "Should contain corner radius tip");
+        Assert.IsTrue(result.Contains("Add custom animations"), "Should contain animation tip");
+        Assert.IsTrue(result.Contains("Create variants"), "Should contain variants tip");
     }
 
-    [Theory]
-    [InlineData("#007ACC")]
-    [InlineData("#FF6B35")]
-    [InlineData("#FFFFFF")]
-    [InlineData("#000000")]
+    [DataTestMethod]
+    [DataRow("#007ACC")]
+    [DataRow("#FF6B35")]
+    [DataRow("#FFFFFF")]
+    [DataRow("#000000")]
     public void GenerateTheme_ValidHexColors_AcceptsColors(string color)
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", color);
-        
+
         // Assert
-        Assert.DoesNotContain("Error generating theme", result);
-        Assert.Contains(color, result);
+        Assert.IsFalse(result.Contains("Error generating theme"), "Should not contain error message for valid color");
+        Assert.IsTrue(result.Contains(color), $"Should contain the provided color: {color}");
     }
 
-    [Theory]
-    [InlineData("#FF0")]  // Short hex
-    [InlineData("red")]   // Named color
-    [InlineData("blue")]  // Named color
+    [DataTestMethod]
+    [DataRow("#FF0")]  // Short hex
+    [DataRow("red")]   // Named color
+    [DataRow("blue")]  // Named color
     public void GenerateTheme_DifferentColorFormats_HandlesCorrectly(string color)
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", color);
-        
+
         // Assert
         // Should either accept the color or convert it properly
-        Assert.DoesNotContain("Error generating theme", result);
+        Assert.IsFalse(result.Contains("Error generating theme"), $"Should handle color format correctly: {color}");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_InvalidColor_ReturnsError()
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", "invalid-color");
-        
+
         // Assert
-        Assert.Contains("Error generating theme", result);
+        Assert.IsTrue(result.Contains("Error generating theme"), "Should contain error message for invalid color");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_EmptyThemeName_HandlesGracefully()
     {
         // Act
         var result = ThemingTool.GenerateTheme("", "#007ACC");
-        
+
         // Assert
-        Assert.Contains("# Custom AvaloniaUI Theme:", result);
+        Assert.IsTrue(result.Contains("# Custom AvaloniaUI Theme:"), "Should handle empty theme name gracefully");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateSelectors_ValidInputs_ReturnsSelectors()
     {
         // Arrange
         var controlType = "Button";
         var styleClasses = "primary,large";
         var pseudoClasses = "pointerover,pressed";
-        
+
         // Act
         var result = ThemingTool.GenerateSelectors(controlType, styleClasses, pseudoClasses, "true");
-        
+
         // Assert
-        Assert.Contains($"# AvaloniaUI CSS-like Selectors for {controlType}", result);
-        Assert.Contains("## Generated Selectors", result);
-        Assert.Contains("## XAML Implementation", result);
-        Assert.Contains("## Selector Types Explained", result);
-        Assert.Contains("## Usage Tips", result);
-        Assert.DoesNotContain("Error generating selectors", result);
+        Assert.IsTrue(result.Contains($"# AvaloniaUI CSS-like Selectors for {controlType}"), "Should contain selector title for control type");
+        Assert.IsTrue(result.Contains("## Generated Selectors"), "Should contain generated selectors section");
+        Assert.IsTrue(result.Contains("## XAML Implementation"), "Should contain XAML implementation section");
+        Assert.IsTrue(result.Contains("## Selector Types Explained"), "Should contain selector types explanation");
+        Assert.IsTrue(result.Contains("## Usage Tips"), "Should contain usage tips section");
+        Assert.IsFalse(result.Contains("Error generating selectors"), "Should not contain error message");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateSelectors_ContainsBasicSelector()
     {
         // Act
         var result = ThemingTool.GenerateSelectors("Button");
-        
+
         // Assert
-        Assert.Contains("- `Button`", result);
+        Assert.IsTrue(result.Contains("- `Button`"), "Should contain basic Button selector");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateSelectors_WithStyleClasses_ContainsClassSelectors()
     {
         // Act
         var result = ThemingTool.GenerateSelectors("Button", "primary,secondary");
-        
+
         // Assert
-        Assert.Contains("- `Button.primary.secondary`", result);
+        Assert.IsTrue(result.Contains("- `Button.primary.secondary`"), "Should contain combined style class selectors");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateSelectors_WithPseudoClasses_ContainsPseudoSelectors()
     {
         // Act
         var result = ThemingTool.GenerateSelectors("Button", "primary", "pointerover,pressed");
-        
+
         // Assert
-        Assert.Contains("- `Button.primary:pointerover`", result);
-        Assert.Contains("- `Button.primary:pressed`", result);
+        Assert.IsTrue(result.Contains("- `Button.primary:pointerover`"), "Should contain pointer over pseudo selector");
+        Assert.IsTrue(result.Contains("- `Button.primary:pressed`"), "Should contain pressed pseudo selector");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateSelectors_WithChildSelectors_ContainsChildSelectors()
     {
         // Act
         var result = ThemingTool.GenerateSelectors("Button", "", "", "true");
-        
+
         // Assert
-        Assert.Contains("- `StackPanel > Button`", result);
-        Assert.Contains("- `Grid Button`", result);
-        Assert.Contains("- `Button /template/ ContentPresenter`", result);
+        Assert.IsTrue(result.Contains("- `StackPanel > Button`"), "Should contain direct child selector");
+        Assert.IsTrue(result.Contains("- `Grid Button`"), "Should contain descendant selector");
+        Assert.IsTrue(result.Contains("- `Button /template/ ContentPresenter`"), "Should contain template selector");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateSelectors_WithoutChildSelectors_ExcludesChildSelectors()
     {
         // Act
         var result = ThemingTool.GenerateSelectors("Button", "", "", "false");
-        
+
         // Assert
-        Assert.DoesNotContain("StackPanel > Button", result);
-        Assert.DoesNotContain("Grid Button", result);
-        Assert.DoesNotContain("Button /template/ ContentPresenter", result);
+        Assert.IsFalse(result.Contains("StackPanel > Button"), "Should not contain direct child selector");
+        Assert.IsFalse(result.Contains("Grid Button"), "Should not contain descendant selector");
+        Assert.IsFalse(result.Contains("Button /template/ ContentPresenter"), "Should not contain template selector");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateSelectors_ContainsXAMLExamples()
     {
         // Act
         var result = ThemingTool.GenerateSelectors("Button", "primary");
-        
+
         // Assert
-        Assert.Contains("<Window.Styles>", result);
-        Assert.Contains("<Style Selector=", result);
-        Assert.Contains("Classes=\"primary\"", result);
+        Assert.IsTrue(result.Contains("<Window.Styles>"), "Should contain Window.Styles example");
+        Assert.IsTrue(result.Contains("<Style Selector="), "Should contain Style Selector example");
+        Assert.IsTrue(result.Contains("Classes=\"primary\""), "Should contain Classes example");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateColorScheme_ValidInputs_ReturnsColorScheme()
     {
         // Arrange
         var baseColor = "#007ACC";
         var schemeType = "monochromatic";
-        
+
         // Act
         var result = ThemingTool.GenerateColorScheme(baseColor, schemeType, 5);
-        
+
         // Assert
-        Assert.Contains($"# Color Scheme: {schemeType} ({baseColor})", result);
-        Assert.Contains("## Generated Colors", result);
-        Assert.Contains("## AvaloniaUI Resource Dictionary", result);
-        Assert.Contains("## CSS Variables Style", result);
-        Assert.Contains("## Usage Examples", result);
-        Assert.Contains("## Accessibility Notes", result);
-        Assert.DoesNotContain("Error generating color scheme", result);
+        Assert.IsTrue(result.Contains($"# Color Scheme: {schemeType} ({baseColor})"), "Should contain color scheme title");
+        Assert.IsTrue(result.Contains("## Generated Colors"), "Should contain generated colors section");
+        Assert.IsTrue(result.Contains("## AvaloniaUI Resource Dictionary"), "Should contain resource dictionary section");
+        Assert.IsTrue(result.Contains("## CSS Variables Style"), "Should contain CSS variables section");
+        Assert.IsTrue(result.Contains("## Usage Examples"), "Should contain usage examples section");
+        Assert.IsTrue(result.Contains("## Accessibility Notes"), "Should contain accessibility notes section");
+        Assert.IsFalse(result.Contains("Error generating color scheme"), "Should not contain error message");
     }
 
-    [Theory]
-    [InlineData("monochromatic")]
-    [InlineData("analogous")]
-    [InlineData("complementary")]
-    [InlineData("triadic")]
-    [InlineData("split-complementary")]
+    [DataTestMethod]
+    [DataRow("monochromatic")]
+    [DataRow("analogous")]
+    [DataRow("complementary")]
+    [DataRow("triadic")]
+    [DataRow("split-complementary")]
     public void GenerateColorScheme_DifferentSchemeTypes_ReturnsScheme(string schemeType)
     {
         // Act
         var result = ThemingTool.GenerateColorScheme("#007ACC", schemeType);
-        
+
         // Assert
-        Assert.Contains($"# Color Scheme: {schemeType}", result);
+        Assert.IsTrue(result.Contains($"# Color Scheme: {schemeType}"), $"Should contain color scheme title with type: {schemeType}");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateColorScheme_ContainsResourceDictionary()
     {
         // Act
         var result = ThemingTool.GenerateColorScheme("#007ACC");
-        
+
         // Assert
-        Assert.Contains("<ResourceDictionary>", result);
-        Assert.Contains("SolidColorBrush", result);
-        Assert.Contains("x:Key=", result);
-        Assert.Contains("Color=", result);
+        Assert.IsTrue(result.Contains("<ResourceDictionary>"), "Should contain ResourceDictionary element");
+        Assert.IsTrue(result.Contains("SolidColorBrush"), "Should contain SolidColorBrush elements");
+        Assert.IsTrue(result.Contains("x:Key="), "Should contain x:Key attributes");
+        Assert.IsTrue(result.Contains("Color="), "Should contain Color attributes");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateColorScheme_ContainsAccessibilityNotes()
     {
         // Act
         var result = ThemingTool.GenerateColorScheme("#007ACC");
-        
+
         // Assert
-        Assert.Contains("## Accessibility Notes", result);
-        Assert.Contains("Contrast Ratios", result);
-        Assert.Contains("WCAG AA compliance", result);
-        Assert.Contains("4.5:1 for normal text", result);
-        Assert.Contains("3:1 for large text", result);
-        Assert.Contains("Color Blindness", result);
-        Assert.Contains("High Contrast Support", result);
+        Assert.IsTrue(result.Contains("## Accessibility Notes"), "Should contain accessibility notes section");
+        Assert.IsTrue(result.Contains("Contrast Ratios"), "Should contain contrast ratios information");
+        Assert.IsTrue(result.Contains("WCAG AA compliance"), "Should contain WCAG AA compliance information");
+        Assert.IsTrue(result.Contains("4.5:1 for normal text"), "Should contain normal text contrast ratio");
+        Assert.IsTrue(result.Contains("3:1 for large text"), "Should contain large text contrast ratio");
+        Assert.IsTrue(result.Contains("Color Blindness"), "Should contain color blindness information");
+        Assert.IsTrue(result.Contains("High Contrast Support"), "Should contain high contrast support information");
     }
 
-    [Theory]
-    [InlineData(2)]
-    [InlineData(5)]
-    [InlineData(10)]
+    [DataTestMethod]
+    [DataRow(2)]
+    [DataRow(5)]
+    [DataRow(10)]
     public void GenerateColorScheme_DifferentColorCounts_ReturnsCorrectCount(int colorCount)
     {
         // Act
         var result = ThemingTool.GenerateColorScheme("#007ACC", "monochromatic", colorCount);
-        
+
         // Assert
         // Should contain the requested number of colors
         var lines = result.Split('\n');
         var colorLines = lines.Where(l => l.Contains(". **") && l.Contains("**: `#")).Count();
-        Assert.Equal(Math.Min(colorCount, 5), colorLines); // Limited by current implementation
+        Assert.AreEqual(Math.Min(colorCount, 5), colorLines, "Should contain the correct number of color lines (limited by implementation)"); // Limited by current implementation
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateColorScheme_InvalidColor_ReturnsError()
     {
         // Act
         var result = ThemingTool.GenerateColorScheme("invalid-color");
-        
+
         // Assert
-        Assert.Contains("Error generating color scheme", result);
+        Assert.IsTrue(result.Contains("Error generating color scheme"), "Should contain error message for invalid color");
     }
 
-    [Theory]
-    [InlineData("true", true)]
-    [InlineData("false", false)]
+    [DataTestMethod]
+    [DataRow("true", true)]
+    [DataRow("false", false)]
     public void GenerateTheme_IncludeEffectsParameter_HandlesCorrectly(string includeEffects, bool expected)
     {
         // Act
         var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "light", includeEffects);
-        
+
         // Assert
-        Assert.Contains($"**Modern Effects**: {expected}", result);
+        Assert.IsTrue(result.Contains($"**Modern Effects**: {expected}"), $"Should contain correct modern effects setting: {expected}");
     }
 
-    [Fact]
+    [TestMethod]
     public void GenerateTheme_CaseInsensitiveThemeType_HandlesCorrectly()
     {
         // Act
         var result1 = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "LIGHT");
         var result2 = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "Light");
-        
+
         // Assert
-        Assert.Contains("**Type**: light", result1);
-        Assert.Contains("**Type**: light", result2);
+        Assert.IsTrue(result1.Contains("**Type**: light"), "Should handle uppercase theme type correctly");
+        Assert.IsTrue(result2.Contains("**Type**: light"), "Should handle title case theme type correctly");
     }
 }

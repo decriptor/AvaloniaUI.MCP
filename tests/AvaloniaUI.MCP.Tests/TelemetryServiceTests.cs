@@ -1,20 +1,23 @@
-using Microsoft.Extensions.Logging;
 using AvaloniaUI.MCP.Services;
-using Xunit;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AvaloniaUI.MCP.Tests;
 
+[TestClass]
 public class TelemetryServiceTests
 {
-    private readonly TelemetryService _telemetryService;
+    private TelemetryService _telemetryService = null!;
 
-    public TelemetryServiceTests()
+    [TestInitialize]
+    public void TestInitialize()
     {
         var logger = new TestLogger<TelemetryService>();
         _telemetryService = new TelemetryService(logger);
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordToolExecution_Should_UpdateMetrics()
     {
         // Arrange
@@ -26,12 +29,12 @@ public class TelemetryServiceTests
 
         // Assert
         var metrics = _telemetryService.GetMetricsSnapshot();
-        Assert.Equal(1L, metrics["total_tool_executions"]);
-        Assert.Equal(1L, metrics["successful_tool_executions"]);
-        Assert.Equal(1.0, (double)metrics["tool_success_rate"]);
+        Assert.AreEqual(1L, metrics["total_tool_executions"], "Total tool executions should be 1");
+        Assert.AreEqual(1L, metrics["successful_tool_executions"], "Successful tool executions should be 1");
+        Assert.AreEqual(1.0, (double)metrics["tool_success_rate"], "Tool success rate should be 1.0");
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordToolExecution_WithFailure_Should_UpdateErrorMetrics()
     {
         // Arrange
@@ -44,12 +47,12 @@ public class TelemetryServiceTests
 
         // Assert
         var metrics = _telemetryService.GetMetricsSnapshot();
-        Assert.Equal(1L, metrics["total_tool_executions"]);
-        Assert.Equal(0L, metrics["successful_tool_executions"]);
-        Assert.Equal(0.0, (double)metrics["tool_success_rate"]);
+        Assert.AreEqual(1L, metrics["total_tool_executions"], "Total tool executions should be 1");
+        Assert.AreEqual(0L, metrics["successful_tool_executions"], "Successful tool executions should be 0");
+        Assert.AreEqual(0.0, (double)metrics["tool_success_rate"], "Tool success rate should be 0.0");
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordResourceAccess_Should_UpdateCacheMetrics()
     {
         // Arrange
@@ -61,12 +64,12 @@ public class TelemetryServiceTests
 
         // Assert
         var metrics = _telemetryService.GetMetricsSnapshot();
-        Assert.Equal(2L, metrics["total_resource_accesses"]);
-        Assert.Equal(1L, metrics["cache_hits"]);
-        Assert.Equal(0.5, (double)metrics["cache_hit_rate"]);
+        Assert.AreEqual(2L, metrics["total_resource_accesses"], "Total resource accesses should be 2");
+        Assert.AreEqual(1L, metrics["cache_hits"], "Cache hits should be 1");
+        Assert.AreEqual(0.5, (double)metrics["cache_hit_rate"], "Cache hit rate should be 0.5");
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordValidation_Should_UpdateValidationMetrics()
     {
         // Arrange
@@ -77,12 +80,12 @@ public class TelemetryServiceTests
 
         // Assert
         var metrics = _telemetryService.GetMetricsSnapshot();
-        Assert.Equal(1L, metrics["total_validations"]);
-        Assert.Equal(1L, metrics["successful_validations"]);
-        Assert.Equal(1.0, (double)metrics["validation_success_rate"]);
+        Assert.AreEqual(1L, metrics["total_validations"], "Total validations should be 1");
+        Assert.AreEqual(1L, metrics["successful_validations"], "Successful validations should be 1");
+        Assert.AreEqual(1.0, (double)metrics["validation_success_rate"], "Validation success rate should be 1.0");
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordValidation_WithFailure_Should_UpdateErrorMetrics()
     {
         // Arrange
@@ -94,12 +97,12 @@ public class TelemetryServiceTests
 
         // Assert
         var metrics = _telemetryService.GetMetricsSnapshot();
-        Assert.Equal(1L, metrics["total_validations"]);
-        Assert.Equal(0L, metrics["successful_validations"]);
-        Assert.Equal(0.0, (double)metrics["validation_success_rate"]);
+        Assert.AreEqual(1L, metrics["total_validations"], "Total validations should be 1");
+        Assert.AreEqual(0L, metrics["successful_validations"], "Successful validations should be 0");
+        Assert.AreEqual(0.0, (double)metrics["validation_success_rate"], "Validation success rate should be 0.0");
     }
 
-    [Fact]
+    [TestMethod]
     public void StartActivity_Should_CreateActivityOrNull()
     {
         // Arrange
@@ -112,33 +115,33 @@ public class TelemetryServiceTests
         // Activity can be null if no listeners are registered, which is expected in unit tests
         if (activity != null)
         {
-            Assert.Equal(activityName, activity.OperationName);
+            Assert.AreEqual(activityName, activity.OperationName, "Activity operation name should match");
         }
         // This test passes as long as no exception is thrown
-        Assert.True(true);
+        Assert.IsTrue(true, "Test should pass without throwing exceptions");
     }
 
-    [Fact]
+    [TestMethod]
     public void GetMetricsSnapshot_Should_ReturnCurrentMetrics()
     {
         // Arrange & Act
         var metrics = _telemetryService.GetMetricsSnapshot();
 
         // Assert
-        Assert.NotNull(metrics);
-        Assert.Contains("total_tool_executions", metrics.Keys);
-        Assert.Contains("successful_tool_executions", metrics.Keys);
-        Assert.Contains("tool_success_rate", metrics.Keys);
-        Assert.Contains("total_resource_accesses", metrics.Keys);
-        Assert.Contains("cache_hits", metrics.Keys);
-        Assert.Contains("cache_hit_rate", metrics.Keys);
-        Assert.Contains("total_validations", metrics.Keys);
-        Assert.Contains("successful_validations", metrics.Keys);
-        Assert.Contains("validation_success_rate", metrics.Keys);
-        Assert.Contains("snapshot_timestamp", metrics.Keys);
+        Assert.IsNotNull(metrics, "Metrics should not be null");
+        CollectionAssert.Contains(metrics.Keys, "total_tool_executions", "Should contain total_tool_executions key");
+        CollectionAssert.Contains(metrics.Keys, "successful_tool_executions", "Should contain successful_tool_executions key");
+        CollectionAssert.Contains(metrics.Keys, "tool_success_rate", "Should contain tool_success_rate key");
+        CollectionAssert.Contains(metrics.Keys, "total_resource_accesses", "Should contain total_resource_accesses key");
+        CollectionAssert.Contains(metrics.Keys, "cache_hits", "Should contain cache_hits key");
+        CollectionAssert.Contains(metrics.Keys, "cache_hit_rate", "Should contain cache_hit_rate key");
+        CollectionAssert.Contains(metrics.Keys, "total_validations", "Should contain total_validations key");
+        CollectionAssert.Contains(metrics.Keys, "successful_validations", "Should contain successful_validations key");
+        CollectionAssert.Contains(metrics.Keys, "validation_success_rate", "Should contain validation_success_rate key");
+        CollectionAssert.Contains(metrics.Keys, "snapshot_timestamp", "Should contain snapshot_timestamp key");
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordServerEvent_Should_NotThrow()
     {
         // Arrange
@@ -150,11 +153,18 @@ public class TelemetryServiceTests
         };
 
         // Act & Assert
-        var exception = Record.Exception(() => _telemetryService.RecordServerEvent(eventType, properties));
-        Assert.Null(exception);
+        try
+        {
+            _telemetryService.RecordServerEvent(eventType, properties);
+            Assert.IsTrue(true, "Method should not throw an exception");
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail($"Method should not throw an exception, but threw: {ex.Message}");
+        }
     }
 
-    [Fact]
+    [TestMethod]
     public void CreateToolExecutionScope_Should_RecordMetricsOnDispose()
     {
         // Arrange
@@ -169,11 +179,11 @@ public class TelemetryServiceTests
 
         // Assert
         var metrics = _telemetryService.GetMetricsSnapshot();
-        Assert.Equal(1L, metrics["total_tool_executions"]);
-        Assert.Equal(1L, metrics["successful_tool_executions"]);
+        Assert.AreEqual(1L, metrics["total_tool_executions"], "Total tool executions should be 1");
+        Assert.AreEqual(1L, metrics["successful_tool_executions"], "Successful tool executions should be 1");
     }
 
-    [Fact]
+    [TestMethod]
     public void CreateValidationScope_Should_RecordMetricsOnDispose()
     {
         // Arrange
@@ -187,69 +197,69 @@ public class TelemetryServiceTests
 
         // Assert
         var metrics = _telemetryService.GetMetricsSnapshot();
-        Assert.Equal(1L, metrics["total_validations"]);
-        Assert.Equal(1L, metrics["successful_validations"]);
+        Assert.AreEqual(1L, metrics["total_validations"], "Total validations should be 1");
+        Assert.AreEqual(1L, metrics["successful_validations"], "Successful validations should be 1");
     }
 
-    [Fact]
+    [TestMethod]
     public void MultipleOperations_Should_AccumulateMetrics()
     {
         // Arrange & Act
         _telemetryService.RecordToolExecution("Tool1", true, TimeSpan.FromMilliseconds(10));
         _telemetryService.RecordToolExecution("Tool2", false, TimeSpan.FromMilliseconds(20), "Error");
         _telemetryService.RecordToolExecution("Tool3", true, TimeSpan.FromMilliseconds(15));
-        
+
         _telemetryService.RecordResourceAccess("Resource1", true);
         _telemetryService.RecordResourceAccess("Resource2", true);
         _telemetryService.RecordResourceAccess("Resource3", false);
-        
+
         _telemetryService.RecordValidation("Validation1", true);
         _telemetryService.RecordValidation("Validation2", false, "Validation error");
 
         // Assert
         var metrics = _telemetryService.GetMetricsSnapshot();
-        
+
         // Tool execution metrics
-        Assert.Equal(3L, metrics["total_tool_executions"]);
-        Assert.Equal(2L, metrics["successful_tool_executions"]);
-        Assert.Equal(2.0/3.0, (double)metrics["tool_success_rate"], 3);
-        
+        Assert.AreEqual(3L, metrics["total_tool_executions"], "Total tool executions should be 3");
+        Assert.AreEqual(2L, metrics["successful_tool_executions"], "Successful tool executions should be 2");
+        Assert.AreEqual(2.0 / 3.0, (double)metrics["tool_success_rate"], 0.001, "Tool success rate should be 2/3");
+
         // Resource access metrics
-        Assert.Equal(3L, metrics["total_resource_accesses"]);
-        Assert.Equal(2L, metrics["cache_hits"]);
-        Assert.Equal(2.0/3.0, (double)metrics["cache_hit_rate"], 3);
-        
+        Assert.AreEqual(3L, metrics["total_resource_accesses"], "Total resource accesses should be 3");
+        Assert.AreEqual(2L, metrics["cache_hits"], "Cache hits should be 2");
+        Assert.AreEqual(2.0 / 3.0, (double)metrics["cache_hit_rate"], 0.001, "Cache hit rate should be 2/3");
+
         // Validation metrics
-        Assert.Equal(2L, metrics["total_validations"]);
-        Assert.Equal(1L, metrics["successful_validations"]);
-        Assert.Equal(0.5, (double)metrics["validation_success_rate"]);
+        Assert.AreEqual(2L, metrics["total_validations"], "Total validations should be 2");
+        Assert.AreEqual(1L, metrics["successful_validations"], "Successful validations should be 1");
+        Assert.AreEqual(0.5, (double)metrics["validation_success_rate"], "Validation success rate should be 0.5");
     }
 
-    [Fact]
+    [TestMethod]
     public void MetricsSnapshot_Should_IncludeTimestamp()
     {
         // Act
         var metrics = _telemetryService.GetMetricsSnapshot();
 
         // Assert
-        Assert.Contains("snapshot_timestamp", metrics.Keys);
+        CollectionAssert.Contains(metrics.Keys, "snapshot_timestamp", "Should contain snapshot_timestamp key");
         var timestamp = (DateTimeOffset)metrics["snapshot_timestamp"];
-        Assert.True(timestamp <= DateTimeOffset.UtcNow);
-        Assert.True(timestamp > DateTimeOffset.UtcNow.AddMinutes(-1));
+        Assert.IsTrue(timestamp <= DateTimeOffset.UtcNow, "Timestamp should be less than or equal to current time");
+        Assert.IsTrue(timestamp > DateTimeOffset.UtcNow.AddMinutes(-1), "Timestamp should be within the last minute");
     }
 }
 
 // Test logger implementation for testing
 public class TestLogger<T> : ILogger<T>
 {
-    public IDisposable BeginScope<TState>(TState state) => new TestScope();
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => new TestScope();
     public bool IsEnabled(LogLevel logLevel) => true;
-    
+
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         // Store log messages if needed for testing
     }
-    
+
     private class TestScope : IDisposable
     {
         public void Dispose() { }

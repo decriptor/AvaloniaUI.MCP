@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Resources;
@@ -214,7 +215,7 @@ public static class MigrationGuideResource
     private static string FormatNamespaceChanges(JsonElement namespaceChanges)
     {
         var result = "";
-        
+
         if (namespaceChanges.TryGetProperty("description", out var description))
         {
             result += $"{description.GetString()}\\n\\n";
@@ -241,7 +242,7 @@ public static class MigrationGuideResource
     private static string FormatFileExtensions(JsonElement fileExtensions)
     {
         var result = "";
-        
+
         if (fileExtensions.TryGetProperty("description", out var description))
         {
             result += $"{description.GetString()}\\n\\n";
@@ -258,7 +259,7 @@ public static class MigrationGuideResource
                     result += $"**{desc.GetString()}**\\n";
                     result += $"- From: `{from.GetString()}`\\n";
                     result += $"- To: `{to.GetString()}`\\n";
-                    
+
                     if (change.TryGetProperty("note", out var note))
                     {
                         result += $"- Note: {note.GetString()}\\n";

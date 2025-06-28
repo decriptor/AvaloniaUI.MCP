@@ -1,4 +1,5 @@
 using System.ComponentModel;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -132,7 +133,7 @@ public class ViewLocator : IDataTemplate
         if (type != null)
         {{
             var control = (Control)Activator.CreateInstance(type)!;
-            
+
             // Apply transition
             if (control is UserControl userControl)
             {{
@@ -141,7 +142,7 @@ public class ViewLocator : IDataTemplate
                     Duration = TimeSpan.FromMilliseconds({duration})
                 }};
             }}
-            
+
             return control;
         }}
 
@@ -211,7 +212,7 @@ public class ViewLocator : IDataTemplate
                      From=""0"" To=""1""
                      Duration=""0:0:0.3""
                      BeginTime=""0:0:0"" />
-    
+
     <!-- Second animation starts after first -->
     <DoubleAnimation Storyboard.TargetName=""Element2""
                      Storyboard.TargetProperty=""Opacity""
@@ -622,7 +623,7 @@ public MainViewModel()
 
     private static string GetIterationAttribute(int iterations)
     {
-        return iterations == -1 ? "IterationCount=\"Infinite\"" : 
+        return iterations == -1 ? "IterationCount=\"Infinite\"" :
                iterations > 1 ? $"IterationCount=\"{iterations}\"" : "";
     }
 
@@ -668,7 +669,7 @@ public MainViewModel()
             Cue = new Cue(0.0),
             Setters = { new Setter(Visual.OpacityProperty, 0.0) }
         });
-        
+
         animation.KeyFrames.Add(new KeyFrame
         {
             Cue = new Cue(1.0),
@@ -678,17 +679,17 @@ public MainViewModel()
             "slidein" => @"animation.KeyFrames.Add(new KeyFrame
         {
             Cue = new Cue(0.0),
-            Setters = 
+            Setters =
             {
                 new Setter(Visual.OpacityProperty, 0.0),
                 new Setter(Visual.RenderTransformProperty, new TranslateTransform(30, 0))
             }
         });
-        
+
         animation.KeyFrames.Add(new KeyFrame
         {
             Cue = new Cue(1.0),
-            Setters = 
+            Setters =
             {
                 new Setter(Visual.OpacityProperty, 1.0),
                 new Setter(Visual.RenderTransformProperty, new TranslateTransform(0, 0))
@@ -798,14 +799,14 @@ public MainViewModel()
                          From=""0"" To=""1""
                          Duration=""0:0:0.3""
                          BeginTime=""0:0:0"" />
-        
+
         <!-- Slide in second element -->
         <DoubleAnimation Storyboard.TargetName=""Element2""
                          Storyboard.TargetProperty=""(TranslateTransform.X)""
                          From=""50"" To=""0""
                          Duration=""0:0:0.4""
                          BeginTime=""0:0:0.2"" />
-        
+
         <!-- Scale final element -->
         <DoubleAnimation Storyboard.TargetName=""Element3""
                          Storyboard.TargetProperty=""(ScaleTransform.ScaleX)""
@@ -836,22 +837,22 @@ public MainViewModel()
     {{
         _{storyboardName.ToLowerInvariant()} = view.FindResource(""{storyboardName}"") as Storyboard;
     }}
-    
+
     public void Start()
     {{
         _{storyboardName.ToLowerInvariant()}?.Begin();
     }}
-    
+
     public void Stop()
     {{
         _{storyboardName.ToLowerInvariant()}?.Stop();
     }}
-    
+
     public void Pause()
     {{
         _{storyboardName.ToLowerInvariant()}?.Pause();
     }}
-    
+
     public void Resume()
     {{
         _{storyboardName.ToLowerInvariant()}?.Resume();
@@ -878,12 +879,12 @@ public MainViewModel()
                          Duration=""0:0:1""
                          RepeatBehavior=""Forever""
                          AutoReverse=""True"" />",
-            
+
             "spiral" => $@"        <DoubleAnimation Storyboard.TargetProperty=""{property}""
                          From=""0"" To=""360""
                          Duration=""0:0:2""
                          RepeatBehavior=""Forever"" />",
-            
+
             _ => $@"        <DoubleAnimation Storyboard.TargetProperty=""{property}""
                          From=""0"" To=""1""
                          Duration=""0:0:0.5"" />"
@@ -981,10 +982,10 @@ public class ElasticEasing : Easing
             _progress = {(pattern == "wave" ? "0" : "1.0")};
             {(pattern != "wave" ? "_animationTimer.Stop();" : "")}
         }}
-        
+
         Dispatcher.UIThread.Post(() => Update{pattern}Animation(_progress));
     }}
-    
+
     private void Update{pattern}Animation(double progress)
     {{
         switch (""{pattern}"")
@@ -993,7 +994,7 @@ public class ElasticEasing : Easing
                 var wave = Math.Sin(progress * Math.PI * 2) * 10;
                 _target.RenderTransform = new TranslateTransform(0, wave);
                 break;
-                
+
             case ""spiral"":
                 var angle = progress * 360;
                 var radius = progress * 50;
@@ -1001,13 +1002,13 @@ public class ElasticEasing : Easing
                 var y = Math.Sin(angle * Math.PI / 180) * radius;
                 _target.RenderTransform = new TranslateTransform(x, y);
                 break;
-                
+
             default:
                 _target.Opacity = progress;
                 break;
         }}
     }}
-    
+
     public void Dispose()
     {{
         _animationTimer?.Dispose();

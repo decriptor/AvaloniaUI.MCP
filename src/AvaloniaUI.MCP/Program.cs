@@ -1,18 +1,33 @@
+using System.Diagnostics;
+
+using AvaloniaUI.MCP.Services;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using ModelContextProtocol.Server;
-using AvaloniaUI.MCP.Services;
-using System.Diagnostics;
+
+using Sentry;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 // Configure logging with structured logging
 builder.Logging.ClearProviders();
-builder.Logging.AddConsole(options =>
+builder.Logging.AddConsole();
+
+// Add Sentry logging with configuration
+builder.Logging.AddSentry(o =>
 {
-    options.IncludeScopes = true;
-    options.TimestampFormat = "yyyy-MM-dd HH:mm:ss.fff ";
+    o.Dsn = "https://82c12a7f9520219b0fe9f91ac1d14b37@o4509369388761088.ingest.us.sentry.io/4509576978235392";
+    o.Environment = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "development";
+    o.TracesSampleRate = 0.1; // 10% of transactions for performance monitoring
+    o.ProfilesSampleRate = 0.1; // 10% for profiling
+    o.AutoSessionTracking = true;
+    o.AttachStacktrace = true;
+    o.SendDefaultPii = false; // Don't send personally identifiable information
+    o.MaxBreadcrumbs = 100;
+    o.Release = "avalonia-mcp@1.0.0";
 });
 
 // Set log levels based on environment
@@ -61,12 +76,12 @@ try
 {
     using var activity = telemetry.StartActivity("resource_cache_preload");
     var stopwatch = Stopwatch.StartNew();
-    
+
     await ResourceCacheService.PreloadCommonResourcesAsync();
-    
+
     stopwatch.Stop();
     logger.LogInformation("Resource cache preloaded successfully in {Duration}ms", stopwatch.ElapsedMilliseconds);
-    
+
     telemetry.RecordServerEvent("cache_preload_success", new Dictionary<string, object>
     {
         ["duration_ms"] = stopwatch.ElapsedMilliseconds
@@ -95,7 +110,7 @@ try
 {
     logger.LogInformation("AvaloniaUI MCP Server is ready to accept connections");
     telemetry.RecordServerEvent("server_ready");
-    
+
     // Run the MCP server
     await host.RunAsync(cancellationTokenSource.Token);
 }
@@ -120,6 +135,6 @@ finally
         ["shutdown_time"] = DateTimeOffset.UtcNow,
         ["metrics"] = telemetry.GetMetricsSnapshot()
     });
-    
+
     logger.LogInformation("AvaloniaUI MCP Server shutdown complete");
 }
