@@ -105,9 +105,9 @@ Try these commands with your MCP client:
     <span>Real-world usage examples</span>
   </a>
   
-  <a href="docs/api/" class="doc-link">
-    <strong>API Documentation</strong>
-    <span>Technical reference</span>
+  <a href="docs/tools/" class="doc-link">
+    <strong>Tools Reference</strong>
+    <span>Complete tool documentation</span>
   </a>
 </div>
 

@@ -17,7 +17,7 @@ Before you begin, ensure you have:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/AvaloniaUI.MCP.git
+git clone https://github.com/decriptor/AvaloniaUI.MCP.git
 cd AvaloniaUI.MCP
 ```
 
@@ -177,11 +177,11 @@ dotnet run --project src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj 2>&1 | tee avaloni
 
 - Check the [troubleshooting guide](./troubleshooting.md)
 - Review [common examples](./examples/)
-- Open an issue on [GitHub](https://github.com/your-org/AvaloniaUI.MCP/issues)
+- Open an issue on [GitHub](https://github.com/decriptor/AvaloniaUI.MCP/issues)
 
 ## Next Steps
 
 - Explore the [Tools Reference](./tools/) for complete functionality
 - Check out [Examples](./examples/) for common use cases
-- Read the [API Documentation](./api/) for advanced usage
-- Join the community [discussions](https://github.com/your-org/AvaloniaUI.MCP/discussions)
+- Read the [Tools Reference](./tools/) for advanced usage
+- Join the community [discussions](https://github.com/decriptor/AvaloniaUI.MCP/discussions)

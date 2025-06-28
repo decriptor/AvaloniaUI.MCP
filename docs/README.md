@@ -7,7 +7,7 @@ Welcome to the AvaloniaUI.MCP server documentation. This comprehensive Model Con
 - [Quick Start](./quick-start.md)
 - [Tools Reference](./tools/)
 - [Resources Guide](./resources/)
-- [API Documentation](./api/)
+- [API Documentation](./tools/)
 - [Examples](./examples/)
 - [Contributing](../CONTRIBUTING.md)
 - [Troubleshooting](./troubleshooting.md)
@@ -33,7 +33,7 @@ AvaloniaUI.MCP is a professional-grade MCP server built on .NET 9.0 that provide
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/AvaloniaUI.MCP.git
+git clone https://github.com/decriptor/AvaloniaUI.MCP.git
 cd AvaloniaUI.MCP
 
 # Build the project
@@ -116,8 +116,8 @@ Optimized for production use:
 
 ## 🤝 Community
 
-- [GitHub Issues](https://github.com/your-org/AvaloniaUI.MCP/issues)
-- [Discussions](https://github.com/your-org/AvaloniaUI.MCP/discussions)
+- [GitHub Issues](https://github.com/decriptor/AvaloniaUI.MCP/issues)
+- [Discussions](https://github.com/decriptor/AvaloniaUI.MCP/discussions)
 - [Contributing Guide](../CONTRIBUTING.md)
 
 ## 📄 License

@@ -1,0 +1,83 @@
+# Docker ignore file for AvaloniaUI.MCP
+
+# Build artifacts
+**/bin/
+**/obj/
+**/publish/
+
+# Visual Studio
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE - VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation and markdown files (not needed for runtime)
+README.md
+CLAUDE.md
+*.md
+docs/
+
+# Test results
+TestResults/
+[Tt]est[Rr]esults*/
+*.trx
+*.coverage
+*.coveragexml
+
+# NuGet packages (will be restored during build)
+packages/
+*.nupkg
+*.snupkg
+
+# Docker files
+Dockerfile*
+.dockerignore
+
+# Environment files
+.env*
+
+# Logs
+logs/
+*.log
+
+# Runtime and debug files
+*.pdb
+*.exe.config
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Jekyll/GitHub Pages (for documentation)
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+_config.yml
+index.md

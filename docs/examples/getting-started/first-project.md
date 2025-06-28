@@ -294,9 +294,9 @@ The server can help you add:
 ## Next Steps
 
 1. **Learn More Patterns**: Explore [MVVM Examples](../mvvm/)
-2. **Add Validation**: See [Input Validation](../security/validation.md)
-3. **Style Your App**: Check out [Theming Examples](../ui-development/theming.md)
-4. **Test Your Code**: Review [Testing Guide](../testing/unit-tests.md)
+2. **Add Validation**: Implement input validation patterns using the SecurityPatternTool
+3. **Style Your App**: Use the ThemingTool to create custom themes
+4. **Test Your Code**: Add unit tests for your ViewModels and business logic
 
 ## Troubleshooting
 

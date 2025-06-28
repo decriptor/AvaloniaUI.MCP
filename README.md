@@ -216,7 +216,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **📖 Documentation**: [GitHub Pages](https://decriptor.github.io/AvaloniaUI.MCP)
 - **🐛 Bug Reports**: [GitHub Issues](https://github.com/decriptor/AvaloniaUI.MCP/issues)
 - **💬 Discussions**: [GitHub Discussions](https://github.com/decriptor/AvaloniaUI.MCP/discussions)
-- **📧 Email**: your-email@example.com
+- **📧 Email**: sshaw@decriptor.com
 
 ---
 

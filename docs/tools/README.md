@@ -89,9 +89,9 @@ All tools include:
 ## 🎓 Examples
 
 For detailed examples of each tool, see:
-- [Common Workflows](../examples/workflows.md)
-- [Tool-Specific Examples](../examples/tools/)
-- [Integration Patterns](../examples/integration.md)
+- [Examples Overview](../examples/)
+- [First Project Tutorial](../examples/getting-started/first-project.md)
+- [Troubleshooting Guide](../troubleshooting.md)
 
 ## 🔍 Tool Discovery
 

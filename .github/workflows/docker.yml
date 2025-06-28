@@ -46,61 +46,14 @@ jobs:
           type=semver,pattern={{major}}
           type=raw,value=latest,enable={{is_default_branch}}
           
-    - name: Create Dockerfile
+    - name: Validate Dockerfile
       run: |
-        cat > Dockerfile << 'EOF'
-        # Build stage
-        FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-        WORKDIR /src
-        
-        # Copy project files
-        COPY ["src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj", "src/AvaloniaUI.MCP/"]
-        COPY ["Directory.Packages.props", "."]
-        COPY ["Directory.Build.props", "."]
-        COPY ["Directory.Build.targets", "."]
-        COPY ["global.json", "."]
-        COPY ["nuget.config", "."]
-        
-        # Restore dependencies
-        RUN dotnet restore "src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj"
-        
-        # Copy source code
-        COPY . .
-        
-        # Build and publish
-        RUN dotnet publish "src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj" \
-            -c Release \
-            -o /app/publish \
-            --no-restore \
-            --self-contained false \
-            -p:PublishSingleFile=false
-            
-        # Runtime stage
-        FROM mcr.microsoft.com/dotnet/runtime:9.0 AS runtime
-        WORKDIR /app
-        
-        # Install required packages for JSON processing (for validation)
-        RUN apt-get update && apt-get install -y \
-            jq \
-            && rm -rf /var/lib/apt/lists/*
-            
-        # Copy published app
-        COPY --from=build /app/publish .
-        
-        # Create non-root user
-        RUN useradd --create-home --shell /bin/bash mcp
-        USER mcp
-        
-        # Set environment variables
-        ENV DOTNET_RUNNING_IN_CONTAINER=true
-        ENV ASPNETCORE_URLS=
-        
-        # Health check
-        HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-            CMD timeout 5s dotnet AvaloniaUI.MCP.dll --version || exit 1
-            
-        ENTRYPOINT ["dotnet", "AvaloniaUI.MCP.dll"]
-        EOF
+        echo "Using repository Dockerfile..."
+        if [ ! -f "Dockerfile" ]; then
+          echo "❌ Dockerfile not found in repository"
+          exit 1
+        fi
+        echo "✅ Dockerfile found and ready to use"
         
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
