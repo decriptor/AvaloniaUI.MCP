@@ -135,15 +135,15 @@ var date_ja = _formattingService.FormatDate(DateTime.Now, ""ja-JP""); // 2024年
         }
     }
 
-    private sealed class LocalizationConfiguration
+    sealed class LocalizationConfiguration
     {
         public string PrimaryLanguage { get; set; } = "";
-        public List<string> AdditionalLanguages { get; set; } = new();
+        public List<string> AdditionalLanguages { get; set; } = [];
         public bool IncludePluralization { get; set; }
         public bool IncludeFormatting { get; set; }
     }
 
-    private static string GenerateLocalizationService(LocalizationConfiguration config)
+    static string GenerateLocalizationService(LocalizationConfiguration config)
     {
         string pluralizationCode = config.IncludePluralization ? GeneratePluralizationCode() : "";
         string formattingCode = config.IncludeFormatting ? GenerateFormattingHelpers() : "";
@@ -169,7 +169,7 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
     {{
         _defaultCulture = defaultCulture;
         _currentCulture = new CultureInfo(defaultCulture);
-        
+
         // Initialize resource managers
         InitializeResourceManagers();
     }}
@@ -187,7 +187,7 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
     public string GetString(string key, string? culture = null)
     {{
         var targetCulture = culture ?? _currentCulture.Name;
-        
+
         if (_resourceManagers.TryGetValue(targetCulture, out var resourceManager))
         {{
             var value = resourceManager.GetString(key, new CultureInfo(targetCulture));
@@ -224,14 +224,14 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
         var rules = GetPluralRules(culture ?? _currentCulture.Name);
         var pluralForm = rules.GetPluralForm(count);
         var pluralKey = $""{key}.{pluralForm}"";
-        
+
         var result = GetString(pluralKey, culture);
         if (result.StartsWith(""["") && result.EndsWith(""]""))
         {
             // Fallback to base key if plural form not found
             result = GetString(key, culture);
         }
-        
+
         return string.Format(_currentCulture, result, count);
     }" : @"public string GetPluralString(string key, int count, string? culture = null)
     {
@@ -248,7 +248,7 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
 
         var oldCulture = _currentCulture.Name;
         _currentCulture = newCulture;
-        
+
         // Set thread culture
         CultureInfo.CurrentCulture = newCulture;
         CultureInfo.CurrentUICulture = newCulture;
@@ -261,7 +261,7 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
     private void InitializeResourceManagers()
     {{
         var assembly = Assembly.GetExecutingAssembly();
-        
+
         foreach (var culture in AvailableCultures)
         {{
             try
@@ -294,7 +294,7 @@ public class CultureChangedEventArgs : EventArgs
 }}";
     }
 
-    private static string GeneratePluralizationCode()
+    static string GeneratePluralizationCode()
     {
         return @"
     private IPluralRules GetPluralRules(string culture)
@@ -340,12 +340,12 @@ public class RussianPluralRules : IPluralRules
     {
         var mod10 = count % 10;
         var mod100 = count % 100;
-        
+
         if (mod10 == 1 && mod100 != 11)
             return ""one"";
         if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
             return ""few"";
-        
+
         return ""many"";
     }
 }
@@ -358,7 +358,7 @@ public class DefaultPluralRules : IPluralRules
     }";
     }
 
-    private static string GenerateFormattingHelpers()
+    static string GenerateFormattingHelpers()
     {
         return @"
     public string FormatCurrency(decimal amount, string? culture = null)
@@ -386,7 +386,7 @@ public class DefaultPluralRules : IPluralRules
     }";
     }
 
-    private static string GenerateResourceFiles(LocalizationConfiguration config)
+    static string GenerateResourceFiles(LocalizationConfiguration config)
     {
         var allLanguages = new List<string> { config.PrimaryLanguage };
         allLanguages.AddRange(config.AdditionalLanguages);
@@ -479,7 +479,7 @@ Resources/
         return resourceStructure;
     }
 
-    private static string GenerateMarkupExtension(LocalizationConfiguration config)
+    static string GenerateMarkupExtension(LocalizationConfiguration config)
     {
         return @"// XAML Markup Extension for Localization
 public class LocalizeExtension : MarkupExtension
@@ -598,7 +598,7 @@ public class LocalizedBinding : IDisposable
 }";
     }
 
-    private static string GenerateSetupInstructions(LocalizationConfiguration config)
+    static string GenerateSetupInstructions(LocalizationConfiguration config)
     {
         return $@"### 1. Install Required Packages
 ```xml
@@ -608,7 +608,7 @@ public class LocalizedBinding : IDisposable
 ### 2. Configure Services
 ```csharp
 // In Program.cs or App.axaml.cs
-services.AddSingleton<ILocalizationService>(provider => 
+services.AddSingleton<ILocalizationService>(provider =>
     new LocalizationService(""{config.PrimaryLanguage}""));
 
 // Register markup extension
@@ -648,7 +648,7 @@ public void SwitchToCulture(string culture)
 - Use placeholders for dynamic content: `Welcome, {{0}}!`";
     }
 
-    private static string GenerateFormattingService(List<string> cultures, bool includeDateTime, bool includeNumber, bool includeCurrency)
+    static string GenerateFormattingService(List<string> cultures, bool includeDateTime, bool includeNumber, bool includeCurrency)
     {
         var methods = new List<string>();
 
@@ -695,11 +695,11 @@ public void SwitchToCulture(string culture)
     {
         var cultureInfo = new CultureInfo(culture);
         var regionInfo = new RegionInfo(cultureInfo.Name);
-        
+
         // Custom currency formatting
         var numberFormat = (NumberFormatInfo)cultureInfo.NumberFormat.Clone();
         numberFormat.CurrencySymbol = GetCurrencySymbol(currencyCode);
-        
+
         return amount.ToString(""C"", numberFormat);
     }
 
@@ -748,7 +748,7 @@ public class CultureFormattingService : ICultureFormattingService
     {{
         _cultures = new Dictionary<string, CultureInfo>();
         var supportedCultures = new[] {{ {string.Join(", ", cultures.Select(c => $"\"{c}\""))} }};
-        
+
         foreach (var culture in supportedCultures)
         {{
             try
@@ -790,7 +790,7 @@ public class CultureFormattingService : ICultureFormattingService
 }}";
     }
 
-    private static string GenerateCultureValidators(List<string> cultures)
+    static string GenerateCultureValidators(List<string> cultures)
     {
         return $@"// Culture-specific validation rules
 public static class CultureValidators
@@ -855,7 +855,7 @@ public static class CultureValidators
         var number = int.Parse(dni.Substring(0, 8));
         var letter = dni[8];
         var expectedLetter = ""TRWAGMYFPDXBNJZSQVHLCKE""[number % 23];
-        
+
         return letter == expectedLetter;
     }}
 
@@ -876,7 +876,7 @@ public static class CultureValidators
 }}";
     }
 
-    private static string GenerateCultureConverters(List<string> cultures)
+    static string GenerateCultureConverters(List<string> cultures)
     {
         return @"// Avalonia value converters for culture-specific formatting
 public class CultureDateConverter : IValueConverter

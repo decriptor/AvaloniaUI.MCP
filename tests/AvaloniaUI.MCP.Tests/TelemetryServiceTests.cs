@@ -7,7 +7,7 @@ namespace AvaloniaUI.MCP.Tests;
 [TestClass]
 public class TelemetryServiceTests : IDisposable
 {
-    private TelemetryService _telemetryService = null!;
+    TelemetryService _telemetryService = null!;
 
     [TestInitialize]
     public void TestInitialize()
@@ -271,7 +271,7 @@ public class TestLogger<T> : ILogger<T>
         // Store log messages if needed for testing
     }
 
-    private sealed class TestScope : IDisposable
+    sealed class TestScope : IDisposable
     {
         public void Dispose() { }
     }

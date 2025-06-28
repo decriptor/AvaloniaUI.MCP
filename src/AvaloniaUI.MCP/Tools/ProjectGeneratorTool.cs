@@ -9,7 +9,7 @@ namespace AvaloniaUI.MCP.Tools;
 [McpServerToolType]
 public static class ProjectGeneratorTool
 {
-    private static readonly string[] toolOperation = ["desktop", "mobile", "all"];
+    static readonly string[] ToolOperation = ["desktop", "mobile", "all"];
 
     [McpServerTool, Description("Creates a new AvaloniaUI project with the specified template and configuration")]
     public static string CreateAvaloniaProject(
@@ -32,7 +32,7 @@ public static class ProjectGeneratorTool
             }
 
             // Additional platform validation
-            string[] validPlatforms = toolOperation;
+            string[] validPlatforms = ToolOperation;
             if (!validPlatforms.Contains(platforms.ToLowerInvariant()))
             {
                 var platformValidation = ValidationResult.Failure($"Invalid platforms '{platforms}'. Valid platforms are: {string.Join(", ", validPlatforms)}");
@@ -66,7 +66,7 @@ public static class ProjectGeneratorTool
         });
     }
 
-    private static string GenerateMvvmProject(string projectPath, string projectName, string platforms)
+    static string GenerateMvvmProject(string projectPath, string projectName, string platforms)
     {
         // Generate all file contents first
         var filesToCreate = new List<(string FilePath, string Content)>
@@ -83,11 +83,11 @@ public static class ProjectGeneratorTool
         string viewModelsDir = Path.Combine(projectPath, "ViewModels");
 
         // Add ViewModel files
-        filesToCreate.AddRange(new[]
-        {
+        filesToCreate.AddRange(
+        [
             (Path.Combine(viewModelsDir, "MainWindowViewModel.cs"), GenerateMainWindowViewModel(projectName)),
             (Path.Combine(viewModelsDir, "ViewModelBase.cs"), GenerateViewModelBase(projectName))
-        });
+        ]);
 
         // Write all files asynchronously in parallel for better performance
         Task writeTask = AsyncFileService.WriteAllFilesAsync(filesToCreate);
@@ -107,7 +107,7 @@ public static class ProjectGeneratorTool
                $"dotnet run";
     }
 
-    private static string GenerateBasicProject(string projectPath, string projectName, string platforms)
+    static string GenerateBasicProject(string projectPath, string projectName, string platforms)
     {
         // Create project file
         string projectFile = GenerateProjectFile(projectName, platforms, false);
@@ -145,7 +145,7 @@ public static class ProjectGeneratorTool
                $"dotnet run";
     }
 
-    private static string GenerateCrossPlatformProject(string projectPath, string projectName, string platforms)
+    static string GenerateCrossPlatformProject(string projectPath, string projectName, string platforms)
     {
         // For cross-platform, create multiple project files
         string desktopProject = GenerateProjectFile($"{projectName}.Desktop", "desktop", true);
@@ -192,7 +192,7 @@ public static class ProjectGeneratorTool
                $"dotnet run --project {projectName}.Desktop.csproj";
     }
 
-    private static string GenerateProjectFile(string projectName, string platforms, bool includeMvvm)
+    static string GenerateProjectFile(string projectName, string platforms, bool includeMvvm)
     {
         string targetFramework = platforms switch
         {
@@ -241,7 +241,7 @@ public static class ProjectGeneratorTool
 </Project>";
     }
 
-    private static string GenerateAppXaml(string projectName)
+    static string GenerateAppXaml(string projectName)
     {
         return $@"<Application xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -252,7 +252,7 @@ public static class ProjectGeneratorTool
 </Application>";
     }
 
-    private static string GenerateAppCode(string projectName)
+    static string GenerateAppCode(string projectName)
     {
         return $@"using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -279,7 +279,7 @@ public partial class App : Application
 }}";
     }
 
-    private static string GenerateMainWindowXaml(string projectName)
+    static string GenerateMainWindowXaml(string projectName)
     {
         return $@"<Window xmlns=""https://github.com/avaloniaui""
         xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -298,18 +298,18 @@ public partial class App : Application
     <StackPanel Margin=""20"" Spacing=""10"">
         <TextBlock Text=""Welcome to AvaloniaUI!"" FontSize=""24"" FontWeight=""Bold""/>
         <TextBlock Text=""{{Binding Greeting}}"" FontSize=""16""/>
-        
+
         <StackPanel Orientation=""Horizontal"" Spacing=""10"">
             <TextBox Text=""{{Binding Name}}"" Watermark=""Enter your name"" Width=""200""/>
             <Button Command=""{{Binding GreetCommand}}"" Content=""Greet""/>
         </StackPanel>
-        
+
         <TextBlock Text=""{{Binding GreetingMessage}}"" FontWeight=""Bold"" Foreground=""Blue""/>
     </StackPanel>
 </Window>";
     }
 
-    private static string GenerateBasicMainWindowXaml(string projectName)
+    static string GenerateBasicMainWindowXaml(string projectName)
     {
         return $@"<Window xmlns=""https://github.com/avaloniaui""
         xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -321,14 +321,14 @@ public partial class App : Application
     <StackPanel Margin=""20"" Spacing=""10"">
         <TextBlock Text=""Welcome to AvaloniaUI!"" FontSize=""24"" FontWeight=""Bold""/>
         <TextBlock Text=""This is a basic AvaloniaUI application."" FontSize=""16""/>
-        
+
         <Button Content=""Click Me!"" Click=""OnButtonClick"" Width=""100""/>
         <TextBlock Name=""ResultText"" FontWeight=""Bold"" Foreground=""Blue""/>
     </StackPanel>
 </Window>";
     }
 
-    private static string GenerateMainWindowCode(string projectName)
+    static string GenerateMainWindowCode(string projectName)
     {
         return $@"using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -352,7 +352,7 @@ public partial class MainWindow : Window
 }}";
     }
 
-    private static string GenerateMainWindowViewModel(string projectName)
+    static string GenerateMainWindowViewModel(string projectName)
     {
         return $@"using System.Reactive;
 using ReactiveUI;
@@ -387,14 +387,14 @@ public class MainWindowViewModel : ViewModelBase
 
     private void ExecuteGreet()
     {{
-        GreetingMessage = string.IsNullOrWhiteSpace(Name) 
-            ? ""Please enter your name!"" 
+        GreetingMessage = string.IsNullOrWhiteSpace(Name)
+            ? ""Please enter your name!""
             : $""Hello, {{Name}}! Welcome to AvaloniaUI!"";
     }}
 }}";
     }
 
-    private static string GenerateViewModelBase(string projectName)
+    static string GenerateViewModelBase(string projectName)
     {
         return $@"using ReactiveUI;
 
@@ -405,7 +405,7 @@ public class ViewModelBase : ReactiveObject
 }}";
     }
 
-    private static string GenerateProgramCs(string projectName)
+    static string GenerateProgramCs(string projectName)
     {
         return $@"using Avalonia;
 using System;

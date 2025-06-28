@@ -96,7 +96,7 @@ public static class DebuggingAssistantTool
         }
     }
 
-    private static string GenerateDiagnostics(string category, string problemDescription)
+    static string GenerateDiagnostics(string category, string problemDescription)
     {
         return category switch
         {
@@ -110,7 +110,7 @@ public static class DebuggingAssistantTool
         };
     }
 
-    private static string GenerateBindingDiagnostics(string problem)
+    static string GenerateBindingDiagnostics(string problem)
     {
         return @"### Data Binding Issues
 
@@ -141,7 +141,7 @@ Look for binding errors in the debug console:
 4. Test with simple string properties first";
     }
 
-    private static string GenerateLayoutDiagnostics(string problem)
+    static string GenerateLayoutDiagnostics(string problem)
     {
         return @"### Layout Issues
 
@@ -172,7 +172,7 @@ Look for binding errors in the debug console:
 4. Ensure containers have proper sizing constraints";
     }
 
-    private static string GenerateStylingDiagnostics(string problem)
+    static string GenerateStylingDiagnostics(string problem)
     {
         return @"### Styling Issues
 
@@ -203,7 +203,7 @@ Look for binding errors in the debug console:
 4. Test with simple styles first";
     }
 
-    private static string GeneratePerformanceDiagnostics(string problem)
+    static string GeneratePerformanceDiagnostics(string problem)
     {
         return @"### Performance Issues
 
@@ -236,7 +236,7 @@ Look for binding errors in the debug console:
 5. Profile memory usage and leaks";
     }
 
-    private static string GenerateStartupDiagnostics(string problem)
+    static string GenerateStartupDiagnostics(string problem)
     {
         return @"### Startup Issues
 
@@ -269,7 +269,7 @@ Look for binding errors in the debug console:
 5. Check for platform compatibility issues";
     }
 
-    private static string GenerateThreadingDiagnostics(string problem)
+    static string GenerateThreadingDiagnostics(string problem)
     {
         return @"### Threading Issues
 
@@ -302,7 +302,7 @@ Look for binding errors in the debug console:
 - Use thread-safe collections when needed";
     }
 
-    private static string GenerateSolutions(string category, string problemDescription)
+    static string GenerateSolutions(string category, string problemDescription)
     {
         return category switch
         {
@@ -316,7 +316,7 @@ Look for binding errors in the debug console:
         };
     }
 
-    private static string GenerateBindingSolutions()
+    static string GenerateBindingSolutions()
     {
         return @"### Binding Solutions
 
@@ -326,7 +326,7 @@ Look for binding errors in the debug console:
    public override void Initialize()
    {
        AvaloniaXamlLoader.Load(this);
-       
+
    #if DEBUG
        // Enable binding error logging
        this.AttachDevTools();
@@ -339,7 +339,7 @@ Look for binding errors in the debug console:
    public class ViewModelBase : ReactiveObject
    {
        private string _title = string.Empty;
-       
+
        public string Title
        {
            get => _title;
@@ -362,7 +362,7 @@ Look for binding errors in the debug console:
    ```";
     }
 
-    private static string GenerateLayoutSolutions()
+    static string GenerateLayoutSolutions()
     {
         return @"### Layout Solutions
 
@@ -373,7 +373,7 @@ Look for binding errors in the debug console:
        <TextBlock Grid.Row=""0"" Grid.Column=""0"" Text=""Name:"" />
        <TextBox Grid.Row=""0"" Grid.Column=""1"" />
    </Grid>
-   
+
    <!-- For lists - use StackPanel -->
    <StackPanel Orientation=""Vertical"">
        <Button Content=""Button 1"" />
@@ -385,9 +385,9 @@ Look for binding errors in the debug console:
    ```xml
    <!-- Avoid conflicting constraints -->
    <Button Width=""100"" MinWidth=""50"" MaxWidth=""200"" />
-   
+
    <!-- Use proper alignment -->
-   <Button HorizontalAlignment=""Stretch"" 
+   <Button HorizontalAlignment=""Stretch""
            VerticalAlignment=""Center"" />
    ```
 
@@ -399,7 +399,7 @@ Look for binding errors in the debug console:
    ```";
     }
 
-    private static string GenerateStylingStolutions()
+    static string GenerateStylingStolutions()
     {
         return @"### Styling Solutions
 
@@ -409,12 +409,12 @@ Look for binding errors in the debug console:
    <Style Selector=""Button"">
        <Setter Property=""Margin"" Value=""4"" />
    </Style>
-   
+
    <!-- Target with class -->
    <Style Selector=""Button.primary"">
        <Setter Property=""Background"" Value=""Blue"" />
    </Style>
-   
+
    <!-- Target with state -->
    <Style Selector=""Button:pointerover"">
        <Setter Property=""Background"" Value=""LightBlue"" />
@@ -435,7 +435,7 @@ Look for binding errors in the debug console:
    ```";
     }
 
-    private static string GeneratePerformanceSolutions()
+    static string GeneratePerformanceSolutions()
     {
         return @"### Performance Solutions
 
@@ -488,7 +488,7 @@ Look for binding errors in the debug console:
    ```";
     }
 
-    private static string GenerateStartupSolutions()
+    static string GenerateStartupSolutions()
     {
         return @"### Startup Solutions
 
@@ -508,7 +508,7 @@ Look for binding errors in the debug console:
            throw;
        }
    }
-   
+
    public static AppBuilder BuildAvaloniaApp()
        => AppBuilder.Configure<App>()
            .UsePlatformDetect()
@@ -542,7 +542,7 @@ Look for binding errors in the debug console:
    ```";
     }
 
-    private static string GenerateThreadingSolutions()
+    static string GenerateThreadingSolutions()
     {
         return @"### Threading Solutions
 
@@ -552,7 +552,7 @@ Look for binding errors in the debug console:
    {
        // Background work
        var data = await GetDataAsync();
-       
+
        // UI updates
        await Dispatcher.UIThread.InvokeAsync(() =>
        {
@@ -569,7 +569,7 @@ Look for binding errors in the debug console:
        // Use ConfigureAwait(false) for non-UI operations
        var result = await _httpClient.GetStringAsync(url)
            .ConfigureAwait(false);
-       
+
        return result;
    }
    ```
@@ -577,7 +577,7 @@ Look for binding errors in the debug console:
 3. **Reactive Commands**
    ```csharp
    public ReactiveCommand<Unit, Unit> LoadCommand { get; }
-   
+
    public MyViewModel()
    {
        LoadCommand = ReactiveCommand.CreateFromTask(LoadDataAsync);
@@ -587,7 +587,7 @@ Look for binding errors in the debug console:
 4. **Cancellation Support**
    ```csharp
    private CancellationTokenSource _cancellationTokenSource = new();
-   
+
    public async Task LoadDataAsync()
    {
        try
@@ -603,7 +603,7 @@ Look for binding errors in the debug console:
    ```";
     }
 
-    private static string GenerateDebugCode(string category)
+    static string GenerateDebugCode(string category)
     {
         return category switch
         {
@@ -617,7 +617,7 @@ Look for binding errors in the debug console:
         };
     }
 
-    private static string GenerateBindingDebugCode()
+    static string GenerateBindingDebugCode()
     {
         return @"// Binding Debug Helper
 public static class BindingDebugHelper
@@ -629,12 +629,12 @@ public static class BindingDebugHelper
         Avalonia.Logging.Logger.Sink = new CustomLogSink();
 #endif
     }
-    
+
     public static void DebugDataContext(Control control)
     {
         Console.WriteLine($""Control: {control.GetType().Name}"");
         Console.WriteLine($""DataContext: {control.DataContext?.GetType().Name ?? ""null""}"");
-        
+
         if (control.Parent != null)
         {
             Console.WriteLine($""Parent DataContext: {control.Parent.DataContext?.GetType().Name ?? ""null""}"");
@@ -659,7 +659,7 @@ public class CustomLogSink : Avalonia.Logging.ILogSink
 }";
     }
 
-    private static string GenerateLayoutDebugCode()
+    static string GenerateLayoutDebugCode()
     {
         return @"// Layout Debug Helper
 public static class LayoutDebugHelper
@@ -675,7 +675,7 @@ public static class LayoutDebugHelper
         Console.WriteLine($""VerticalAlignment: {control.VerticalAlignment}"");
         Console.WriteLine(""---"");
     }
-    
+
     public static void HighlightControl(Control control, IBrush brush)
     {
         if (control is Border border)
@@ -691,14 +691,14 @@ public static class LayoutDebugHelper
             {
                 var index = parent.Children.IndexOf(control);
                 parent.Children.RemoveAt(index);
-                
+
                 var highlightBorder = new Border
                 {
                     BorderBrush = brush,
                     BorderThickness = new Thickness(2),
                     Child = control
                 };
-                
+
                 parent.Children.Insert(index, highlightBorder);
             }
         }
@@ -706,7 +706,7 @@ public static class LayoutDebugHelper
 }";
     }
 
-    private static string GenerateStylingDebugCode()
+    static string GenerateStylingDebugCode()
     {
         return @"// Styling Debug Helper
 public static class StylingDebugHelper
@@ -715,17 +715,17 @@ public static class StylingDebugHelper
     {
         Console.WriteLine($""Element: {element.GetType().Name}"");
         Console.WriteLine($""Classes: {string.Join("", "", element.Classes)}"");
-        
+
         // This would require internal access to style system
         // In practice, use DevTools for style inspection
     }
-    
+
     public static void TestResourceResolution(Control control, string resourceKey)
     {
         var resource = control.TryFindResource(resourceKey);
         Console.WriteLine($""Resource '{resourceKey}': {resource?.GetType().Name ?? ""Not Found""}"");
     }
-    
+
     public static void AddDebugClass(StyledElement element, string className)
     {
         element.Classes.Add(className);
@@ -734,18 +734,18 @@ public static class StylingDebugHelper
 }";
     }
 
-    private static string GeneratePerformanceDebugCode()
+    static string GeneratePerformanceDebugCode()
     {
         return @"// Performance Debug Helper
 public static class PerformanceDebugHelper
 {
     private static readonly Dictionary<string, Stopwatch> _timers = new();
-    
+
     public static void StartTimer(string operation)
     {
         _timers[operation] = Stopwatch.StartNew();
     }
-    
+
     public static void StopTimer(string operation)
     {
         if (_timers.TryGetValue(operation, out var timer))
@@ -755,22 +755,22 @@ public static class PerformanceDebugHelper
             _timers.Remove(operation);
         }
     }
-    
+
     public static void MeasureMemory(string operation)
     {
         GC.Collect();
         GC.WaitForPendingFinalizers();
         GC.Collect();
-        
+
         var beforeMemory = GC.GetTotalMemory(false);
         Console.WriteLine($""{operation} - Memory before: {beforeMemory:N0} bytes"");
-        
+
         // Store operation name for later measurement
         _memoryOperations[operation] = beforeMemory;
     }
-    
+
     private static readonly Dictionary<string, long> _memoryOperations = new();
-    
+
     public static void EndMeasureMemory(string operation)
     {
         if (_memoryOperations.TryGetValue(operation, out var beforeMemory))
@@ -778,20 +778,20 @@ public static class PerformanceDebugHelper
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            
+
             var afterMemory = GC.GetTotalMemory(false);
             var difference = afterMemory - beforeMemory;
-            
+
             Console.WriteLine($""{operation} - Memory after: {afterMemory:N0} bytes"");
             Console.WriteLine($""{operation} - Memory difference: {difference:N0} bytes"");
-            
+
             _memoryOperations.Remove(operation);
         }
     }
 }";
     }
 
-    private static string GenerateStartupDebugCode()
+    static string GenerateStartupDebugCode()
     {
         return @"// Startup Debug Helper
 public static class StartupDebugHelper
@@ -800,11 +800,11 @@ public static class StartupDebugHelper
     {
         Console.WriteLine($""[STARTUP] {DateTime.Now:HH:mm:ss.fff} - {step}"");
     }
-    
+
     public static void MeasureStartupTime(Action startupAction)
     {
         var stopwatch = Stopwatch.StartNew();
-        
+
         try
         {
             startupAction();
@@ -815,12 +815,12 @@ public static class StartupDebugHelper
             Console.WriteLine($""Startup completed in {stopwatch.ElapsedMilliseconds}ms"");
         }
     }
-    
+
     public static void ValidateConfiguration()
     {
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
         Console.WriteLine($""Loaded assemblies: {assemblies.Length}"");
-        
+
         foreach (var assembly in assemblies.Where(a => a.GetName().Name?.Contains(""Avalonia"") == true))
         {
             Console.WriteLine($""  - {assembly.GetName().Name} v{assembly.GetName().Version}"");
@@ -829,7 +829,7 @@ public static class StartupDebugHelper
 }";
     }
 
-    private static string GenerateThreadingDebugCode()
+    static string GenerateThreadingDebugCode()
     {
         return @"// Threading Debug Helper
 public static class ThreadingDebugHelper
@@ -841,7 +841,7 @@ public static class ThreadingDebugHelper
             throw new InvalidOperationException(""This operation must be called on the UI thread"");
         }
     }
-    
+
     public static async Task SafeUIUpdateAsync(Action uiUpdate)
     {
         if (Dispatcher.UIThread.CheckAccess())
@@ -853,19 +853,19 @@ public static class ThreadingDebugHelper
             await Dispatcher.UIThread.InvokeAsync(uiUpdate);
         }
     }
-    
+
     public static void LogThreadInfo(string operation)
     {
         var thread = Thread.CurrentThread;
         var isUIThread = Dispatcher.UIThread.CheckAccess();
-        
+
         Console.WriteLine($""[THREAD] {operation}"");
         Console.WriteLine($""  Thread ID: {thread.ManagedThreadId}"");
         Console.WriteLine($""  Thread Name: {thread.Name ?? ""<unnamed>""}"");
         Console.WriteLine($""  Is UI Thread: {isUIThread}"");
         Console.WriteLine($""  Is Background: {thread.IsBackground}"");
     }
-    
+
     public static IDisposable MonitorDispatcher()
     {
         var timer = new System.Timers.Timer(1000);
@@ -875,7 +875,7 @@ public static class ThreadingDebugHelper
             Console.WriteLine($""[DISPATCHER] {DateTime.Now:HH:mm:ss} - Monitoring"");
         };
         timer.Start();
-        
+
         return new DisposableAction(() => timer.Dispose());
     }
 }
@@ -883,17 +883,17 @@ public static class ThreadingDebugHelper
 public class DisposableAction : IDisposable
 {
     private readonly Action _action;
-    
+
     public DisposableAction(Action action)
     {
         _action = action;
     }
-    
+
     public void Dispose() => _action();
 }";
     }
 
-    private static string GenerateUtilityCode(string utilityType)
+    static string GenerateUtilityCode(string utilityType)
     {
         return utilityType switch
         {
@@ -906,39 +906,39 @@ public class DisposableAction : IDisposable
         };
     }
 
-    private static string GenerateLoggerUtility()
+    static string GenerateLoggerUtility()
     {
         return @"// Structured Logging Utility
 public static class AvaloniaLogger
 {
     private static ILogger _logger = NullLogger.Instance;
-    
+
     public static void Initialize(ILogger logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
     public static void LogBinding(string property, object? value, string source)
     {
         _logger.LogDebug(""Binding Update: {Property} = {Value} from {Source}"", property, value, source);
     }
-    
+
     public static void LogLayout(string element, Rect bounds, Size desiredSize)
     {
-        _logger.LogDebug(""Layout: {Element} - Bounds: {Bounds}, DesiredSize: {DesiredSize}"", 
+        _logger.LogDebug(""Layout: {Element} - Bounds: {Bounds}, DesiredSize: {DesiredSize}"",
             element, bounds, desiredSize);
     }
-    
+
     public static void LogNavigation(string from, string to)
     {
         _logger.LogInformation(""Navigation: {From} -> {To}"", from, to);
     }
-    
+
     public static void LogPerformance(string operation, TimeSpan duration)
     {
         _logger.LogInformation(""Performance: {Operation} took {Duration}ms"", operation, duration.TotalMilliseconds);
     }
-    
+
     public static void LogError(Exception exception, string context)
     {
         _logger.LogError(exception, ""Error in {Context}"", context);
@@ -949,17 +949,17 @@ public static class AvaloniaLogger
 public class AvaloniaLogSink : ILogSink
 {
     private readonly ILogger _logger;
-    
+
     public AvaloniaLogSink(ILogger logger)
     {
         _logger = logger;
     }
-    
+
     public bool IsEnabled(LogEventLevel level, string area)
     {
         return level >= LogEventLevel.Information;
     }
-    
+
     public void Log(LogEventLevel level, string area, object source, string messageTemplate, params object[] propertyValues)
     {
         var logLevel = level switch
@@ -972,13 +972,13 @@ public class AvaloniaLogSink : ILogSink
             LogEventLevel.Fatal => Microsoft.Extensions.Logging.LogLevel.Critical,
             _ => Microsoft.Extensions.Logging.LogLevel.Information
         };
-        
+
         _logger.Log(logLevel, ""[{Area}] {MessageTemplate}"", area, messageTemplate);
     }
 }";
     }
 
-    private static string GenerateVisualTreeUtility()
+    static string GenerateVisualTreeUtility()
     {
         return @"// Visual Tree Debugging Utility
 public static class VisualTreeHelper
@@ -987,7 +987,7 @@ public static class VisualTreeHelper
     {
         var indent = new string(' ', depth * 2);
         var info = $""{visual.GetType().Name}"";
-        
+
         if (visual is Control control)
         {
             info += $"" - Name: {control.Name ?? ""<unnamed>""}"";
@@ -996,45 +996,45 @@ public static class VisualTreeHelper
                 info += $"", DataContext: {control.DataContext.GetType().Name}"";
             }
         }
-        
+
         Console.WriteLine($""{indent}{info}"");
-        
+
         foreach (var child in visual.GetVisualChildren())
         {
             PrintVisualTree(child, depth + 1);
         }
     }
-    
+
     public static T? FindChild<T>(Visual parent, string name = """") where T : class
     {
         foreach (var child in parent.GetVisualChildren())
         {
-            if (child is T target && (string.IsNullOrEmpty(name) || 
+            if (child is T target && (string.IsNullOrEmpty(name) ||
                 (child is Control control && control.Name == name)))
             {
                 return target;
             }
-            
+
             var found = FindChild<T>(child, name);
             if (found != null)
                 return found;
         }
-        
+
         return null;
     }
-    
+
     public static IEnumerable<T> FindChildren<T>(Visual parent) where T : class
     {
         foreach (var child in parent.GetVisualChildren())
         {
             if (child is T target)
                 yield return target;
-                
+
             foreach (var grandChild in FindChildren<T>(child))
                 yield return grandChild;
         }
     }
-    
+
     public static void HighlightElement(Visual element, Color color)
     {
         if (element is Control control)
@@ -1045,17 +1045,17 @@ public static class VisualTreeHelper
                 Background = new SolidColorBrush(color) { Opacity = 0.3 },
                 IsHitTestVisible = false
             };
-            
+
             // This would require more complex implementation to properly overlay
             // In practice, use DevTools for visual debugging
         }
     }
-    
+
     public static string GetVisualPath(Visual element)
     {
         var path = new List<string>();
         var current = element;
-        
+
         while (current != null)
         {
             var name = current.GetType().Name;
@@ -1066,13 +1066,13 @@ public static class VisualTreeHelper
             path.Insert(0, name);
             current = current.GetVisualParent();
         }
-        
+
         return string.Join("" -> "", path);
     }
 }";
     }
 
-    private static string GenerateBindingUtility()
+    static string GenerateBindingUtility()
     {
         return @"// Binding Debug Utility
 public static class BindingDebugUtility
@@ -1083,7 +1083,7 @@ public static class BindingDebugUtility
         // Implementation would track binding updates and errors
         Console.WriteLine($""Tracing binding for {control.GetType().Name}.{propertyName}"");
     }
-    
+
     public static void ValidateBindingPath(object dataContext, string bindingPath)
     {
         if (dataContext == null)
@@ -1091,35 +1091,35 @@ public static class BindingDebugUtility
             Console.WriteLine($""❌ DataContext is null for path: {bindingPath}"");
             return;
         }
-        
+
         var parts = bindingPath.Split('.');
         var current = dataContext;
         var currentPath = """";
-        
+
         foreach (var part in parts)
         {
             currentPath = string.IsNullOrEmpty(currentPath) ? part : $""{currentPath}.{part}"";
-            
+
             var property = current?.GetType().GetProperty(part);
             if (property == null)
             {
                 Console.WriteLine($""❌ Property not found: {currentPath} on {current?.GetType().Name}"");
                 return;
             }
-            
+
             Console.WriteLine($""✅ Found property: {currentPath} ({property.PropertyType.Name})"");
             current = property.GetValue(current);
-            
+
             if (current == null && parts.Last() != part)
             {
                 Console.WriteLine($""⚠️  Null value at: {currentPath}"");
                 return;
             }
         }
-        
+
         Console.WriteLine($""✅ Binding path valid: {bindingPath}"");
     }
-    
+
     public static void CheckPropertyChangeNotification(object viewModel, string propertyName)
     {
         if (viewModel is INotifyPropertyChanged notifyObject)
@@ -1130,16 +1130,16 @@ public static class BindingDebugUtility
                 if (e.PropertyName == propertyName)
                     eventFired = true;
             };
-            
+
             notifyObject.PropertyChanged += handler;
-            
+
             // Use reflection to trigger property change
             var property = viewModel.GetType().GetProperty(propertyName);
             if (property?.CanWrite == true)
             {
                 var currentValue = property.GetValue(viewModel);
                 property.SetValue(viewModel, currentValue); // Trigger setter
-                
+
                 if (eventFired)
                 {
                     Console.WriteLine($""✅ PropertyChanged fired for: {propertyName}"");
@@ -1149,7 +1149,7 @@ public static class BindingDebugUtility
                     Console.WriteLine($""❌ PropertyChanged NOT fired for: {propertyName}"");
                 }
             }
-            
+
             notifyObject.PropertyChanged -= handler;
         }
         else
@@ -1160,7 +1160,7 @@ public static class BindingDebugUtility
 }";
     }
 
-    private static string GeneratePerformanceUtility()
+    static string GeneratePerformanceUtility()
     {
         return @"// Performance Monitoring Utility
 public class PerformanceMonitor : IDisposable
@@ -1170,38 +1170,38 @@ public class PerformanceMonitor : IDisposable
     private long _lastGcCount0;
     private long _lastGcCount1;
     private long _lastGcCount2;
-    
+
     public PerformanceMonitor(ILogger logger, TimeSpan interval = default)
     {
         _logger = logger;
         var monitorInterval = interval == default ? TimeSpan.FromSeconds(5) : interval;
-        
+
         _timer = new Timer(MonitorPerformance, null, TimeSpan.Zero, monitorInterval);
-        
+
         _lastGcCount0 = GC.CollectionCount(0);
         _lastGcCount1 = GC.CollectionCount(1);
         _lastGcCount2 = GC.CollectionCount(2);
     }
-    
+
     private void MonitorPerformance(object? state)
     {
         var process = Process.GetCurrentProcess();
         var memoryUsage = GC.GetTotalMemory(false);
-        
+
         var gc0 = GC.CollectionCount(0) - _lastGcCount0;
         var gc1 = GC.CollectionCount(1) - _lastGcCount1;
         var gc2 = GC.CollectionCount(2) - _lastGcCount2;
-        
+
         _logger.LogInformation(""Performance Metrics: Memory={MemoryMB}MB, GC=[{GC0},{GC1},{GC2}], Threads={ThreadCount}"",
             memoryUsage / (1024 * 1024),
             gc0, gc1, gc2,
             process.Threads.Count);
-            
+
         _lastGcCount0 = GC.CollectionCount(0);
         _lastGcCount1 = GC.CollectionCount(1);
         _lastGcCount2 = GC.CollectionCount(2);
     }
-    
+
     public void Dispose()
     {
         _timer?.Dispose();
@@ -1214,20 +1214,20 @@ public class OperationTimer : IDisposable
     private readonly Stopwatch _stopwatch;
     private readonly string _operationName;
     private readonly ILogger _logger;
-    
+
     public OperationTimer(string operationName, ILogger logger)
     {
         _operationName = operationName;
         _logger = logger;
         _stopwatch = Stopwatch.StartNew();
-        
+
         _logger.LogDebug(""Started operation: {Operation}"", operationName);
     }
-    
+
     public void Dispose()
     {
         _stopwatch.Stop();
-        _logger.LogInformation(""Completed operation: {Operation} in {Duration}ms"", 
+        _logger.LogInformation(""Completed operation: {Operation} in {Duration}ms"",
             _operationName, _stopwatch.ElapsedMilliseconds);
     }
 }
@@ -1242,22 +1242,22 @@ public static class PerformanceExtensions
 }";
     }
 
-    private static string GenerateMemoryUtility()
+    static string GenerateMemoryUtility()
     {
         return @"// Memory Monitoring Utility
 public static class MemoryMonitor
 {
     private static readonly ConcurrentDictionary<string, WeakReference> _trackedObjects = new();
-    
+
     public static void TrackObject(string key, object obj)
     {
         _trackedObjects[key] = new WeakReference(obj);
     }
-    
+
     public static void CheckTrackedObjects()
     {
         var collected = new List<string>();
-        
+
         foreach (var kvp in _trackedObjects)
         {
             if (!kvp.Value.IsAlive)
@@ -1265,28 +1265,28 @@ public static class MemoryMonitor
                 collected.Add(kvp.Key);
             }
         }
-        
+
         foreach (var key in collected)
         {
             _trackedObjects.TryRemove(key, out _);
         }
-        
+
         Console.WriteLine($""Memory Check: {_trackedObjects.Count} objects alive, {collected.Count} collected"");
     }
-    
+
     public static void ForceGarbageCollection()
     {
         GC.Collect();
         GC.WaitForPendingFinalizers();
         GC.Collect();
-        
+
         var memoryBefore = GC.GetTotalMemory(false);
         GC.Collect();
         var memoryAfter = GC.GetTotalMemory(true);
-        
+
         Console.WriteLine($""Garbage Collection: Freed {(memoryBefore - memoryAfter) / 1024}KB"");
     }
-    
+
     public static MemorySnapshot TakeSnapshot()
     {
         return new MemorySnapshot
@@ -1299,7 +1299,7 @@ public static class MemoryMonitor
             TrackedObjectCount = _trackedObjects.Count
         };
     }
-    
+
     public static void CompareSnapshots(MemorySnapshot before, MemorySnapshot after)
     {
         var memoryDiff = after.TotalMemory - before.TotalMemory;
@@ -1307,7 +1307,7 @@ public static class MemoryMonitor
         var gen1Diff = after.Gen1Collections - before.Gen1Collections;
         var gen2Diff = after.Gen2Collections - before.Gen2Collections;
         var duration = after.Timestamp - before.Timestamp;
-        
+
         Console.WriteLine($""Memory Analysis ({duration.TotalSeconds:F1}s):"");
         Console.WriteLine($""  Memory Change: {memoryDiff / 1024:N0}KB"");
         Console.WriteLine($""  GC Collections: Gen0={gen0Diff}, Gen1={gen1Diff}, Gen2={gen2Diff}"");
@@ -1326,7 +1326,7 @@ public class MemorySnapshot
 }";
     }
 
-    private static string GenerateDevToolsIntegration()
+    static string GenerateDevToolsIntegration()
     {
         return @"// DevTools Integration
 public static class DevToolsHelper
@@ -1341,7 +1341,7 @@ public static class DevToolsHelper
         });
 #endif
     }
-    
+
     public static void ConfigureDevTools(AppBuilder builder)
     {
         builder.ConfigureDevTools(options =>
@@ -1354,7 +1354,7 @@ public static class DevToolsHelper
 #endif
         });
     }
-    
+
     public static void AddCustomDevToolsTab(Window mainWindow)
     {
 #if DEBUG
@@ -1370,22 +1370,22 @@ public class PerformanceDevToolsView : UserControl
 {
     private readonly Timer _updateTimer;
     private readonly TextBlock _metricsDisplay;
-    
+
     public PerformanceDevToolsView()
     {
         _metricsDisplay = new TextBlock { FontFamily = ""Consolas"" };
         Content = new ScrollViewer { Content = _metricsDisplay };
-        
+
         _updateTimer = new Timer(UpdateMetrics, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
-    
+
     private void UpdateMetrics(object? state)
     {
         Dispatcher.UIThread.Post(() =>
         {
             var process = Process.GetCurrentProcess();
             var memory = GC.GetTotalMemory(false);
-            
+
             var metrics = $@""Performance Metrics
 Memory: {memory / (1024 * 1024):N1} MB
 GC Gen0: {GC.CollectionCount(0)}
@@ -1393,7 +1393,7 @@ GC Gen1: {GC.CollectionCount(1)}
 GC Gen2: {GC.CollectionCount(2)}
 Threads: {process.Threads.Count}
 Updated: {DateTime.Now:HH:mm:ss}"";
-            
+
             _metricsDisplay.Text = metrics;
         });
     }
@@ -1401,20 +1401,20 @@ Updated: {DateTime.Now:HH:mm:ss}"";
 #endif";
     }
 
-    private static string GenerateTelemetryCode()
+    static string GenerateTelemetryCode()
     {
         return @"// Telemetry Integration
 public class AvaloniaTelemetry
 {
     private readonly ILogger _logger;
     private readonly string _applicationName;
-    
+
     public AvaloniaTelemetry(ILogger logger, string applicationName)
     {
         _logger = logger;
         _applicationName = applicationName;
     }
-    
+
     public void TrackEvent(string eventName, Dictionary<string, object>? properties = null)
     {
         var telemetryEvent = new
@@ -1424,10 +1424,10 @@ public class AvaloniaTelemetry
             Timestamp = DateTime.UtcNow,
             Properties = properties ?? new Dictionary<string, object>()
         };
-        
+
         _logger.LogInformation(""Telemetry: {Event}"", JsonSerializer.Serialize(telemetryEvent));
     }
-    
+
     public void TrackException(Exception exception, Dictionary<string, object>? properties = null)
     {
         var telemetryData = new
@@ -1442,10 +1442,10 @@ public class AvaloniaTelemetry
             Timestamp = DateTime.UtcNow,
             Properties = properties ?? new Dictionary<string, object>()
         };
-        
+
         _logger.LogError(""Exception Telemetry: {Data}"", JsonSerializer.Serialize(telemetryData));
     }
-    
+
     public void TrackPerformance(string operationName, TimeSpan duration, Dictionary<string, object>? properties = null)
     {
         var performanceData = new
@@ -1456,10 +1456,10 @@ public class AvaloniaTelemetry
             Timestamp = DateTime.UtcNow,
             Properties = properties ?? new Dictionary<string, object>()
         };
-        
+
         _logger.LogInformation(""Performance Telemetry: {Data}"", JsonSerializer.Serialize(performanceData));
     }
-    
+
     public void TrackUserAction(string action, string? elementName = null, Dictionary<string, object>? properties = null)
     {
         var actionData = new
@@ -1470,7 +1470,7 @@ public class AvaloniaTelemetry
             Timestamp = DateTime.UtcNow,
             Properties = properties ?? new Dictionary<string, object>()
         };
-        
+
         _logger.LogInformation(""User Action Telemetry: {Data}"", JsonSerializer.Serialize(actionData));
     }
 }
@@ -1482,7 +1482,7 @@ public class TelemetryExtensions
     {
         telemetry.TrackUserAction(""Command"", commandName);
     }
-    
+
     public static void TrackNavigation(AvaloniaTelemetry telemetry, string fromView, string toView)
     {
         telemetry.TrackEvent(""Navigation"", new Dictionary<string, object>
@@ -1491,7 +1491,7 @@ public class TelemetryExtensions
             { ""To"", toView }
         });
     }
-    
+
     public static void TrackError(AvaloniaTelemetry telemetry, Exception exception, string context)
     {
         telemetry.TrackException(exception, new Dictionary<string, object>

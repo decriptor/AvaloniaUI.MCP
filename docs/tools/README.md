@@ -63,7 +63,7 @@ Many tools support detailed configuration:
 Tools can be used together for complete workflows:
 
 1. Generate project structure
-2. Validate XAML components  
+2. Validate XAML components
 3. Apply security patterns
 4. Add theming support
 5. Optimize performance

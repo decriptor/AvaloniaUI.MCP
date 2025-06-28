@@ -75,7 +75,7 @@ public static class XamlPatternsResource
         }
     }
 
-    private static string FormatXamlPatterns(JsonElement patternsData)
+    static string FormatXamlPatterns(JsonElement patternsData)
     {
         string result = "# AvaloniaUI XAML Patterns\\n\\n";
         result += "This reference contains common XAML patterns and templates for AvaloniaUI development.\\n\\n";
@@ -92,7 +92,7 @@ public static class XamlPatternsResource
         return result;
     }
 
-    private static string? FindXamlPattern(JsonElement patternsData, string patternName)
+    static string? FindXamlPattern(JsonElement patternsData, string patternName)
     {
         if (patternsData.TryGetProperty("avalonia_xaml_patterns", out JsonElement patterns))
         {
@@ -109,7 +109,7 @@ public static class XamlPatternsResource
         return null;
     }
 
-    private static string ExtractMvvmPatterns(JsonElement patternsData)
+    static string ExtractMvvmPatterns(JsonElement patternsData)
     {
         string result = "# MVVM Patterns for AvaloniaUI\\n\\n";
 
@@ -130,7 +130,7 @@ public static class XamlPatternsResource
         return result;
     }
 
-    private static string FormatPattern(JsonElement pattern)
+    static string FormatPattern(JsonElement pattern)
     {
         string result = "";
 
@@ -164,4 +164,3 @@ public static class XamlPatternsResource
         return result;
     }
 }
-

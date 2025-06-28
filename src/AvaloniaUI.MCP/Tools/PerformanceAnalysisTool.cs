@@ -60,14 +60,14 @@ public static partial class PerformanceAnalysisTool
         };
     }
 
-    private static string DetectCodeType(string content)
+    static string DetectCodeType(string content)
     {
-        return content.TrimStart().StartsWith("<") && (content.Contains("xmlns") || content.Contains("</"))
+        return content.TrimStart().StartsWith('<') && (content.Contains("xmlns") || content.Contains("</"))
             ? "xaml"
             : content.Contains("namespace") || content.Contains("class") || content.Contains("using") ? "csharp" : "unknown";
     }
 
-    private static void AnalyzeXamlPerformance(string xamlContent, List<string> issues, List<string> recommendations)
+    static void AnalyzeXamlPerformance(string xamlContent, List<string> issues, List<string> recommendations)
     {
         try
         {
@@ -97,7 +97,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void CheckForCompiledBindings(XDocument doc, List<string> issues, List<string> recommendations)
+    static void CheckForCompiledBindings(XDocument doc, List<string> issues, List<string> recommendations)
     {
         XElement? root = doc.Root;
         if (root != null)
@@ -119,7 +119,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void CheckBindingPatterns(XDocument doc, List<string> issues, List<string> recommendations)
+    static void CheckBindingPatterns(XDocument doc, List<string> issues, List<string> recommendations)
     {
         IEnumerable<XElement> elementsWithBindings = doc.Descendants().Where(e =>
             e.Attributes().Any(a => a.Value.Contains("{Binding")));
@@ -154,7 +154,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void CheckLayoutPerformance(XDocument doc, List<string> issues, List<string> recommendations)
+    static void CheckLayoutPerformance(XDocument doc, List<string> issues, List<string> recommendations)
     {
         // Check for nested layout containers
         string[] layoutControls = ["Grid", "StackPanel", "DockPanel", "Canvas", "WrapPanel"];
@@ -194,7 +194,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void CheckResourceUsage(XDocument doc, List<string> issues, List<string> recommendations)
+    static void CheckResourceUsage(XDocument doc, List<string> issues, List<string> recommendations)
     {
         IEnumerable<XElement> resources = doc.Descendants().Where(e => e.Name.LocalName.EndsWith("Resources"));
         int resourceCount = resources.SelectMany(r => r.Elements()).Count();
@@ -218,11 +218,11 @@ public static partial class PerformanceAnalysisTool
             issues.Add($"⚠️ Duplicate resource key: {key}");
         }
     }
-    private static readonly string[] virtualizationControlArray = ["ListBox", "ListView", "DataGrid", "TreeView"];
+    static readonly string[] VirtualizationControlArray = ["ListBox", "ListView", "DataGrid", "TreeView"];
 
-    private static void CheckVirtualization(XDocument doc, List<string> issues, List<string> recommendations)
+    static void CheckVirtualization(XDocument doc, List<string> issues, List<string> recommendations)
     {
-        IEnumerable<XElement> listControls = doc.Descendants().Where(e => virtualizationControlArray.Contains(e.Name.LocalName));
+        IEnumerable<XElement> listControls = doc.Descendants().Where(e => VirtualizationControlArray.Contains(e.Name.LocalName));
 
         foreach (XElement? control in listControls)
         {
@@ -237,9 +237,9 @@ public static partial class PerformanceAnalysisTool
             }
         }
     }
-    private static readonly string[] stylingAttributeArray = ["Background", "Foreground", "FontSize", "FontWeight"];
+    static readonly string[] StylingAttributeArray = ["Background", "Foreground", "FontSize", "FontWeight"];
 
-    private static void CheckStylingPerformance(XDocument doc, List<string> issues, List<string> recommendations)
+    static void CheckStylingPerformance(XDocument doc, List<string> issues, List<string> recommendations)
     {
         IEnumerable<XElement> styles = doc.Descendants("Style");
         IEnumerable<XElement> complexSelectors = styles.Where(s =>
@@ -256,7 +256,7 @@ public static partial class PerformanceAnalysisTool
 
         // Check for inline styles
         IEnumerable<XElement> inlineStyles = doc.Descendants().Where(e =>
-            e.Attributes().Any(a => stylingAttributeArray.Contains(a.Name.LocalName)));
+            e.Attributes().Any(a => StylingAttributeArray.Contains(a.Name.LocalName)));
 
         if (inlineStyles.Count() > 10)
         {
@@ -265,7 +265,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void AnalyzeCSharpPerformance(string csharpContent, List<string> issues, List<string> recommendations)
+    static void AnalyzeCSharpPerformance(string csharpContent, List<string> issues, List<string> recommendations)
     {
         // Check for INotifyPropertyChanged implementation
         CheckPropertyChangeNotification(csharpContent, issues, recommendations);
@@ -283,7 +283,7 @@ public static partial class PerformanceAnalysisTool
         CheckAvaloniaPropertyUsage(csharpContent, issues, recommendations);
     }
 
-    private static void CheckPropertyChangeNotification(string content, List<string> issues, List<string> recommendations)
+    static void CheckPropertyChangeNotification(string content, List<string> issues, List<string> recommendations)
     {
         bool hasINotifyPropertyChanged = content.Contains("INotifyPropertyChanged");
         bool hasPropertyChangedEvent = content.Contains("PropertyChanged");
@@ -306,7 +306,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void CheckAsyncPatterns(string content, List<string> issues, List<string> recommendations)
+    static void CheckAsyncPatterns(string content, List<string> issues, List<string> recommendations)
     {
         bool hasAsyncVoid = MyRegex1().IsMatch(content);
         if (hasAsyncVoid)
@@ -324,7 +324,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void CheckCollectionUsage(string content, List<string> issues, List<string> recommendations)
+    static void CheckCollectionUsage(string content, List<string> issues, List<string> recommendations)
     {
         if (content.Contains("List<") && content.Contains("Add(") && content.Contains("foreach"))
         {
@@ -339,7 +339,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void CheckMemoryLeakPatterns(string content, List<string> issues, List<string> recommendations)
+    static void CheckMemoryLeakPatterns(string content, List<string> issues, List<string> recommendations)
     {
         bool hasEventSubscription = content.Contains("+=") && (content.Contains("Event") || content.Contains("Changed"));
         bool hasEventUnsubscription = content.Contains("-=");
@@ -358,7 +358,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static void CheckAvaloniaPropertyUsage(string content, List<string> issues, List<string> recommendations)
+    static void CheckAvaloniaPropertyUsage(string content, List<string> issues, List<string> recommendations)
     {
         bool hasAvaloniaProperty = content.Contains("AvaloniaProperty");
         bool hasStyledProperty = content.Contains("StyledProperty");
@@ -375,7 +375,7 @@ public static partial class PerformanceAnalysisTool
         }
     }
 
-    private static string FormatPerformanceReport(string codeType, List<string> issues, List<string> recommendations)
+    static string FormatPerformanceReport(string codeType, List<string> issues, List<string> recommendations)
     {
         string report = $"# AvaloniaUI Performance Analysis Report ({codeType.ToUpper(System.Globalization.CultureInfo.CurrentCulture)})\n\n";
 
@@ -427,7 +427,7 @@ public static partial class PerformanceAnalysisTool
         return report;
     }
 
-    private static string GetBindingPerformanceRecommendations()
+    static string GetBindingPerformanceRecommendations()
     {
         return @"# Data Binding Performance Recommendations
 
@@ -464,7 +464,7 @@ Use: `{Binding $parent[UserControl].PropertyName}`
 - Frequent binding updates in loops";
     }
 
-    private static string GetLayoutPerformanceRecommendations()
+    static string GetLayoutPerformanceRecommendations()
     {
         return @"# Layout Performance Recommendations
 
@@ -504,7 +504,7 @@ Use: `{Binding $parent[UserControl].PropertyName}`
 - Missing RowDefinitions/ColumnDefinitions in Grid";
     }
 
-    private static string GetStylingPerformanceRecommendations()
+    static string GetStylingPerformanceRecommendations()
     {
         return @"# Styling Performance Recommendations
 
@@ -544,7 +544,7 @@ Use: `{Binding $parent[UserControl].PropertyName}`
 - Large numbers of unused styles";
     }
 
-    private static string GetCollectionPerformanceRecommendations()
+    static string GetCollectionPerformanceRecommendations()
     {
         return @"# Collection Performance Recommendations
 
@@ -590,7 +590,7 @@ using (collection.DeferRefresh())
 - Missing virtualization for large lists";
     }
 
-    private static string GetGeneralPerformanceRecommendations()
+    static string GetGeneralPerformanceRecommendations()
     {
         return @"# General AvaloniaUI Performance Recommendations
 

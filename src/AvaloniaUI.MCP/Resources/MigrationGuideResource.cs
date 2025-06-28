@@ -104,7 +104,7 @@ public static class MigrationGuideResource
         }
     }
 
-    private static string FormatMigrationGuide(JsonElement migrationData)
+    static string FormatMigrationGuide(JsonElement migrationData)
     {
         string result = "# WPF to AvaloniaUI Migration Guide\\n\\n";
         result += "This comprehensive guide will help you migrate your WPF applications to AvaloniaUI.\\n\\n";
@@ -163,7 +163,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string ExtractControlMappings(JsonElement migrationData)
+    static string ExtractControlMappings(JsonElement migrationData)
     {
         string result = "# WPF to AvaloniaUI Control Mappings\\n\\n";
 
@@ -176,7 +176,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string ExtractNamespaceAndBindingChanges(JsonElement migrationData)
+    static string ExtractNamespaceAndBindingChanges(JsonElement migrationData)
     {
         string result = "# Namespace and Binding Changes\\n\\n";
 
@@ -199,7 +199,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string ExtractMigrationSteps(JsonElement migrationData)
+    static string ExtractMigrationSteps(JsonElement migrationData)
     {
         string result = "# Migration Process Steps\\n\\n";
 
@@ -212,7 +212,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string FormatNamespaceChanges(JsonElement namespaceChanges)
+    static string FormatNamespaceChanges(JsonElement namespaceChanges)
     {
         string result = "";
 
@@ -239,7 +239,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string FormatFileExtensions(JsonElement fileExtensions)
+    static string FormatFileExtensions(JsonElement fileExtensions)
     {
         string result = "";
 
@@ -272,7 +272,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string FormatControlMappings(JsonElement controlMappings)
+    static string FormatControlMappings(JsonElement controlMappings)
     {
         string result = "";
 
@@ -312,7 +312,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string FormatBindingChanges(JsonElement bindingChanges)
+    static string FormatBindingChanges(JsonElement bindingChanges)
     {
         string result = "";
 
@@ -345,7 +345,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string FormatStylingChanges(JsonElement stylingChanges)
+    static string FormatStylingChanges(JsonElement stylingChanges)
     {
         string result = "";
 
@@ -374,7 +374,7 @@ public static class MigrationGuideResource
         return result;
     }
 
-    private static string FormatMigrationSteps(JsonElement migrationSteps)
+    static string FormatMigrationSteps(JsonElement migrationSteps)
     {
         string result = "";
 

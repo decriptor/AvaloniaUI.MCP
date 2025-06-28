@@ -8,14 +8,14 @@ namespace AvaloniaUI.MCP.Services;
 /// </summary>
 public static class ResourceCacheService
 {
-    private static readonly ConcurrentDictionary<string, CachedResource> _cache = new();
-    private static readonly Lock _cacheLock = new();
+    static readonly ConcurrentDictionary<string, CachedResource> Cache = new();
+    static readonly Lock CacheLock = new();
 
     // Cache configuration
-    private static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromMinutes(30);
-    private static readonly int MaxCacheSize = 50;
+    static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromMinutes(30);
+    static readonly int MaxCacheSize = 50;
 
-    private sealed class CachedResource(string content, TimeSpan cacheExpiry)
+    sealed class CachedResource(string content, TimeSpan cacheExpiry)
     {
         public string Content { get; } = content;
         public DateTime ExpiryTime { get; } = DateTime.UtcNow.Add(cacheExpiry);
@@ -32,7 +32,7 @@ public static class ResourceCacheService
         TimeSpan expiry = cacheExpiry ?? DefaultCacheExpiry;
 
         // Try to get from cache first
-        if (_cache.TryGetValue(resourceKey, out CachedResource? cachedResource))
+        if (Cache.TryGetValue(resourceKey, out CachedResource? cachedResource))
         {
             if (!cachedResource.IsExpired)
             {
@@ -42,7 +42,7 @@ public static class ResourceCacheService
             else
             {
                 // Remove expired entry
-                _cache.TryRemove(resourceKey, out _);
+                Cache.TryRemove(resourceKey, out _);
             }
         }
 
@@ -63,7 +63,7 @@ public static class ResourceCacheService
         TimeSpan expiry = cacheExpiry ?? DefaultCacheExpiry;
 
         // Try to get from cache first
-        if (_cache.TryGetValue(resourceKey, out CachedResource? cachedResource))
+        if (Cache.TryGetValue(resourceKey, out CachedResource? cachedResource))
         {
             if (!cachedResource.IsExpired)
             {
@@ -73,7 +73,7 @@ public static class ResourceCacheService
             else
             {
                 // Remove expired entry
-                _cache.TryRemove(resourceKey, out _);
+                Cache.TryRemove(resourceKey, out _);
             }
         }
 
@@ -128,27 +128,27 @@ public static class ResourceCacheService
         return Task.Run(() => CacheResource(cacheKey, processedContent, cacheExpiry ?? DefaultCacheExpiry));
     }
 
-    private static void CacheResource(string key, string content, TimeSpan expiry)
+    static void CacheResource(string key, string content, TimeSpan expiry)
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
             // Ensure cache doesn't grow too large
-            if (_cache.Count >= MaxCacheSize)
+            if (Cache.Count >= MaxCacheSize)
             {
                 CleanupExpiredEntries();
 
                 // If still too large, remove least recently used
-                if (_cache.Count >= MaxCacheSize)
+                if (Cache.Count >= MaxCacheSize)
                 {
                     RemoveLeastRecentlyUsed();
                 }
             }
 
-            _cache.TryAdd(key, new CachedResource(content, expiry));
+            Cache.TryAdd(key, new CachedResource(content, expiry));
         }
     }
 
-    private static async Task CacheResourceAsync(string key, string content, TimeSpan expiry)
+    static async Task CacheResourceAsync(string key, string content, TimeSpan expiry)
     {
         await Task.Run(() => CacheResource(key, content, expiry));
     }
@@ -158,29 +158,29 @@ public static class ResourceCacheService
     /// </summary>
     public static void CleanupExpiredEntries()
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
-            var expiredKeys = _cache
+            var expiredKeys = Cache
                 .Where(kvp => kvp.Value.IsExpired)
                 .Select(kvp => kvp.Key)
                 .ToList();
 
             foreach (string? key in expiredKeys)
             {
-                _cache.TryRemove(key, out _);
+                Cache.TryRemove(key, out _);
             }
         }
     }
 
-    private static void RemoveLeastRecentlyUsed()
+    static void RemoveLeastRecentlyUsed()
     {
-        KeyValuePair<string, CachedResource> lruEntry = _cache
+        KeyValuePair<string, CachedResource> lruEntry = Cache
             .OrderBy(kvp => kvp.Value.LastAccessed)
             .FirstOrDefault();
 
         if (!lruEntry.Equals(default(KeyValuePair<string, CachedResource>)))
         {
-            _cache.TryRemove(lruEntry.Key, out _);
+            Cache.TryRemove(lruEntry.Key, out _);
         }
     }
 
@@ -189,9 +189,9 @@ public static class ResourceCacheService
     /// </summary>
     public static void ClearCache()
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
-            _cache.Clear();
+            Cache.Clear();
         }
     }
 
@@ -200,7 +200,7 @@ public static class ResourceCacheService
     /// </summary>
     public static bool RemoveFromCache(string resourceKey)
     {
-        return _cache.TryRemove(resourceKey, out _);
+        return Cache.TryRemove(resourceKey, out _);
     }
 
     /// <summary>
@@ -208,15 +208,15 @@ public static class ResourceCacheService
     /// </summary>
     public static CacheStatistics GetCacheStatistics()
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
             DateTime now = DateTime.UtcNow;
-            int totalEntries = _cache.Count;
-            int expiredEntries = _cache.Count(kvp => kvp.Value.IsExpired);
+            int totalEntries = Cache.Count;
+            int expiredEntries = Cache.Count(kvp => kvp.Value.IsExpired);
             int validEntries = totalEntries - expiredEntries;
 
-            CachedResource? oldestEntry = _cache.Values.MinBy(v => v.LastAccessed);
-            CachedResource? newestEntry = _cache.Values.MaxBy(v => v.LastAccessed);
+            CachedResource? oldestEntry = Cache.Values.MinBy(v => v.LastAccessed);
+            CachedResource? newestEntry = Cache.Values.MaxBy(v => v.LastAccessed);
 
             return new CacheStatistics
             {
@@ -225,7 +225,7 @@ public static class ResourceCacheService
                 ExpiredEntries = expiredEntries,
                 OldestEntryAge = oldestEntry != null ? now - oldestEntry.LastAccessed : TimeSpan.Zero,
                 NewestEntryAge = newestEntry != null ? now - newestEntry.LastAccessed : TimeSpan.Zero,
-                CacheKeys = [.. _cache.Keys]
+                CacheKeys = [.. Cache.Keys]
             };
         }
     }
@@ -278,7 +278,7 @@ public static class ResourceCacheService
         public int ExpiredEntries { get; set; }
         public TimeSpan OldestEntryAge { get; set; }
         public TimeSpan NewestEntryAge { get; set; }
-        public List<string> CacheKeys { get; set; } = new();
+        public List<string> CacheKeys { get; set; } = [];
 
         public double HitRatio => TotalEntries > 0 ? (double)ValidEntries / TotalEntries : 0.0;
 

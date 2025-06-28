@@ -20,27 +20,27 @@ description: A comprehensive Model Context Protocol server for AvaloniaUI develo
     <h3>🛠️ 15+ Development Tools</h3>
     <p>Comprehensive toolset for project generation, validation, security, and optimization</p>
   </div>
-  
+
   <div class="feature-item">
     <h3>📚 Extensive Knowledge Base</h3>
     <p>500+ controls, patterns, and examples for rapid development</p>
   </div>
-  
+
   <div class="feature-item">
     <h3>🔒 Enterprise Security</h3>
     <p>Built-in security patterns, validation, and audit logging</p>
   </div>
-  
+
   <div class="feature-item">
     <h3>📊 Telemetry & Monitoring</h3>
     <p>Real-time performance metrics and health monitoring</p>
   </div>
-  
+
   <div class="feature-item">
     <h3>🔄 WPF Migration</h3>
     <p>Complete migration assistance from WPF to AvaloniaUI</p>
   </div>
-  
+
   <div class="feature-item">
     <h3>⚡ High Performance</h3>
     <p>Optimized for production with caching and async operations</p>
@@ -94,17 +94,17 @@ Try these commands with your MCP client:
     <strong>Quick Start Guide</strong>
     <span>Get up and running in minutes</span>
   </a>
-  
+
   <a href="docs/tools/" class="doc-link">
     <strong>Tools Reference</strong>
     <span>Complete tool documentation</span>
   </a>
-  
+
   <a href="docs/examples/" class="doc-link">
     <strong>Examples & Tutorials</strong>
     <span>Real-world usage examples</span>
   </a>
-  
+
   <a href="docs/tools/" class="doc-link">
     <strong>Tools Reference</strong>
     <span>Complete tool documentation</span>
@@ -117,7 +117,7 @@ Try these commands with your MCP client:
 - **ProjectGeneratorTool** - Create MVVM, basic, or cross-platform projects
 - **ArchitectureTemplateTool** - Generate architectural patterns
 
-### Development & Validation  
+### Development & Validation
 - **XamlValidationTool** - Validate XAML syntax and best practices
 - **SecurityPatternTool** - Generate secure coding patterns
 - **DiagnosticTool** - Server health and performance monitoring
@@ -141,17 +141,17 @@ Try these commands with your MCP client:
     <div class="metric-value">< 100ms</div>
     <div class="metric-label">Average Response Time</div>
   </div>
-  
+
   <div class="metric">
     <div class="metric-value">150+</div>
     <div class="metric-label">Unit Tests</div>
   </div>
-  
+
   <div class="metric">
     <div class="metric-value">90%+</div>
     <div class="metric-label">Test Coverage</div>
   </div>
-  
+
   <div class="metric">
     <div class="metric-value">80%+</div>
     <div class="metric-label">Cache Hit Rate</div>
@@ -176,12 +176,12 @@ AvaloniaUI.MCP is built with enterprise-grade architecture:
     <strong>Report Issues</strong>
     <span>Bug reports and feature requests</span>
   </a>
-  
+
   <a href="https://github.com/decriptor/AvaloniaUI.MCP/discussions" class="community-link">
     <strong>Discussions</strong>
     <span>Community Q&A and ideas</span>
   </a>
-  
+
   <a href="CONTRIBUTING" class="community-link">
     <strong>Contributing</strong>
     <span>Help improve the project</span>

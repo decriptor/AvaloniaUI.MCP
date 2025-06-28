@@ -66,12 +66,12 @@ public static class ServiceLayerTool
 public class {config.EntityName}ViewModel
 {{
     private readonly I{config.ServiceName} _{config.ServiceName.ToLowerInvariant()};
-    
+
     public {config.EntityName}ViewModel(I{config.ServiceName} {config.ServiceName.ToLowerInvariant()})
     {{
         _{config.ServiceName.ToLowerInvariant()} = {config.ServiceName.ToLowerInvariant()};
     }}
-    
+
     public async Task Load{config.EntityName}sAsync()
     {{
         var result = await _{config.ServiceName.ToLowerInvariant()}.GetAllAsync();
@@ -151,7 +151,7 @@ public class {config.EntityName}ViewModel
         }
     }
 
-    private sealed class ServiceConfiguration
+    sealed class ServiceConfiguration
     {
         public string ServiceName { get; set; } = "";
         public string EntityName { get; set; } = "";
@@ -160,7 +160,7 @@ public class {config.EntityName}ViewModel
         public bool IncludeCaching { get; set; }
     }
 
-    private sealed class DomainServiceConfiguration
+    sealed class DomainServiceConfiguration
     {
         public string ServiceName { get; set; } = "";
         public string BusinessDomain { get; set; } = "";
@@ -168,7 +168,7 @@ public class {config.EntityName}ViewModel
         public bool IncludeRulesEngine { get; set; }
     }
 
-    private static string GenerateServiceInterface(ServiceConfiguration config)
+    static string GenerateServiceInterface(ServiceConfiguration config)
     {
         return $@"public interface I{config.ServiceName}
 {{
@@ -179,7 +179,7 @@ public class {config.EntityName}ViewModel
     Task<ServiceResult<{config.EntityName}Dto>> UpdateAsync(int id, Update{config.EntityName}Request request, CancellationToken cancellationToken = default);
     Task<ServiceResult<bool>> DeleteAsync(int id, CancellationToken cancellationToken = default);
     Task<ServiceResult<bool>> ExistsAsync(int id, CancellationToken cancellationToken = default);
-    
+
     // Business-specific methods
     Task<ServiceResult<IEnumerable<{config.EntityName}Dto>>> SearchAsync(string searchTerm, CancellationToken cancellationToken = default);
     Task<ServiceResult<{config.EntityName}Dto>> ActivateAsync(int id, CancellationToken cancellationToken = default);
@@ -225,7 +225,7 @@ public class ServiceResult<T>
 }}";
     }
 
-    private static string GenerateServiceImplementation(ServiceConfiguration config)
+    static string GenerateServiceImplementation(ServiceConfiguration config)
     {
         string cachingField = config.IncludeCaching ? "private readonly ICacheService _cacheService;" : "";
         string cachingParam = config.IncludeCaching ? ", ICacheService cacheService" : "";
@@ -426,7 +426,7 @@ public class ServiceResult<T>
 
             entity.IsActive = isActive;
             entity.UpdatedAt = DateTime.UtcNow;
-            
+
             await _{config.EntityName.ToLowerInvariant()}Repository.UpdateAsync(entity, cancellationToken);
             var dto = _mapper.Map<{config.EntityName}Dto>(entity);
 
@@ -442,7 +442,7 @@ public class ServiceResult<T>
 }}";
     }
 
-    private static string GenerateDataTransferObjects(ServiceConfiguration config)
+    static string GenerateDataTransferObjects(ServiceConfiguration config)
     {
         return $@"// Read DTO
 public class {config.EntityName}Dto
@@ -463,10 +463,10 @@ public class Create{config.EntityName}Request
     [Required]
     [StringLength(100, MinimumLength = 1)]
     public string Name {{ get; set; }} = string.Empty;
-    
+
     [StringLength(500)]
     public string Description {{ get; set; }} = string.Empty;
-    
+
     [Required]
     public string CreatedBy {{ get; set; }} = string.Empty;
 }}
@@ -477,10 +477,10 @@ public class Update{config.EntityName}Request
     [Required]
     [StringLength(100, MinimumLength = 1)]
     public string Name {{ get; set; }} = string.Empty;
-    
+
     [StringLength(500)]
     public string Description {{ get; set; }} = string.Empty;
-    
+
     [Required]
     public string UpdatedBy {{ get; set; }} = string.Empty;
 }}
@@ -497,7 +497,7 @@ public class {config.EntityName}MappingProfile : Profile
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
-            
+
         CreateMap<Update{config.EntityName}Request, {config.EntityName}>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
@@ -508,7 +508,7 @@ public class {config.EntityName}MappingProfile : Profile
 }}";
     }
 
-    private static string GenerateValidationCode(ServiceConfiguration config)
+    static string GenerateValidationCode(ServiceConfiguration config)
     {
         return $@"// FluentValidation validators
 public class Create{config.EntityName}RequestValidator : AbstractValidator<Create{config.EntityName}Request>
@@ -532,15 +532,15 @@ public class Create{config.EntityName}RequestValidator : AbstractValidator<Creat
     {{
         // Implement uniqueness check against repository
         // In a real implementation, this would query the database
-        
+
         await Task.Yield(); // Allow for async behavior
-        
+
         if (string.IsNullOrWhiteSpace(name))
             return false;
-            
+
         // Mock implementation - in production, replace with actual repository call
         // Example: return !await _repository.ExistsAsync(x => x.Name.ToLower() == name.ToLower(), cancellationToken);
-        
+
         // Simulate common reserved names that should not be allowed
         var reservedNames = new[] {{ ""admin"", ""system"", ""root"", ""administrator"", ""guest"", ""null"", ""default"" }};
         return !reservedNames.Contains(name.ToLowerInvariant());
@@ -571,13 +571,13 @@ public static class ValidationServiceExtensions
     {{
         services.AddScoped<IValidator<Create{config.EntityName}Request>, Create{config.EntityName}RequestValidator>();
         services.AddScoped<IValidator<Update{config.EntityName}Request>, Update{config.EntityName}RequestValidator>();
-        
+
         return services;
     }}
 }}";
     }
 
-    private static string GenerateDomainServiceCode(DomainServiceConfiguration config)
+    static string GenerateDomainServiceCode(DomainServiceConfiguration config)
     {
         return $@"// Domain service for {config.BusinessDomain}
 public interface I{config.ServiceName}
@@ -651,12 +651,12 @@ public class {config.ServiceName} : I{config.ServiceName}
     {{
         // Implement specific domain logic processing
         // This is where complex business rules and workflows are handled
-        
+
         _logger.LogInformation(""Processing domain logic for type {{Type}}"", typeof(T).Name);
-        
+
         // Example domain logic processing
         var result = await ApplyDomainRulesAsync(request.Data, cancellationToken);
-        
+
         return DomainResult<T>.Success(result);
     }}
 
@@ -664,12 +664,12 @@ public class {config.ServiceName} : I{config.ServiceName}
     {{
         // Implement business rules validation
         // This could include complex multi-entity validations, business constraints, etc.
-        
+
         {(config.IncludeRulesEngine ? @"var validationResult = await _rulesEngine.ValidateAsync(domainObject, cancellationToken);
         return validationResult.IsValid;" : @"// Example validation logic
         if (domainObject == null)
             return false;
-            
+
         // Add specific business rule validations here
         return true;")}
     }}
@@ -680,12 +680,12 @@ public class {config.ServiceName} : I{config.ServiceName}
         {{
             // Core business logic implementation
             // This is where the main business operations are performed
-            
+
             // Step 1: Validate business rules
             var validationResult = await ValidateBusinessRulesAsync(request, cancellationToken);
             if (!validationResult.IsSuccess)
                 return validationResult;
-            
+
             // Step 2: Process the operation based on type
             switch (request.OperationType.ToLowerInvariant())
             {{
@@ -710,42 +710,42 @@ public class {config.ServiceName} : I{config.ServiceName}
             return DomainResult.Failure($""Business logic processing failed: {{ex.Message}}"");
         }}
     }}
-    
+
     private async Task<DomainResult> ValidateBusinessRulesAsync(BusinessOperationRequest request, CancellationToken cancellationToken)
     {{
         await Task.Yield();
-        
+
         // Example business rule validations
         if (string.IsNullOrWhiteSpace(request.OperationType))
             return DomainResult.Failure(""Operation type is required"");
-            
+
         if (request.Data == null)
             return DomainResult.Failure(""Operation data is required"");
-            
+
         return DomainResult.Success();
     }}
-    
+
     private async Task<DomainResult> ProcessCreateOperationAsync(BusinessOperationRequest request, CancellationToken cancellationToken)
     {{
         await Task.Yield();
         // Mock create operation - in production, implement actual create logic
         return DomainResult.Success(""Entity created successfully"");
     }}
-    
+
     private async Task<DomainResult> ProcessUpdateOperationAsync(BusinessOperationRequest request, CancellationToken cancellationToken)
     {{
         await Task.Yield();
         // Mock update operation - in production, implement actual update logic
         return DomainResult.Success(""Entity updated successfully"");
     }}
-    
+
     private async Task<DomainResult> ProcessDeleteOperationAsync(BusinessOperationRequest request, CancellationToken cancellationToken)
     {{
         await Task.Yield();
         // Mock delete operation - in production, implement actual delete logic
         return DomainResult.Success(""Entity deleted successfully"");
     }}
-    
+
     private async Task<DomainResult> ProcessValidationOperationAsync(BusinessOperationRequest request, CancellationToken cancellationToken)
     {{
         await Task.Yield();
@@ -756,10 +756,10 @@ public class {config.ServiceName} : I{config.ServiceName}
     private async Task<T> ApplyDomainRulesAsync<T>(T data, CancellationToken cancellationToken)
     {{
         await Task.Yield(); // Allow for async behavior
-        
+
         if (data == null)
             return data;
-            
+
         try
         {{
             // Apply domain-specific rules and transformations
@@ -769,17 +769,17 @@ public class {config.ServiceName} : I{config.ServiceName}
                     // Apply string-specific domain rules
                     var processedString = ApplyStringDomainRules(stringData);
                     return (T)(object)processedString;
-                    
+
                 case Dictionary<string, object> dictData:
                     // Apply dictionary-specific domain rules
                     var processedDict = ApplyDictionaryDomainRules(dictData);
                     return (T)(object)processedDict;
-                    
+
                 case IEnumerable<object> listData:
                     // Apply list-specific domain rules
                     var processedList = ApplyListDomainRules(listData);
                     return (T)(object)processedList;
-                    
+
                 default:
                     // For other types, apply generic transformations
                     return ApplyGenericDomainRules(data);
@@ -791,21 +791,21 @@ public class {config.ServiceName} : I{config.ServiceName}
             return data;
         }}
     }}
-    
+
     private string ApplyStringDomainRules(string input)
     {{
         if (string.IsNullOrWhiteSpace(input))
             return input;
-            
+
         // Example domain rules for strings
         return input.Trim() // Remove leading/trailing whitespace
                    .Replace(""  "", "" ""); // Replace multiple spaces with single space
     }}
-    
+
     private Dictionary<string, object> ApplyDictionaryDomainRules(Dictionary<string, object> input)
     {{
         var result = new Dictionary<string, object>();
-        
+
         foreach (var kvp in input)
         {{
             // Example domain rules for dictionaries
@@ -815,10 +815,10 @@ public class {config.ServiceName} : I{config.ServiceName}
                 result[key] = kvp.Value;
             }}
         }}
-        
+
         return result;
     }}
-    
+
     private IEnumerable<object> ApplyListDomainRules(IEnumerable<object> input)
     {{
         // Example domain rules for lists
@@ -826,7 +826,7 @@ public class {config.ServiceName} : I{config.ServiceName}
                    .Distinct() // Remove duplicates
                    .ToList();
     }}
-    
+
     private T ApplyGenericDomainRules<T>(T input)
     {{
         // Apply generic domain rules for unknown types
@@ -879,7 +879,7 @@ public class DomainResult<T> : DomainResult
 }}";
     }
 
-    private static string GenerateBusinessRulesEngine(DomainServiceConfiguration config)
+    static string GenerateBusinessRulesEngine(DomainServiceConfiguration config)
     {
         return $@"// Business Rules Engine
 public interface IBusinessRulesEngine
@@ -977,7 +977,7 @@ public class SampleBusinessRule : IBusinessRule<BusinessOperationRequest>
     public async Task<BusinessRuleResult> ValidateAsync(BusinessOperationRequest target, CancellationToken cancellationToken = default)
     {{
         await Task.Delay(1, cancellationToken);
-        
+
         // Implement specific validation logic
         if (string.IsNullOrEmpty(target.OperationType))
         {{
@@ -990,7 +990,7 @@ public class SampleBusinessRule : IBusinessRule<BusinessOperationRequest>
     public async Task<BusinessRuleResult> ExecuteAsync(BusinessOperationRequest target, CancellationToken cancellationToken = default)
     {{
         await Task.Delay(1, cancellationToken);
-        
+
         // Implement rule execution logic
         return BusinessRuleResult.Executed(""Rule executed successfully"");
     }}
@@ -1000,7 +1000,7 @@ public class SampleBusinessRule : IBusinessRule<BusinessOperationRequest>
     {{
         if (target is BusinessOperationRequest request)
             return await ValidateAsync(request, cancellationToken);
-        
+
         return BusinessRuleResult.Invalid(""Invalid target type"");
     }}
 
@@ -1008,13 +1008,13 @@ public class SampleBusinessRule : IBusinessRule<BusinessOperationRequest>
     {{
         if (target is BusinessOperationRequest request)
             return await ExecuteAsync(request, cancellationToken);
-        
+
         return BusinessRuleResult.Invalid(""Invalid target type"");
     }}
 }}";
     }
 
-    private static string GenerateDomainEventsCode(DomainServiceConfiguration config)
+    static string GenerateDomainEventsCode(DomainServiceConfiguration config)
     {
         return $@"// Domain Events
 public interface IDomainEvent
@@ -1112,7 +1112,7 @@ public class DomainEventPublisher : IDomainEventPublisher
 }}
 
 // Example domain event handler
-public class BusinessOperationEventHandler : 
+public class BusinessOperationEventHandler :
     IDomainEventHandler<BusinessOperationStartedEvent>,
     IDomainEventHandler<BusinessOperationCompletedEvent>
 {{
@@ -1125,7 +1125,7 @@ public class BusinessOperationEventHandler :
 
     public async Task HandleAsync(BusinessOperationStartedEvent domainEvent, CancellationToken cancellationToken = default)
     {{
-        _logger.LogInformation(""Business operation started: {{OperationType}} by {{User}}"", 
+        _logger.LogInformation(""Business operation started: {{OperationType}} by {{User}}"",
             domainEvent.OperationType, domainEvent.InitiatedBy);
 
         // Handle the event (e.g., send notifications, update metrics, etc.)
@@ -1134,7 +1134,7 @@ public class BusinessOperationEventHandler :
 
     public async Task HandleAsync(BusinessOperationCompletedEvent domainEvent, CancellationToken cancellationToken = default)
     {{
-        _logger.LogInformation(""Business operation completed: {{OperationType}}, Success: {{Success}}, Duration: {{Duration}}"", 
+        _logger.LogInformation(""Business operation completed: {{OperationType}}, Success: {{Success}}, Duration: {{Duration}}"",
             domainEvent.OperationType, domainEvent.IsSuccessful, domainEvent.Duration);
 
         // Handle the event (e.g., update analytics, trigger workflows, etc.)

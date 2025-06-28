@@ -141,10 +141,10 @@ public void MyTool_WithValidInput_ReturnsExpectedResult()
 {
     // Arrange
     var input = "test input";
-    
+
     // Act
     var result = MyNewTool.MyToolMethod(input);
-    
+
     // Assert
     Assert.Contains("expected content", result);
 }

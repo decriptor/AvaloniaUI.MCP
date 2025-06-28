@@ -135,12 +135,12 @@ MyApp/
     <StackPanel Margin="20" Spacing="10">
         <TextBlock Text="Welcome to AvaloniaUI!" FontSize="24" FontWeight="Bold"/>
         <TextBlock Text="{Binding Greeting}" FontSize="16"/>
-        
+
         <StackPanel Orientation="Horizontal" Spacing="10">
             <TextBox Text="{Binding Name}" Watermark="Enter your name" Width="200"/>
             <Button Command="{Binding GreetCommand}" Content="Greet"/>
         </StackPanel>
-        
+
         <TextBlock Text="{Binding GreetingMessage}" FontWeight="Bold" Foreground="Blue"/>
     </StackPanel>
 </Window>
@@ -181,8 +181,8 @@ public class MainWindowViewModel : ViewModelBase
 
     private void ExecuteGreet()
     {
-        GreetingMessage = string.IsNullOrWhiteSpace(Name) 
-            ? "Please enter your name!" 
+        GreetingMessage = string.IsNullOrWhiteSpace(Name)
+            ? "Please enter your name!"
             : $"Hello, {Name}! Welcome to AvaloniaUI!";
     }
 }
@@ -210,7 +210,7 @@ dotnet build MyApp.Mobile.csproj
 
 The tool validates:
 - **Project names** - Valid C# identifiers, no reserved words
-- **Directory paths** - Valid and accessible locations  
+- **Directory paths** - Valid and accessible locations
 - **Template types** - Supported template options
 - **Platform combinations** - Valid platform specifications
 

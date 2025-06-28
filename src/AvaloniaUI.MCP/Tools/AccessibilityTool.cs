@@ -9,13 +9,13 @@ namespace AvaloniaUI.MCP.Tools;
 [McpServerToolType]
 public static class AccessibilityTool
 {
-    private static readonly string[] value = new[]
-                {
+    static readonly string[] Value =
+                [
                     "- **Contrast Ratio**: Minimum 4.5:1 for normal text, 3:1 for large text",
                     "- **Keyboard Navigation**: All interactive elements must be keyboard accessible",
                     "- **Screen Reader**: Proper ARIA labels and roles for assistive technology",
                     "- **Focus Management**: Clear visual focus indicators and logical tab order"
-                };
+                ];
 
     [McpServerTool, Description("Generates WCAG compliant accessible UI components with proper ARIA labels and keyboard support")]
     public static string GenerateAccessibleComponent(
@@ -51,12 +51,12 @@ public static class AccessibilityTool
                 .AddIf(config.IncludeKeyboardNavigation, builder =>
                     builder.AddCodeSection("Keyboard Navigation Handler", "csharp", keyboardHandler))
                 .AddSection("Accessibility Testing Checklist", testingChecklist)
-                .AddSection($"WCAG {config.WcagLevel} Compliance Notes", string.Join("\n", value))
+                .AddSection($"WCAG {config.WcagLevel} Compliance Notes", string.Join("\n", Value))
                 .Build();
         });
     }
 
-    private sealed class AccessibilityConfiguration
+    sealed class AccessibilityConfiguration
     {
         public string ComponentType { get; set; } = "";
         public string WcagLevel { get; set; } = "";
@@ -64,7 +64,7 @@ public static class AccessibilityTool
         public bool IncludeScreenReaderSupport { get; set; }
     }
 
-    private static string GenerateAccessibleComponentXaml(AccessibilityConfiguration config)
+    static string GenerateAccessibleComponentXaml(AccessibilityConfiguration config)
     {
         return config.ComponentType switch
         {
@@ -77,7 +77,7 @@ public static class AccessibilityTool
         };
     }
 
-    private static string GenerateAccessibleForm(AccessibilityConfiguration config)
+    static string GenerateAccessibleForm(AccessibilityConfiguration config)
     {
         return @"<UserControl xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -193,7 +193,7 @@ public static class AccessibilityTool
 </UserControl>";
     }
 
-    private static string GenerateAccessibleNavigation(AccessibilityConfiguration config)
+    static string GenerateAccessibleNavigation(AccessibilityConfiguration config)
     {
         return @"<UserControl xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -341,7 +341,7 @@ public static class AccessibilityTool
 </UserControl>";
     }
 
-    private static string GenerateAccessibleDataTable(AccessibilityConfiguration config)
+    static string GenerateAccessibleDataTable(AccessibilityConfiguration config)
     {
         return @"<UserControl xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -503,7 +503,7 @@ public static class AccessibilityTool
 </UserControl>";
     }
 
-    private static string GenerateAccessibleModal(AccessibilityConfiguration config)
+    static string GenerateAccessibleModal(AccessibilityConfiguration config)
     {
         return @"<UserControl xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -569,7 +569,7 @@ public static class AccessibilityTool
 </UserControl>";
     }
 
-    private static string GenerateAccessibleNotification(AccessibilityConfiguration config)
+    static string GenerateAccessibleNotification(AccessibilityConfiguration config)
     {
         return @"<UserControl xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -644,7 +644,7 @@ public static class AccessibilityTool
 </UserControl>";
     }
 
-    private static string GenerateGenericAccessibleComponent(AccessibilityConfiguration config)
+    static string GenerateGenericAccessibleComponent(AccessibilityConfiguration config)
     {
         return @"<UserControl xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
@@ -669,7 +669,7 @@ public static class AccessibilityTool
 </UserControl>";
     }
 
-    private static string GenerateAccessibilityHelpers(AccessibilityConfiguration config)
+    static string GenerateAccessibilityHelpers(AccessibilityConfiguration config)
     {
         return @"// Accessibility Helper Classes
 public static class AccessibilityHelpers
@@ -686,17 +686,17 @@ public static class AccessibilityHelpers
             Text = message,
             IsVisible = false
         };
-        
+
         AutomationProperties.SetLiveSetting(announcement, AutomationLiveSetting.Assertive);
         AutomationProperties.SetName(announcement, message);
-        
+
         // Add to visual tree temporarily
         if (context.Parent is Panel parent)
         {
             parent.Children.Add(announcement);
-            
+
             // Remove after announcement
-            Dispatcher.UIThread.Post(() => 
+            Dispatcher.UIThread.Post(() =>
             {
                 parent.Children.Remove(announcement);
             }, DispatcherPriority.Background);
@@ -712,7 +712,7 @@ public static class AccessibilityHelpers
 
         // Associate label with input
         AutomationProperties.SetLabeledBy(input, label);
-        
+
         // Set help text if provided
         if (!string.IsNullOrEmpty(helpText))
         {
@@ -842,7 +842,7 @@ public static class AccessibilityHelpers
 }";
     }
 
-    private static string GenerateKeyboardNavigationCode(AccessibilityConfiguration config)
+    static string GenerateKeyboardNavigationCode(AccessibilityConfiguration config)
     {
         return @"// Keyboard Navigation Handler
 public class KeyboardNavigationHandler
@@ -854,7 +854,7 @@ public class KeyboardNavigationHandler
     {
         _focusableElements.Clear();
         _focusableElements.AddRange(elements.Where(e => e != null && e.Focusable));
-        
+
         // Set up keyboard event handlers
         foreach (var element in _focusableElements)
         {
@@ -865,32 +865,32 @@ public class KeyboardNavigationHandler
     private void OnElementKeyDown(object sender, KeyEventArgs e)
     {
         if (sender is not Control currentControl) return;
-        
+
         _currentFocusIndex = _focusableElements.IndexOf(currentControl);
-        
+
         switch (e.Key)
         {
             case Key.Tab:
                 HandleTabNavigation(e);
                 break;
-                
+
             case Key.Enter:
             case Key.Space:
                 HandleActivation(currentControl, e);
                 break;
-                
+
             case Key.Escape:
                 HandleEscape(currentControl, e);
                 break;
-                
+
             case Key.Home:
                 HandleHome(e);
                 break;
-                
+
             case Key.End:
                 HandleEnd(e);
                 break;
-                
+
             case Key.Up:
             case Key.Down:
             case Key.Left:
@@ -903,7 +903,7 @@ public class KeyboardNavigationHandler
     private void HandleTabNavigation(KeyEventArgs e)
     {
         if (_focusableElements.Count == 0) return;
-        
+
         int nextIndex;
         if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
         {
@@ -915,7 +915,7 @@ public class KeyboardNavigationHandler
             // Tab: Move to next element
             nextIndex = _currentFocusIndex < _focusableElements.Count - 1 ? _currentFocusIndex + 1 : 0;
         }
-        
+
         MoveFocusTo(nextIndex);
         e.Handled = true;
     }
@@ -974,19 +974,19 @@ public class KeyboardNavigationHandler
     {
         // Custom arrow key navigation for grid-like controls
         // This can be customized based on the specific layout
-        
+
         switch (e.Key)
         {
             case Key.Up:
                 MoveFocusToPrevious();
                 e.Handled = true;
                 break;
-                
+
             case Key.Down:
                 MoveFocusToNext();
                 e.Handled = true;
                 break;
-                
+
             case Key.Left:
                 if (CultureInfo.CurrentCulture.TextInfo.IsRightToLeft)
                     MoveFocusToNext();
@@ -994,7 +994,7 @@ public class KeyboardNavigationHandler
                     MoveFocusToPrevious();
                 e.Handled = true;
                 break;
-                
+
             case Key.Right:
                 if (CultureInfo.CurrentCulture.TextInfo.IsRightToLeft)
                     MoveFocusToPrevious();
@@ -1008,9 +1008,9 @@ public class KeyboardNavigationHandler
     private void MoveFocusToNext()
     {
         if (_focusableElements.Count == 0) return;
-        
-        int nextIndex = _currentFocusIndex < _focusableElements.Count - 1 
-            ? _currentFocusIndex + 1 
+
+        int nextIndex = _currentFocusIndex < _focusableElements.Count - 1
+            ? _currentFocusIndex + 1
             : 0;
         MoveFocusTo(nextIndex);
     }
@@ -1018,9 +1018,9 @@ public class KeyboardNavigationHandler
     private void MoveFocusToPrevious()
     {
         if (_focusableElements.Count == 0) return;
-        
-        int prevIndex = _currentFocusIndex > 0 
-            ? _currentFocusIndex - 1 
+
+        int prevIndex = _currentFocusIndex > 0
+            ? _currentFocusIndex - 1
             : _focusableElements.Count - 1;
         MoveFocusTo(prevIndex);
     }
@@ -1034,7 +1034,7 @@ public class KeyboardNavigationHandler
             {
                 element.Focus();
                 _currentFocusIndex = index;
-                
+
                 // Announce focus change to screen readers
                 var name = AutomationProperties.GetName(element);
                 if (!string.IsNullOrEmpty(name))
@@ -1047,7 +1047,7 @@ public class KeyboardNavigationHandler
 }";
     }
 
-    private static string GenerateAccessibilityTestingChecklist(AccessibilityConfiguration config)
+    static string GenerateAccessibilityTestingChecklist(AccessibilityConfiguration config)
     {
         return $@"### Manual Testing Checklist
 
@@ -1101,7 +1101,7 @@ public class KeyboardNavigationHandler
 {GenerateWcagRequirements(config.WcagLevel)}";
     }
 
-    private static string GenerateWcagRequirements(string level)
+    static string GenerateWcagRequirements(string level)
     {
         string baseRequirements = @"
 #### Level A Requirements
@@ -1112,7 +1112,7 @@ public class KeyboardNavigationHandler
 - Text has sufficient contrast
 - Content doesn't flash excessively
 
-#### Level AA Requirements  
+#### Level AA Requirements
 - Enhanced color contrast (4.5:1 normal, 3:1 large text)
 - Text can resize to 200% without assistive technology
 - Content is meaningful when stylesheets are disabled
