@@ -8,6 +8,13 @@
     <PackageVersion Include="ModelContextProtocol" Version="0.3.0-preview.1" />
     <PackageVersion Include="ModelContextProtocol.Core" Version="0.3.0-preview.1" />
     
+    <!-- Avalonia packages for project generation -->
+    <PackageVersion Include="Avalonia" Version="11.3.2" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.2" />
+    <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.2" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.2" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.2" />
+    
     <!-- JSON handling -->
     <PackageVersion Include="System.Text.Json" Version="9.0.0" />
     
@@ -17,6 +24,12 @@
     <!-- Logging -->
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+    
+    <!-- Telemetry and Observability -->
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="9.0.0" />
+    <PackageVersion Include="OpenTelemetry" Version="1.9.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.9.0" />
     
     <!-- Dependency Injection -->
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />

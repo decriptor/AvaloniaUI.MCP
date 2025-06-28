@@ -136,6 +136,48 @@
           "avalonia_control": "DataGrid",
           "compatibility": "Partial",
           "notes": "Available but some advanced features may differ"
+        },
+        {
+          "wpf_control": "TreeView",
+          "avalonia_control": "TreeView",
+          "compatibility": "Full",
+          "notes": "Fully compatible with hierarchical data binding and TreeDataTemplate"
+        },
+        {
+          "wpf_control": "Calendar",
+          "avalonia_control": "Calendar",
+          "compatibility": "Full",
+          "notes": "Full calendar functionality with date selection and ranges"
+        },
+        {
+          "wpf_control": "DatePicker",
+          "avalonia_control": "DatePicker",
+          "compatibility": "Full",
+          "notes": "Spinner-based date selection with customizable format"
+        },
+        {
+          "wpf_control": "Menu",
+          "avalonia_control": "Menu",
+          "compatibility": "Full",
+          "notes": "Full menu functionality with MenuItem hierarchy"
+        },
+        {
+          "wpf_control": "ContextMenu",
+          "avalonia_control": "ContextMenu",
+          "compatibility": "Full",
+          "notes": "Right-click context menus with full functionality"
+        },
+        {
+          "wpf_control": "ToolTip",
+          "avalonia_control": "ToolTip",
+          "compatibility": "Full",
+          "notes": "Tooltip functionality with placement and timing options"
+        },
+        {
+          "wpf_control": "Popup",
+          "avalonia_control": "Popup",
+          "compatibility": "Enhanced",
+          "notes": "Enhanced in 11.3+ with ShouldUseOverlayLayer property"
         }
       ],
       "unavailable_controls": [
@@ -177,6 +219,16 @@
           "feature": "Compiled Bindings",
           "syntax": "x:DataType=\"vm:MyViewModel\"",
           "description": "AvaloniaUI supports compiled bindings for better performance"
+        },
+        {
+          "feature": "Container Queries (11.3+)",
+          "syntax": "@container(min-width: 300px) Button",
+          "description": "CSS-like container queries for responsive component design"
+        },
+        {
+          "feature": "Enhanced Spacing (11.3+)",
+          "syntax": "Grid RowSpacing=\"8\" ColumnSpacing=\"12\"",
+          "description": "Built-in spacing properties for layout containers"
         }
       ]
     },

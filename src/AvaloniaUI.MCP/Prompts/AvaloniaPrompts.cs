@@ -42,9 +42,11 @@ Create the following project structure:
 ```
 
 ### 2. Required NuGet Packages
-- Avalonia (11.2.0 or later)
+- Avalonia (11.3.2 - latest stable)
 - Avalonia.Desktop (for desktop support)
 - Avalonia.ReactiveUI (for MVVM support)
+- Avalonia.Fonts.Inter (for modern typography)
+- Avalonia.Controls.DataGrid (for data grid functionality)
 - Additional platform packages as needed
 
 ### 3. Key Implementation Points
@@ -457,5 +459,108 @@ Please proceed with implementing responsive design following these guidelines.";
 - Platform-appropriate input methods
 - Consistent user experience across platforms"
         };
+    }
+
+    [McpServerPrompt]
+    [Description("Template for implementing container queries for responsive design in AvaloniaUI 11.3+")]
+    public static Task<string> ContainerQueryPrompt(
+        [Description("Component name to make responsive")] string componentName,
+        [Description("Breakpoints for responsive behavior (comma-separated widths in px)")] string breakpoints = "300,600,900")
+    {
+        var breakpointList = breakpoints.Split(',').Select(b => b.Trim()).ToList();
+        
+        var prompt = $@"# Implement Container Queries for {componentName}
+
+## Responsive Design with Container Queries (AvaloniaUI 11.3+)
+
+### Target Breakpoints
+{string.Join("\n", breakpointList.Select((bp, i) => $"- **{bp}px**: Breakpoint {i + 1}"))}
+
+### Implementation
+```xml
+<Border Name=""{componentName}Container"">
+    <Border.Styles>
+        <Style Selector=""Border"">
+            <Setter Property=""Padding"" Value=""8"" />
+        </Style>
+        
+{string.Join("\n", breakpointList.Select(bp => $"        <Style Selector=\"@container(min-width: {bp}px) Border\">\n            <Setter Property=\"Padding\" Value=\"{Math.Max(8, int.Parse(bp) / 25)}\" />\n        </Style>"))}
+    </Border.Styles>
+    
+    <StackPanel>
+        <TextBlock Text=""{componentName}"" FontWeight=""Bold"" />
+        <TextBlock Text=""Responsive content"" />
+    </StackPanel>
+</Border>
+```
+
+### Best Practices
+- Use container queries for component-level responsiveness
+- Test at various container sizes
+- Combine with modern CSS-like selectors
+- Monitor performance with complex queries
+
+Please implement container queries for {componentName} following these guidelines.";
+
+        return Task.FromResult(prompt);
+    }
+
+    [McpServerPrompt]
+    [Description("Template for optimizing AvaloniaUI application performance")]
+    public static Task<string> PerformanceOptimizationPrompt(
+        [Description("Performance area to focus on: 'startup', 'rendering', 'memory', 'binding', 'collections'")] string focusArea = "general",
+        [Description("Target platforms: 'desktop', 'mobile', 'all'")] string targetPlatforms = "desktop")
+    {
+        var prompt = $@"# AvaloniaUI Performance Optimization Strategy
+
+## Focus Area: {focusArea.ToUpperInvariant()}
+## Target Platforms: {targetPlatforms}
+
+### Key Optimization Areas
+
+#### 1. Compiled Bindings (Critical)
+```xml
+<UserControl x:DataType=""vm:UserViewModel"">
+    <TextBlock Text=""{{Binding UserName}}"" />
+</UserControl>
+```
+
+#### 2. Efficient Resource Usage
+```xml
+<Button Background=""{{StaticResource PrimaryBrush}}"" />
+```
+
+#### 3. Layout Optimization
+```xml
+<Grid RowSpacing=""8"" ColumnSpacing=""12"">
+    <Grid.RowDefinitions>
+        <RowDefinition Height=""Auto"" />
+        <RowDefinition Height=""*"" />
+    </Grid.RowDefinitions>
+</Grid>
+```
+
+#### 4. Virtualization for Collections
+```xml
+<ListBox VirtualizingStackPanel.IsVirtualizing=""True""
+         VirtualizingStackPanel.VirtualizationMode=""Recycling"">
+```
+
+### Measurement and Monitoring
+- Profile before optimizing
+- Use dotTrace, PerfView, or similar tools
+- Monitor key metrics: startup time, memory usage, frame rate
+- Test on target devices
+
+### Implementation Checklist
+- [ ] Implement compiled bindings
+- [ ] Optimize resource usage
+- [ ] Review layout hierarchy
+- [ ] Enable virtualization for lists
+- [ ] Test on target platforms
+
+Please implement these optimizations based on your specific performance requirements for {focusArea}.";
+
+        return Task.FromResult(prompt);
     }
 }

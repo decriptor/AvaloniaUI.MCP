@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using ModelContextProtocol.Server;
+using AvaloniaUI.MCP.Services;
 
 namespace AvaloniaUI.MCP.Tools;
 
@@ -14,12 +15,15 @@ public static class XamlValidationTool
         [Description("The XAML content to validate")] string xamlContent,
         [Description("Additional validation options: 'strict' for strict validation, 'warnings' to include warnings")] string validationLevel = "normal")
     {
-        try
+        return ErrorHandlingService.SafeExecute("ValidateXaml", () =>
         {
-            if (string.IsNullOrWhiteSpace(xamlContent))
-            {
-                return "Error: XAML content cannot be empty";
-            }
+            // Validate inputs
+            var validation = ErrorHandlingService.ValidateCommonParameters(
+                xamlContent: xamlContent
+            );
+            
+            if (!validation.IsValid)
+                return ErrorHandlingService.CreateValidationError("ValidateXaml", validation);
 
             var validationResult = new List<string>();
             var hasErrors = false;
@@ -66,8 +70,14 @@ public static class XamlValidationTool
                     // 3. Check for common AvaloniaUI-specific issues
                     ValidateAvaloniaSpecificIssues(doc, validationResult, validationLevel, ref hasErrors);
 
-                    // 4. Check for common XAML patterns
+                    // 4. Check for new 11.3+ features
+                    ValidateNewFeatures(doc, validationResult, validationLevel, ref hasErrors);
+
+                    // 5. Check for common XAML patterns
                     ValidateCommonPatterns(doc, validationResult, validationLevel, ref hasErrors);
+
+                    // 6. Check for performance optimizations
+                    ValidatePerformanceOptimizations(doc, validationResult, validationLevel, ref hasErrors);
                 }
             }
             catch (XmlException ex)
@@ -84,11 +94,7 @@ public static class XamlValidationTool
 
             var summary = hasErrors ? "❌ XAML Validation Failed" : "✅ XAML Validation Passed";
             return $"{summary}\\n\\n{string.Join("\\n", validationResult)}";
-        }
-        catch (Exception ex)
-        {
-            return $"Error during validation: {ex.Message}";
-        }
+        });
     }
 
     [McpServerTool, Description("Converts WPF XAML to AvaloniaUI XAML by updating namespaces and incompatible elements")]
@@ -260,6 +266,134 @@ public static class XamlValidationTool
         if (resources.Any())
         {
             validationResult.Add($"✓ Found {resources.Count()} resource section(s)");
+        }
+    }
+
+    private static void ValidateNewFeatures(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
+    {
+        // Check for Container Queries (11.3+)
+        var containerQueries = doc.Descendants("Style").Where(s => 
+            s.Attribute("Selector")?.Value.Contains("@container") == true);
+        
+        if (containerQueries.Any())
+        {
+            validationResult.Add("✓ Using Container Queries (11.3+ feature) - excellent for responsive design!");
+            
+            foreach (var query in containerQueries)
+            {
+                var selector = query.Attribute("Selector")?.Value ?? "";
+                if (!selector.Contains("min-width") && !selector.Contains("max-width") && 
+                    !selector.Contains("min-height") && !selector.Contains("max-height"))
+                {
+                    validationResult.Add("⚠ Container query without size constraints - consider adding min-width/max-width");
+                }
+            }
+        }
+
+        // Check for new Popup.ShouldUseOverlayLayer property (11.3+)
+        var popupsWithOverlay = doc.Descendants("Popup").Where(p => 
+            p.Attribute("ShouldUseOverlayLayer") != null);
+        
+        if (popupsWithOverlay.Any())
+        {
+            validationResult.Add("✓ Using ShouldUseOverlayLayer property (11.3+ feature) for better popup rendering");
+        }
+
+        // Check for enhanced spacing properties (11.3+)
+        var elementsWithSpacing = doc.Descendants().Where(e => 
+            e.Attributes().Any(a => a.Name.LocalName == "Spacing" || 
+                                   a.Name.LocalName == "RowSpacing" || 
+                                   a.Name.LocalName == "ColumnSpacing"));
+        
+        if (elementsWithSpacing.Any())
+        {
+            validationResult.Add("✓ Using enhanced spacing properties (11.3+ feature) - great for layout!");
+        }
+
+        // Check for ItemsControl.PreparingContainer usage
+        var itemsControlsWithPreparing = doc.Descendants().Where(e => 
+            e.Name.LocalName.Contains("ItemsControl") && 
+            e.Attributes().Any(a => a.Name.LocalName == "PreparingContainer"));
+        
+        if (itemsControlsWithPreparing.Any())
+        {
+            validationResult.Add("✓ Using PreparingContainer event (11.3+ feature)");
+        }
+
+        // Check for TextBox.LineCount property
+        var textBoxesWithLineCount = doc.Descendants("TextBox").Where(t => 
+            t.Attribute("LineCount") != null);
+        
+        if (textBoxesWithLineCount.Any())
+        {
+            validationResult.Add("✓ Using TextBox.LineCount property (11.3+ feature)");
+        }
+    }
+
+    private static void ValidatePerformanceOptimizations(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
+    {
+        // Check for compiled bindings (x:DataType)
+        var elementsWithDataType = doc.Descendants().Where(e => 
+            e.Attributes().Any(a => a.Name.LocalName == "DataType" && a.Name.NamespaceName.Contains("2006/xaml")));
+        
+        var elementsWithBindings = doc.Descendants().Where(e => 
+            e.Attributes().Any(a => a.Value.Contains("{Binding")));
+
+        if (elementsWithBindings.Any() && !elementsWithDataType.Any())
+        {
+            validationResult.Add("💡 Consider using x:DataType for compiled bindings (better performance)");
+        }
+        else if (elementsWithDataType.Any())
+        {
+            validationResult.Add("✓ Using compiled bindings with x:DataType - excellent performance!");
+        }
+
+        // Check for virtualization on list controls
+        var listControls = doc.Descendants().Where(e => 
+            new[] { "ListBox", "ListView", "DataGrid", "TreeView" }.Contains(e.Name.LocalName));
+        
+        foreach (var control in listControls)
+        {
+            var hasVirtualization = control.Attributes().Any(a => 
+                a.Value.Contains("VirtualizingStackPanel") || a.Name.LocalName.Contains("Virtualiz"));
+            
+            if (!hasVirtualization)
+            {
+                validationResult.Add($"💡 Consider enabling virtualization for {control.Name.LocalName} with large datasets");
+            }
+        }
+
+        // Check for efficient styling patterns
+        var inlineStyles = doc.Descendants().Where(e => 
+            e.Attributes().Any(a => new[] { "Background", "Foreground", "FontSize", "FontWeight", "Margin", "Padding" }
+                .Contains(a.Name.LocalName))).Count();
+        
+        if (inlineStyles > 5)
+        {
+            validationResult.Add($"💡 {inlineStyles} inline style properties found - consider using styles for better maintainability");
+        }
+
+        // Check for proper resource usage
+        var dynamicResources = doc.Descendants().Where(e => 
+            e.Attributes().Any(a => a.Value.Contains("DynamicResource"))).Count();
+        
+        var staticResources = doc.Descendants().Where(e => 
+            e.Attributes().Any(a => a.Value.Contains("StaticResource"))).Count();
+        
+        if (dynamicResources > staticResources && dynamicResources > 3)
+        {
+            validationResult.Add("💡 Consider using StaticResource instead of DynamicResource for better performance where possible");
+        }
+
+        // Check for modern selector usage
+        var modernSelectors = doc.Descendants("Style").Where(s => 
+            s.Attribute("Selector")?.Value.Contains(":") == true || 
+            s.Attribute("Selector")?.Value.Contains(".") == true ||
+            s.Attribute("Selector")?.Value.Contains(">") == true);
+        
+        if (modernSelectors.Any())
+        {
+            validationResult.Add("✓ Using modern CSS-like selectors - good styling practice!");
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Text.Json;
 using ModelContextProtocol.Server;
+using AvaloniaUI.MCP.Services;
 
 namespace AvaloniaUI.MCP.Resources;
 
@@ -9,50 +10,44 @@ public static class AvaloniaControlsResource
 {
     [McpServerResource]
     [Description("Comprehensive reference of AvaloniaUI controls with examples and usage guidelines")]
-    public static Task<string> GetControlsReference()
+    public static async Task<string> GetControlsReference()
     {
-        try
+        return await ErrorHandlingService.SafeExecuteAsync("GetControlsReference", async () =>
         {
             var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "controls.json");
-            if (!File.Exists(dataPath))
+            
+            // Use cache for both the JSON data and the formatted result
+            var cacheKey = "formatted_controls_reference";
+            
+            return await ResourceCacheService.GetOrLoadResourceAsync(cacheKey, async () =>
             {
-                return Task.FromResult("Error: Controls reference data not found");
-            }
-
-            var jsonContent = File.ReadAllText(dataPath);
-            var controlsData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
-
-            var formattedContent = FormatControlsReference(controlsData);
-            return Task.FromResult(formattedContent);
-        }
-        catch (Exception ex)
-        {
-            return Task.FromResult($"Error loading controls reference: {ex.Message}");
-        }
+                var controlsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
+                return FormatControlsReference(controlsData);
+            }, TimeSpan.FromMinutes(30));
+        });
     }
 
     [McpServerResource]
     [Description("Get information about a specific AvaloniaUI control")]
-    public static Task<string> GetControlInfo([Description("Name of the control to get information about")] string controlName)
+    public static async Task<string> GetControlInfo([Description("Name of the control to get information about")] string controlName)
     {
-        try
+        return await ErrorHandlingService.SafeExecuteAsync("GetControlInfo", async () =>
         {
+            // Validate input
+            var validation = InputValidationService.ValidateIdentifier(controlName, "control name");
+            if (!validation.IsValid)
+                return ErrorHandlingService.CreateValidationError("GetControlInfo", validation);
+
             var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "controls.json");
-            if (!File.Exists(dataPath))
+            var cacheKey = $"control_info_{controlName.ToLowerInvariant()}";
+            
+            return await ResourceCacheService.GetOrLoadResourceAsync(cacheKey, async () =>
             {
-                return Task.FromResult("Error: Controls reference data not found");
-            }
-
-            var jsonContent = File.ReadAllText(dataPath);
-            var controlsData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
-
-            var controlInfo = FindControlInfo(controlsData, controlName);
-            return Task.FromResult(controlInfo ?? $"Control '{controlName}' not found in the reference");
-        }
-        catch (Exception ex)
-        {
-            return Task.FromResult($"Error getting control info: {ex.Message}");
-        }
+                var controlsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
+                var controlInfo = FindControlInfo(controlsData, controlName);
+                return controlInfo ?? $"Control '{controlName}' not found in the reference";
+            }, TimeSpan.FromMinutes(15));
+        });
     }
 
     private static string FormatControlsReference(JsonElement controlsData)

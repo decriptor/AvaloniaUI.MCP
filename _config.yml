@@ -1,0 +1,88 @@
+# GitHub Pages configuration for AvaloniaUI.MCP
+
+title: AvaloniaUI.MCP
+description: >-
+  A comprehensive Model Context Protocol (MCP) server for AvaloniaUI development.
+  Provides tools, resources, and guidance for building cross-platform applications.
+
+url: "https://your-org.github.io"
+baseurl: "/AvaloniaUI.MCP"
+
+# Theme configuration
+theme: minima
+remote_theme: pages-themes/cayman@v0.2.0
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Navigation
+header_pages:
+  - docs/README.md
+  - docs/quick-start.md
+  - docs/tools/README.md
+  - docs/examples/README.md
+  - CONTRIBUTING.md
+
+# Site settings
+author: AvaloniaUI.MCP Team
+email: your-email@example.com
+
+github:
+  repository_url: "https://github.com/your-org/AvaloniaUI.MCP"
+  
+# Build settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Exclude from processing
+exclude:
+  - .gitignore
+  - .github/
+  - src/
+  - tests/
+  - bin/
+  - obj/
+  - *.sln
+  - *.slnx
+  - *.csproj
+  - nuget.config
+  - global.json
+  - Directory.Build.*
+  - vendor/
+  - node_modules/
+
+# Include specific files
+include:
+  - docs/
+  - README.md
+  - CONTRIBUTING.md
+  - LICENSE
+
+# Collections
+collections:
+  tools:
+    output: true
+    permalink: /:collection/:name/
+  examples:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: "docs"
+      type: "pages"
+    values:
+      layout: "default"
+      show_downloads: true

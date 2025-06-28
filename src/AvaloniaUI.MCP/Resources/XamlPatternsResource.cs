@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Text.Json;
 using ModelContextProtocol.Server;
+using AvaloniaUI.MCP.Services;
 
 namespace AvaloniaUI.MCP.Resources;
 
@@ -9,26 +10,19 @@ public static class XamlPatternsResource
 {
     [McpServerResource]
     [Description("Common XAML patterns and templates for AvaloniaUI development")]
-    public static Task<string> GetXamlPatterns()
+    public static async Task<string> GetXamlPatterns()
     {
-        try
+        return await ErrorHandlingService.SafeExecuteAsync("GetXamlPatterns", async () =>
         {
             var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "xaml-patterns.json");
-            if (!File.Exists(dataPath))
+            var cacheKey = "formatted_xaml_patterns";
+            
+            return await ResourceCacheService.GetOrLoadResourceAsync(cacheKey, async () =>
             {
-                return Task.FromResult("Error: XAML patterns data not found");
-            }
-
-            var jsonContent = File.ReadAllText(dataPath);
-            var patternsData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
-
-            var formattedContent = FormatXamlPatterns(patternsData);
-            return Task.FromResult(formattedContent);
-        }
-        catch (Exception ex)
-        {
-            return Task.FromResult($"Error loading XAML patterns: {ex.Message}");
-        }
+                var patternsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
+                return FormatXamlPatterns(patternsData);
+            }, TimeSpan.FromMinutes(30));
+        });
     }
 
     [McpServerResource]

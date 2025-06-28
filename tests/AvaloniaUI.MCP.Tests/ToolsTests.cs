@@ -41,7 +41,8 @@ public class ToolsTests
         var result = ProjectGeneratorTool.CreateAvaloniaProject(emptyProjectName);
         
         // Assert
-        Assert.Contains("Error: Project name cannot be empty", result);
+        Assert.Contains("# ❌ Error", result);
+        Assert.Contains("Project name cannot be empty", result);
     }
 
     [Fact]
@@ -55,7 +56,8 @@ public class ToolsTests
         var result = ProjectGeneratorTool.CreateAvaloniaProject(projectName, invalidTemplate);
         
         // Assert
-        Assert.Contains("Error: Invalid template", result);
+        Assert.Contains("# ❌ Error", result);
+        Assert.Contains("Invalid template type", result);
         Assert.Contains("invalid", result);
     }
 
@@ -69,7 +71,8 @@ public class ToolsTests
         var result = XamlValidationTool.ValidateXaml(emptyXaml);
         
         // Assert
-        Assert.Contains("Error: XAML content cannot be empty", result);
+        Assert.Contains("# ❌ Error", result);
+        Assert.Contains("XAML content cannot be empty", result);
     }
 
     [Fact]

@@ -9,7 +9,16 @@
       "Bash(mkdir:*)",
       "WebFetch(domain:devblogs.microsoft.com)",
       "Bash(dotnet test)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "WebFetch(domain:www.nuget.org)",
+      "Bash(rm:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)"
     ],
     "deny": []
   }

@@ -22,6 +22,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" />
     
+    <!-- Telemetry and Observability -->
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
+    <PackageReference Include="OpenTelemetry" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" />
+    
     <!-- Dependency Injection -->
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />

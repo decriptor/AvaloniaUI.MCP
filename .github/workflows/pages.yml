@@ -1,0 +1,188 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'index.md'
+      - '_config.yml'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'index.md'
+      - '_config.yml'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          
+      - name: Create Gemfile
+        run: |
+          cat > Gemfile << EOF
+          source "https://rubygems.org"
+          gem "github-pages", group: :jekyll_plugins
+          gem "jekyll-include-cache", group: :jekyll_plugins
+          gem "jekyll-sitemap", group: :jekyll_plugins
+          gem "jekyll-seo-tag", group: :jekyll_plugins
+          gem "jekyll-feed", group: :jekyll_plugins
+          EOF
+          
+      - name: Install dependencies
+        run: bundle install
+        
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
+        
+      - name: Generate API documentation
+        run: |
+          # Create API docs directory
+          mkdir -p docs/api
+          
+          # Generate tool documentation index
+          cat > docs/api/README.md << 'EOF'
+          # API Documentation
+          
+          ## Tools API Reference
+          
+          Complete API documentation for all AvaloniaUI.MCP tools.
+          
+          ### Core Tools
+          - [ProjectGeneratorTool](./tools/project-generator.md)
+          - [XamlValidationTool](./tools/xaml-validation.md)
+          - [SecurityPatternTool](./tools/security-pattern.md)
+          - [DiagnosticTool](./tools/diagnostic.md)
+          
+          ### UI Development Tools
+          - [ThemingTool](./tools/theming.md)
+          - [CustomControlGenerator](./tools/custom-control.md)
+          - [AnimationTool](./tools/animation.md)
+          - [UIUXDesignTool](./tools/ui-ux-design.md)
+          
+          ### Integration Tools
+          - [APIIntegrationTool](./tools/api-integration.md)
+          - [LocalizationTool](./tools/localization.md)
+          - [DataAccessPatternTool](./tools/data-access.md)
+          
+          ### Development Tools
+          - [DebuggingAssistantTool](./tools/debugging.md)
+          - [TestingIntegrationTool](./tools/testing.md)
+          - [PerformanceAnalysisTool](./tools/performance.md)
+          
+          ### Architecture Tools
+          - [ArchitectureTemplateTool](./tools/architecture-template.md)
+          - [ServiceLayerTool](./tools/service-layer.md)
+          - [AccessibilityTool](./tools/accessibility.md)
+          
+          ## Resources API
+          
+          Knowledge base resources available through the MCP server.
+          
+          ### Control Reference
+          - Complete AvaloniaUI controls catalog
+          - Property documentation
+          - Usage examples
+          
+          ### Pattern Library
+          - XAML patterns and templates
+          - MVVM patterns
+          - Best practices
+          
+          ### Migration Guide
+          - WPF to AvaloniaUI migration
+          - Control mappings
+          - Namespace changes
+          
+          ## Protocol Documentation
+          
+          AvaloniaUI.MCP implements the Model Context Protocol specification.
+          
+          ### Supported Capabilities
+          - Tools: ✅ Full support
+          - Resources: ✅ Full support  
+          - Prompts: ✅ Full support
+          - Sampling: ❌ Not implemented
+          
+          ### Transport
+          - STDIO: ✅ Primary transport
+          - HTTP: ❌ Not implemented
+          - WebSocket: ❌ Not implemented
+          
+          ### Error Handling
+          - Structured error responses
+          - Helpful error messages
+          - Recovery suggestions
+          EOF
+        
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
+  # Generate documentation metrics
+  metrics:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Calculate documentation metrics
+        run: |
+          echo "## Documentation Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Documentation Files | $(find docs -name '*.md' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool Documentation Pages | $(find docs/tools -name '*.md' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Example Pages | $(find docs/examples -name '*.md' | wc -l) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Lines of Documentation | $(find docs -name '*.md' -exec wc -l {} + | tail -n 1 | awk '{print $1}') |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📖 **Documentation Site**: ${{ steps.deployment.outputs.page_url || 'Building...' }}" >> $GITHUB_STEP_SUMMARY
