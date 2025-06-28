@@ -4,49 +4,47 @@ on:
   push:
     tags:
       - 'v*.*.*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Release version (e.g., v1.0.0)'
-        required: true
-        default: 'v1.0.0'
 
 env:
-  DOTNET_VERSION: '9.0.300'
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  contents: write
+  packages: write
+
+# Prevent multiple releases from running simultaneously
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   validate-release:
     name: Validate Release
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 15
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
+        global-json-file: global.json
+
     - name: Restore dependencies
       run: dotnet restore
-      
+
     - name: Build solution
       run: dotnet build --configuration Release --no-restore
-      
+
     - name: Run all tests
       run: dotnet test --configuration Release --no-build --verbosity normal
-      
+
     - name: Validate version format
       run: |
-        if [[ "${{ github.event.inputs.version }}" ]]; then
-          VERSION="${{ github.event.inputs.version }}"
-        else
-          VERSION="${GITHUB_REF#refs/tags/}"
-        fi
-        
+        VERSION="${GITHUB_REF#refs/tags/}"
         if [[ $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           echo "✅ Valid version format: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
@@ -56,269 +54,140 @@ jobs:
           exit 1
         fi
 
-  build-release:
-    name: Build Release
+  build-and-release:
+    name: Build and Release Docker Image
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: validate-release
-    
-    strategy:
-      matrix:
-        runtime: 
-          - { id: 'win-x64', name: 'Windows x64', ext: 'zip' }
-          - { id: 'win-arm64', name: 'Windows ARM64', ext: 'zip' }
-          - { id: 'linux-x64', name: 'Linux x64', ext: 'tar.gz' }
-          - { id: 'linux-arm64', name: 'Linux ARM64', ext: 'tar.gz' }
-          - { id: 'osx-x64', name: 'macOS x64', ext: 'tar.gz' }
-          - { id: 'osx-arm64', name: 'macOS ARM64', ext: 'tar.gz' }
-        
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
+
     - name: Get version
       run: |
-        if [[ "${{ github.event.inputs.version }}" ]]; then
-          VERSION="${{ github.event.inputs.version }}"
-        else
-          VERSION="${GITHUB_REF#refs/tags/}"
-        fi
+        VERSION="${GITHUB_REF#refs/tags/}"
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "VERSION_NUMBER=${VERSION#v}" >> $GITHUB_ENV
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Publish application
-      run: |
-        dotnet publish src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj \
-          --configuration Release \
-          --runtime ${{ matrix.runtime.id }} \
-          --self-contained true \
-          --output ./publish/${{ matrix.runtime.id }} \
-          -p:PublishSingleFile=true \
-          -p:PublishTrimmed=true \
-          -p:TrimMode=partial \
-          -p:Version=${{ env.VERSION_NUMBER }} \
-          -p:AssemblyVersion=${{ env.VERSION_NUMBER }} \
-          -p:FileVersion=${{ env.VERSION_NUMBER }}
-          
-    - name: Include documentation
-      run: |
-        cp README.md ./publish/${{ matrix.runtime.id }}/
-        cp CLAUDE.md ./publish/${{ matrix.runtime.id }}/
-        
-        # Create a simple setup guide for this platform
-        cat > ./publish/${{ matrix.runtime.id }}/SETUP.md << 'EOF'
-        # AvaloniaUI MCP Server Setup
-        
-        ## Quick Start
-        
-        1. Extract this archive to your desired location
-        2. Configure your MCP client to use this server
-        3. For Claude Desktop, add this to your config:
-        
-        ```json
-        {
-          "mcpServers": {
-            "avaloniaui-mcp": {
-              "command": "/path/to/AvaloniaUI.MCP",
-              "args": [],
-              "env": {}
-            }
-          }
-        }
-        ```
-        
-        Replace `/path/to/AvaloniaUI.MCP` with the actual path to the executable.
-        
-        For detailed setup instructions, see README.md
-        EOF
-        
-    - name: Create archive
-      run: |
-        cd publish/${{ matrix.runtime.id }}
-        ARCHIVE_NAME="avaloniaui-mcp-${{ env.VERSION }}-${{ matrix.runtime.id }}"
-        
-        if [[ "${{ matrix.runtime.ext }}" == "zip" ]]; then
-          zip -r ../${ARCHIVE_NAME}.zip .
-        else
-          tar -czf ../${ARCHIVE_NAME}.tar.gz .
-        fi
-        
-        echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> $GITHUB_ENV
-        
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
       with:
-        name: ${{ env.ARCHIVE_NAME }}
-        path: publish/${{ env.ARCHIVE_NAME }}.${{ matrix.runtime.ext }}
-        retention-days: 90
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=raw,value=latest
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: build-release
-    permissions:
-      contents: write
-      
+    timeout-minutes: 5
+    needs: build-and-release
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Get version
       run: |
-        if [[ "${{ github.event.inputs.version }}" ]]; then
-          VERSION="${{ github.event.inputs.version }}"
-        else
-          VERSION="${GITHUB_REF#refs/tags/}"
-        fi
+        VERSION="${GITHUB_REF#refs/tags/}"
         echo "VERSION=$VERSION" >> $GITHUB_ENV
-        
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: release-artifacts
-        
+
     - name: Generate release notes
       run: |
         cat > release-notes.md << 'EOF'
         # AvaloniaUI MCP Server ${{ env.VERSION }}
-        
+
         A comprehensive Model Context Protocol server for AvaloniaUI development assistance.
-        
+
         ## 🚀 Features
-        
+
         - **Project Generation**: Create new AvaloniaUI projects with various templates
         - **XAML Validation**: Validate and convert XAML files
         - **WPF Migration**: Tools and guidance for migrating from WPF
         - **Knowledge Base**: Comprehensive AvaloniaUI documentation and examples
-        - **Cross-Platform**: Support for Windows, macOS, and Linux
-        
-        ## 📦 Downloads
-        
-        Choose the appropriate version for your platform:
-        
-        - **Windows x64**: `avaloniaui-mcp-${{ env.VERSION }}-win-x64.zip`
-        - **Windows ARM64**: `avaloniaui-mcp-${{ env.VERSION }}-win-arm64.zip`
-        - **Linux x64**: `avaloniaui-mcp-${{ env.VERSION }}-linux-x64.tar.gz`
-        - **Linux ARM64**: `avaloniaui-mcp-${{ env.VERSION }}-linux-arm64.tar.gz`
-        - **macOS x64**: `avaloniaui-mcp-${{ env.VERSION }}-osx-x64.tar.gz`
-        - **macOS ARM64**: `avaloniaui-mcp-${{ env.VERSION }}-osx-arm64.tar.gz`
-        
-        ## 🔧 Installation
-        
-        1. Download the appropriate archive for your platform
-        2. Extract to your desired location
-        3. Configure your MCP client (see README.md for detailed instructions)
-        4. Restart your MCP client
-        
+
+        ## 🐳 Docker Usage
+
+        Pull and run the latest version:
+
+        ```bash
+        docker pull ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:${{ env.VERSION }}
+        docker run -it ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:${{ env.VERSION }}
+        ```
+
+        Or use the latest tag:
+
+        ```bash
+        docker pull ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:latest
+        docker run -it ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:latest
+        ```
+
+        ## 🔧 MCP Client Configuration
+
+        For Claude Desktop, add this to your MCP configuration:
+
+        ```json
+        {
+          "mcpServers": {
+            "avaloniaui-mcp": {
+              "command": "docker",
+              "args": [
+                "run", 
+                "--rm", 
+                "-i",
+                "ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:${{ env.VERSION }}"
+              ]
+            }
+          }
+        }
+        ```
+
         ## 📚 Documentation
-        
-        - See `README.md` for complete setup and usage instructions
-        - See `CLAUDE.md` for development guidance
-        - Check the [repository](https://github.com/your-username/AvaloniaUI.MCP) for the latest documentation
-        
-        ## 🆘 Support
-        
-        - Report issues on [GitHub Issues](https://github.com/your-username/AvaloniaUI.MCP/issues)
-        - Check the troubleshooting section in README.md
-        - Use the built-in debugging tools and prompts
-        
+
+        - See README.md for complete setup and usage instructions
+        - Check the repository for the latest documentation
+
         ---
-        
-        **Requirements**: .NET 9.0 Runtime (included in self-contained builds)
+
+        **Available Docker Images:**
+        - `ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:${{ env.VERSION }}`
+        - `ghcr.io/${{ github.repository_owner }}/avaloniaui.mcp:latest`
+
+        Multi-platform support: linux/amd64, linux/arm64
         EOF
-        
+
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.VERSION }}
         name: AvaloniaUI MCP Server ${{ env.VERSION }}
         body_path: release-notes.md
-        files: |
-          release-artifacts/*/avaloniaui-mcp-${{ env.VERSION }}-*.zip
-          release-artifacts/*/avaloniaui-mcp-${{ env.VERSION }}-*.tar.gz
         draft: false
         prerelease: ${{ contains(env.VERSION, '-') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish-package:
-    name: Publish NuGet Package
-    runs-on: ubuntu-latest
-    needs: validate-release
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Get version
-      run: |
-        VERSION="${GITHUB_REF#refs/tags/}"
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        echo "VERSION_NUMBER=${VERSION#v}" >> $GITHUB_ENV
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build solution
-      run: dotnet build --configuration Release --no-restore
-      
-    - name: Pack NuGet package
-      run: |
-        dotnet pack src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj \
-          --configuration Release \
-          --no-build \
-          --output ./nupkg \
-          -p:PackageVersion=${{ env.VERSION_NUMBER }} \
-          -p:Version=${{ env.VERSION_NUMBER }}
-          
-    - name: Publish to NuGet
-      run: |
-        dotnet nuget push ./nupkg/*.nupkg \
-          --api-key ${{ secrets.NUGET_API_KEY }} \
-          --source https://api.nuget.org/v3/index.json \
-          --skip-duplicate
-      if: env.NUGET_API_KEY != ''
-      env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-
-  notify-release:
-    name: Notify Release
-    runs-on: ubuntu-latest
-    needs: [create-release, publish-package]
-    if: always()
-    
-    steps:
-    - name: Get version
-      run: |
-        if [[ "${{ github.event.inputs.version }}" ]]; then
-          VERSION="${{ github.event.inputs.version }}"
-        else
-          VERSION="${GITHUB_REF#refs/tags/}"
-        fi
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        
-    - name: Notify success
-      if: needs.create-release.result == 'success'
-      run: |
-        echo "🎉 Successfully released AvaloniaUI MCP Server ${{ env.VERSION }}!"
-        echo "📦 Release available at: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ env.VERSION }}"
-        
-    - name: Notify failure
-      if: needs.create-release.result == 'failure'
-      run: |
-        echo "❌ Release failed for version ${{ env.VERSION }}"
-        echo "Please check the workflow logs for details."
-        exit 1

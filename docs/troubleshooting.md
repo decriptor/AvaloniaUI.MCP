@@ -89,8 +89,8 @@ MCP client cannot connect to server
     "avalonia": {
       "command": "dotnet",
       "args": [
-        "run", 
-        "--project", 
+        "run",
+        "--project",
         "/absolute/path/to/AvaloniaUI.MCP/src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj"
       ],
       "cwd": "/absolute/path/to/AvaloniaUI.MCP"

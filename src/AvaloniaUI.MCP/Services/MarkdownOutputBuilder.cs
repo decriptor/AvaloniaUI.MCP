@@ -7,7 +7,7 @@ namespace AvaloniaUI.MCP.Services;
 /// </summary>
 public sealed class MarkdownOutputBuilder
 {
-    private readonly StringBuilder _builder = new();
+    readonly StringBuilder _builder = new();
 
     /// <summary>
     /// Creates a new markdown output builder with the specified title

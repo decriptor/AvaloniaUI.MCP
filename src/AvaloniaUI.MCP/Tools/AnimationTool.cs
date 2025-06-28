@@ -391,7 +391,7 @@ public class ReactiveAnimator
         }
     }
 
-    private sealed class AnimationConfiguration
+    sealed class AnimationConfiguration
     {
         public string Type { get; set; } = "";
         public string TargetElement { get; set; } = "";
@@ -401,7 +401,7 @@ public class ReactiveAnimator
         public int Iterations { get; set; }
     }
 
-    private static string GenerateAnimationXaml(AnimationConfiguration config)
+    static string GenerateAnimationXaml(AnimationConfiguration config)
     {
         string easingFunction = GetEasingFunction(config.Easing);
         _ = GetAnimationProperties(config.Type);
@@ -500,7 +500,7 @@ public class ReactiveAnimator
         };
     }
 
-    private static string GenerateAnimationCode(AnimationConfiguration config)
+    static string GenerateAnimationCode(AnimationConfiguration config)
     {
         return $@"public class {config.Type}Animation
 {{
@@ -534,7 +534,7 @@ public class ReactiveAnimator
 }}";
     }
 
-    private static string GenerateUsageExamples(AnimationConfiguration config)
+    static string GenerateUsageExamples(AnimationConfiguration config)
     {
         return $@"
 ### Trigger on Load
@@ -589,7 +589,7 @@ public MainViewModel()
 ```";
     }
 
-    private static string GetEasingFunction(string easing)
+    static string GetEasingFunction(string easing)
     {
         return easing switch
         {
@@ -604,7 +604,7 @@ public MainViewModel()
         };
     }
 
-    private static string GetEasingFunctionCode(string easing)
+    static string GetEasingFunctionCode(string easing)
     {
         return easing switch
         {
@@ -619,13 +619,13 @@ public MainViewModel()
         };
     }
 
-    private static string GetIterationAttribute(int iterations)
+    static string GetIterationAttribute(int iterations)
     {
         return iterations == -1 ? "IterationCount=\"Infinite\"" :
                iterations > 1 ? $"IterationCount=\"{iterations}\"" : "";
     }
 
-    private static string GetAnimationProperties(string type)
+    static string GetAnimationProperties(string type)
     {
         return type switch
         {
@@ -638,7 +638,7 @@ public MainViewModel()
         };
     }
 
-    private static string GenerateCustomAnimationPattern(AnimationConfiguration config, string easingFunction)
+    static string GenerateCustomAnimationPattern(AnimationConfiguration config, string easingFunction)
     {
         return $@"<!-- Custom animation for {config.Type} -->
 <UserControl.Styles>
@@ -658,7 +658,7 @@ public MainViewModel()
 </UserControl.Styles>";
     }
 
-    private static string GetAnimationKeyFrames(string type)
+    static string GetAnimationKeyFrames(string type)
     {
         return type switch
         {
@@ -703,7 +703,7 @@ public MainViewModel()
         };
     }
 
-    private static string GeneratePageTransitionXaml(string transitionType, string direction, int duration, bool includeReverse)
+    static string GeneratePageTransitionXaml(string transitionType, string direction, int duration, bool includeReverse)
     {
         return transitionType.ToLowerInvariant() switch
         {
@@ -732,7 +732,7 @@ public MainViewModel()
         };
     }
 
-    private static string GetSlideOrientation(string direction)
+    static string GetSlideOrientation(string direction)
     {
         return direction.ToLowerInvariant() switch
         {
@@ -742,7 +742,7 @@ public MainViewModel()
         };
     }
 
-    private static string GetTransitionClass(string transitionType)
+    static string GetTransitionClass(string transitionType)
     {
         return transitionType switch
         {
@@ -753,31 +753,31 @@ public MainViewModel()
         };
     }
 
-    private static string GeneratePageTransitionImplementation(string transitionType)
+    static string GeneratePageTransitionImplementation(string transitionType)
     {
         return $@"public class NavigationService
 {{
     private ContentControl _contentHost;
-    
+
     public NavigationService(ContentControl contentHost)
     {{
         _contentHost = contentHost;
     }}
-    
+
     public async Task NavigateAsync<T>(T viewModel) where T : ViewModelBase
     {{
         var view = ViewLocator.Build(viewModel);
-        
+
         if (view is UserControl userControl)
         {{
             // Apply transition
             userControl.PageTransition = Create{transitionType}Transition();
         }}
-        
+
         _contentHost.Content = view;
         await Task.Delay(50); // Allow transition to start
     }}
-    
+
     private IPageTransition Create{transitionType}Transition()
     {{
         return new {GetTransitionClass(transitionType)}
@@ -788,7 +788,7 @@ public MainViewModel()
 }}";
     }
 
-    private static string GenerateStoryboardXaml(string sequence, int totalDuration, string storyboardName)
+    static string GenerateStoryboardXaml(string sequence, int totalDuration, string storyboardName)
     {
         // Parse sequence and generate appropriate animations
         return @"        <!-- Fade in first element -->
@@ -813,7 +813,7 @@ public MainViewModel()
                          BeginTime=""0:0:0.5"" />";
     }
 
-    private static string GenerateStoryboardTriggers(string storyboardName)
+    static string GenerateStoryboardTriggers(string storyboardName)
     {
         return $@"<EventTrigger RoutedEvent=""Button.Click"" SourceName=""TriggerButton"">
     <BeginStoryboard Storyboard=""{{StaticResource {storyboardName}}}"" />
@@ -825,12 +825,12 @@ public MainViewModel()
 </EventTrigger>";
     }
 
-    private static string GenerateStoryboardCodeControl(string storyboardName)
+    static string GenerateStoryboardCodeControl(string storyboardName)
     {
         return $@"public class StoryboardController
 {{
     private readonly Storyboard _{storyboardName.ToLowerInvariant()};
-    
+
     public StoryboardController(UserControl view)
     {{
         _{storyboardName.ToLowerInvariant()} = view.FindResource(""{storyboardName}"") as Storyboard;
@@ -858,7 +858,7 @@ public MainViewModel()
 }}";
     }
 
-    private static string GenerateCustomAnimationXaml(string effectName, List<string> properties, string pattern, string complexity)
+    static string GenerateCustomAnimationXaml(string effectName, List<string> properties, string pattern, string complexity)
     {
         return $@"<!-- Custom {effectName} Effect -->
 <UserControl.Resources>
@@ -868,7 +868,7 @@ public MainViewModel()
 </UserControl.Resources>";
     }
 
-    private static string GeneratePropertyAnimation(string property, string pattern, string complexity)
+    static string GeneratePropertyAnimation(string property, string pattern, string complexity)
     {
         return pattern switch
         {
@@ -889,7 +889,7 @@ public MainViewModel()
         };
     }
 
-    private static string GenerateCustomEasingFunctions()
+    static string GenerateCustomEasingFunctions()
     {
         return @"public class CustomEasing : Easing
 {
@@ -902,13 +902,13 @@ public class SpringEasing : Easing
 {
     public double Tension { get; set; } = 300;
     public double Friction { get; set; } = 10;
-    
+
     public override double Ease(double progress)
     {
         // Spring physics simulation
         var tension = Tension / 1000.0;
         var friction = Friction / 100.0;
-        
+
         return 1 - Math.Pow(Math.E, -friction * progress) * Math.Cos(tension * progress);
     }
 }
@@ -923,7 +923,7 @@ public class BounceEasing : Easing
             return 7.5625 * (progress -= 0.545) * progress + 0.75;
         if (progress < 0.91)
             return 7.5625 * (progress -= 0.818) * progress + 0.9375;
-        
+
         return 7.5625 * (progress -= 0.955) * progress + 0.984375;
     }
 }
@@ -932,49 +932,49 @@ public class ElasticEasing : Easing
 {
     public double Amplitude { get; set; } = 1;
     public double Period { get; set; } = 0.3;
-    
+
     public override double Ease(double progress)
     {
         if (progress == 0 || progress == 1)
             return progress;
-            
+
         var p = Period / 4;
-        return -(Amplitude * Math.Pow(2, 10 * (progress -= 1)) * 
+        return -(Amplitude * Math.Pow(2, 10 * (progress -= 1)) *
                 Math.Sin((progress - p) * (2 * Math.PI) / Period));
     }
 }";
     }
 
-    private static string GenerateCustomAnimationCode(string effectName, string pattern)
+    static string GenerateCustomAnimationCode(string effectName, string pattern)
     {
         return $@"public class {effectName}AnimationController
 {{
     private readonly Timer _animationTimer;
     private readonly Control _target;
     private double _progress = 0;
-    
+
     public {effectName}AnimationController(Control target)
     {{
         _target = target;
         _animationTimer = new Timer(16); // ~60fps
         _animationTimer.Elapsed += OnAnimationTick;
     }}
-    
+
     public void Start()
     {{
         _progress = 0;
         _animationTimer.Start();
     }}
-    
+
     public void Stop()
     {{
         _animationTimer.Stop();
     }}
-    
+
     private void OnAnimationTick(object sender, ElapsedEventArgs e)
     {{
         _progress += 0.016; // 16ms increment
-        
+
         if (_progress >= 1.0)
         {{
             _progress = {(pattern == "wave" ? "0" : "1.0")};

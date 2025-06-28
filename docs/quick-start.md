@@ -45,8 +45,8 @@ Add the following to your Claude Desktop MCP configuration:
     "avalonia": {
       "command": "dotnet",
       "args": [
-        "run", 
-        "--project", 
+        "run",
+        "--project",
         "/path/to/AvaloniaUI.MCP/src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj"
       ],
       "cwd": "/path/to/AvaloniaUI.MCP"

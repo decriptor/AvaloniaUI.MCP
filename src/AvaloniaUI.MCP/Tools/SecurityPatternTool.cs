@@ -6,15 +6,15 @@ namespace AvaloniaUI.MCP.Tools;
 
 /// <summary>
 /// DEFENSIVE SECURITY PATTERN GENERATOR
-/// 
+///
 /// This tool generates secure, defensive security patterns and best practices for AvaloniaUI applications.
-/// 
+///
 /// PURPOSE: Help developers implement SECURE authentication, encryption, validation, and data protection.
-/// 
+///
 /// ALL CODE EXAMPLES: Show PROPER security implementations to PREVENT vulnerabilities.
-/// 
+///
 /// COMPLIANCE: Supports GDPR, HIPAA, PCI DSS, and other security standards.
-/// 
+///
 /// This tool is designed to PROTECT against security threats, not create them.
 /// </summary>
 [McpServerToolType]
@@ -147,7 +147,7 @@ public static class SecurityPatternTool
         }
     }
 
-    private sealed class SecurityConfiguration
+    sealed class SecurityConfiguration
     {
         public string AuthType { get; set; } = "";
         public bool IncludeEncryption { get; set; }
@@ -155,7 +155,7 @@ public static class SecurityPatternTool
         public string SecurityLevel { get; set; } = "";
     }
 
-    private sealed class DataSecurityConfiguration
+    sealed class DataSecurityConfiguration
     {
         public string DataType { get; set; } = "";
         public string EncryptionMethod { get; set; } = "";
@@ -163,7 +163,7 @@ public static class SecurityPatternTool
         public bool IncludeAuditLog { get; set; }
     }
 
-    private static string GenerateAuthenticationService(SecurityConfiguration config)
+    static string GenerateAuthenticationService(SecurityConfiguration config)
     {
         return config.AuthType switch
         {
@@ -175,7 +175,7 @@ public static class SecurityPatternTool
         };
     }
 
-    private static string GenerateJwtAuthentication(SecurityConfiguration config)
+    static string GenerateJwtAuthentication(SecurityConfiguration config)
     {
         return @"// JWT Authentication Service
 public interface IJwtAuthenticationService
@@ -393,7 +393,7 @@ public class JwtSettings
 }";
     }
 
-    private static string GenerateOAuthAuthentication(SecurityConfiguration config)
+    static string GenerateOAuthAuthentication(SecurityConfiguration config)
     {
         return @"// OAuth 2.0 Authentication Service
 public interface IOAuthAuthenticationService
@@ -426,7 +426,7 @@ public class OAuthAuthenticationService : IOAuthAuthenticationService
         {
             // Generate state parameter for CSRF protection
             var state = GenerateSecureRandomString(32);
-            
+
             // Generate PKCE code verifier and challenge
             var codeVerifier = GenerateSecureRandomString(128);
             var codeChallenge = GenerateCodeChallenge(codeVerifier);
@@ -462,13 +462,13 @@ public class OAuthAuthenticationService : IOAuthAuthenticationService
                 [""redirect_uri""] = redirectUri
             };
 
-            var response = await _httpClient.PostAsync(_settings.TokenEndpoint, 
+            var response = await _httpClient.PostAsync(_settings.TokenEndpoint,
                 new FormUrlEncodedContent(tokenRequest));
 
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning(""Token exchange failed: {StatusCode} - {Content}"", 
+                _logger.LogWarning(""Token exchange failed: {StatusCode} - {Content}"",
                     response.StatusCode, errorContent);
                 return OAuthResult.Failure(""Token exchange failed"");
             }
@@ -489,11 +489,11 @@ public class OAuthAuthenticationService : IOAuthAuthenticationService
     {
         try
         {
-            _httpClient.DefaultRequestHeaders.Authorization = 
+            _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue(""Bearer"", accessToken);
 
             var response = await _httpClient.GetAsync(_settings.UserInfoEndpoint);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new UnauthorizedAccessException(""Invalid access token"");
@@ -519,7 +519,7 @@ public class OAuthAuthenticationService : IOAuthAuthenticationService
         {
             rng.GetBytes(random);
         }
-        
+
         return new string(random.Select(b => chars[b % chars.Length]).ToArray());
     }
 
@@ -542,7 +542,7 @@ public class OAuthSettings
 }";
     }
 
-    private static string GenerateBasicAuthentication(SecurityConfiguration config)
+    static string GenerateBasicAuthentication(SecurityConfiguration config)
     {
         return @"// Basic Authentication Service
 public interface IBasicAuthenticationService
@@ -656,7 +656,7 @@ public class BasicAuthenticationService : IBasicAuthenticationService
             var encodedCredentials = authHeader.Substring(6); // Remove ""Basic ""
             var decodedBytes = Convert.FromBase64String(encodedCredentials);
             var decodedCredentials = Encoding.UTF8.GetString(decodedBytes);
-            
+
             var colonIndex = decodedCredentials.IndexOf(':');
             if (colonIndex <= 0 || colonIndex == decodedCredentials.Length - 1)
                 return null;
@@ -682,7 +682,7 @@ public class BasicAuthenticationService : IBasicAuthenticationService
 }";
     }
 
-    private static string GenerateMultiFactorAuthentication(SecurityConfiguration config)
+    static string GenerateMultiFactorAuthentication(SecurityConfiguration config)
     {
         return @"// Multi-Factor Authentication Service
 public interface IMultiFactorAuthenticationService
@@ -777,10 +777,10 @@ public class MultiFactorAuthenticationService : IMultiFactorAuthenticationServic
     {
         var secret = _totpService.GenerateSecret();
         var qrCodeUrl = _totpService.GenerateQrCodeUrl(user.Email, secret, ""Your App Name"");
-        
+
         // Store secret temporarily - it will be confirmed when user verifies
         await _userRepository.StoreTempMfaSecretAsync(user.Id, secret);
-        
+
         return MfaSetupResult.Success(secret, qrCodeUrl);
     }
 
@@ -793,8 +793,8 @@ public class MultiFactorAuthenticationService : IMultiFactorAuthenticationServic
         }
 
         var isValid = _totpService.VerifyCode(secret, code);
-        return isValid 
-            ? MfaVerificationResult.Success() 
+        return isValid
+            ? MfaVerificationResult.Success()
             : MfaVerificationResult.Failure(""Invalid TOTP code"");
     }
 
@@ -818,7 +818,7 @@ public class MultiFactorAuthenticationService : IMultiFactorAuthenticationServic
         {
             rng.GetBytes(random);
         }
-        
+
         return new string(random.Select(b => chars[b % chars.Length]).ToArray());
     }
 
@@ -889,7 +889,7 @@ public class MfaVerificationResult
 }";
     }
 
-    private static string GenerateGenericAuthentication(SecurityConfiguration config)
+    static string GenerateGenericAuthentication(SecurityConfiguration config)
     {
         return @"// Generic Authentication Service
 public interface IGenericAuthenticationService
@@ -928,16 +928,16 @@ public class GenericAuthenticationService : IGenericAuthenticationService
             await Task.Delay(100); // Simulate database/service call
 
             // Example validation logic (customize for your authentication system)
-            if (request.Username.Equals(""admin"", StringComparison.OrdinalIgnoreCase) && 
+            if (request.Username.Equals(""admin"", StringComparison.OrdinalIgnoreCase) &&
                 request.Password == ""SecurePassword123!"")
             {
-                var user = new User 
-                { 
+                var user = new User
+                {
                     Id = Guid.NewGuid().ToString(),
                     Username = request.Username,
                     Email = $""{request.Username}@example.com""
                 };
-                
+
                 return AuthenticationResult.Success(""example-access-token"", ""example-refresh-token"", user);
             }
 
@@ -957,21 +957,21 @@ public class GenericAuthenticationService : IGenericAuthenticationService
         {
             // Example credential validation logic
             if (credentials == null) return false;
-            
+
             // Handle basic username/password validation
             if (credentials is Dictionary<string, object> dict)
             {
                 if (!dict.ContainsKey(""username"") || !dict.ContainsKey(""password""))
                     return false;
-                    
+
                 var username = dict[""username""]?.ToString();
                 var password = dict[""password""]?.ToString();
-                
-                return !string.IsNullOrWhiteSpace(username) && 
+
+                return !string.IsNullOrWhiteSpace(username) &&
                        !string.IsNullOrWhiteSpace(password) &&
                        username.Length >= 3 && password.Length >= 8;
             }
-            
+
             // Handle authentication request objects
             if (credentials is AuthenticationRequest request)
             {
@@ -979,7 +979,7 @@ public class GenericAuthenticationService : IGenericAuthenticationService
                        !string.IsNullOrWhiteSpace(request.Password) &&
                        request.Username.Length >= 3 && request.Password.Length >= 8;
             }
-            
+
             return false;
         }
         catch (Exception)
@@ -997,7 +997,7 @@ public class AuthenticationRequest
 }";
     }
 
-    private static string GenerateEncryptionService()
+    static string GenerateEncryptionService()
     {
         return @"// Encryption Service
 public interface IEncryptionService
@@ -1072,10 +1072,10 @@ public class EncryptionService : IEncryptionService
 
             using var encryptor = aes.CreateEncryptor();
             using var msEncrypt = new MemoryStream();
-            
+
             // Prepend IV to encrypted data
             msEncrypt.Write(aes.IV, 0, aes.IV.Length);
-            
+
             using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
             {
                 csEncrypt.Write(plainBytes, 0, plainBytes.Length);
@@ -1100,17 +1100,17 @@ public class EncryptionService : IEncryptionService
             // Extract IV from the beginning of cipher bytes
             var iv = new byte[aes.BlockSize / 8];
             var encryptedData = new byte[cipherBytes.Length - iv.Length];
-            
+
             Array.Copy(cipherBytes, 0, iv, 0, iv.Length);
             Array.Copy(cipherBytes, iv.Length, encryptedData, 0, encryptedData.Length);
-            
+
             aes.IV = iv;
 
             using var decryptor = aes.CreateDecryptor();
             using var msDecrypt = new MemoryStream(encryptedData);
             using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
             using var msPlain = new MemoryStream();
-            
+
             csDecrypt.CopyTo(msPlain);
             return msPlain.ToArray();
         }
@@ -1167,7 +1167,7 @@ public class EncryptionService : IEncryptionService
 }";
     }
 
-    private static string GenerateInputValidation()
+    static string GenerateInputValidation()
     {
         return @"// Input Validation Service
 public interface IInputValidationService
@@ -1325,7 +1325,7 @@ public class InputValidationService : IInputValidationService
             return true;
 
         var upperInput = input.ToUpperInvariant();
-        
+
         // Check for SQL injection patterns
         if (SqlKeywords.Any(keyword => upperInput.Contains(keyword)))
         {
@@ -1333,7 +1333,7 @@ public class InputValidationService : IInputValidationService
         }
 
         // Check for common SQL injection characters
-        if (input.Contains(""--"") || input.Contains(""/*"") || input.Contains(""*/"") || 
+        if (input.Contains(""--"") || input.Contains(""/*"") || input.Contains(""*/"") ||
             input.Contains(""xp_"") || input.Contains(""sp_""))
         {
             return false;
@@ -1364,7 +1364,7 @@ public class ValidationResult
 }";
     }
 
-    private static string GenerateSecurityGuidelines(SecurityConfiguration config)
+    static string GenerateSecurityGuidelines(SecurityConfiguration config)
     {
         return $@"### Security Implementation Guidelines
 
@@ -1400,7 +1400,7 @@ public class ValidationResult
 - **PCI DSS**: Secure payment card data processing";
     }
 
-    private static string GetSecurityLevelRequirements(string level)
+    static string GetSecurityLevelRequirements(string level)
     {
         return level switch
         {
@@ -1429,7 +1429,7 @@ public class ValidationResult
         };
     }
 
-    private static string GenerateSecureDataService(DataSecurityConfiguration config)
+    static string GenerateSecureDataService(DataSecurityConfiguration config)
     {
         return @"// Secure Data Service
 public interface ISecureDataService<T> where T : class
@@ -1464,7 +1464,7 @@ public class SecureDataService<T> : ISecureDataService<T> where T : class, ISecu
         _sanitizationService = sanitizationService ?? throw new ArgumentNullException(nameof(sanitizationService));
         _auditLogger = auditLogger ?? throw new ArgumentNullException(nameof(auditLogger));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _encryptionKey = configuration.GetConnectionString(""EncryptionKey"") ?? 
+        _encryptionKey = configuration.GetConnectionString(""EncryptionKey"") ??
             throw new InvalidOperationException(""Encryption key not configured"");
     }
 
@@ -1668,7 +1668,7 @@ public interface ISecureEntity
 }";
     }
 
-    private static string GenerateDataSanitization()
+    static string GenerateDataSanitization()
     {
         return @"// Data Sanitization Service
 public interface IDataSanitizationService
@@ -1684,7 +1684,7 @@ public interface IDataSanitizationService
 public class DataSanitizationService : IDataSanitizationService
 {
     private readonly ILogger<DataSanitizationService> _logger;
-    private static readonly string[] DangerousExtensions = 
+    private static readonly string[] DangerousExtensions =
     {
         "".exe"", "".bat"", "".cmd"", "".com"", "".pif"", "".scr"", "".vbs"", "".js"", "".jar"", "".dll""
     };
@@ -1700,15 +1700,15 @@ public class DataSanitizationService : IDataSanitizationService
             return string.Empty;
 
         // Remove script tags and their content
-        input = Regex.Replace(input, @""<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>"", 
+        input = Regex.Replace(input, @""<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>"",
             string.Empty, RegexOptions.IgnoreCase);
 
         // Remove dangerous HTML attributes
-        input = Regex.Replace(input, @""(on\w+)=""[^""]*"""", 
+        input = Regex.Replace(input, @""(on\w+)=""[^""]*"""",
             string.Empty, RegexOptions.IgnoreCase);
 
         // Remove javascript: and vbscript: protocols
-        input = Regex.Replace(input, @""(javascript|vbscript):[^""']*"", 
+        input = Regex.Replace(input, @""(javascript|vbscript):[^""']*"",
             string.Empty, RegexOptions.IgnoreCase);
 
         // Encode remaining HTML entities
@@ -1726,7 +1726,7 @@ public class DataSanitizationService : IDataSanitizationService
         input = input.Replace(""\0"", string.Empty);
 
         // Remove control characters except tab, newline, and carriage return
-        input = new string(input.Where(c => 
+        input = new string(input.Where(c =>
             !char.IsControl(c) || c == '\t' || c == '\n' || c == '\r').ToArray());
 
         // Trim whitespace
@@ -1755,7 +1755,7 @@ public class DataSanitizationService : IDataSanitizationService
         // Remove common SQL injection patterns
         var sqlPatterns = new[]
         {
-            @""\bUNION\b"", @""\bSELECT\b"", @""\bINSERT\b"", @""\bUPDATE\b"", 
+            @""\bUNION\b"", @""\bSELECT\b"", @""\bINSERT\b"", @""\bUPDATE\b"",
             @""\bDELETE\b"", @""\bDROP\b"", @""\bEXEC\b"", @""\bEXECUTE\b""
         };
 
@@ -1819,7 +1819,7 @@ public class DataSanitizationService : IDataSanitizationService
         }
 
         // Ensure URL starts with http or https
-        if (!url.StartsWith(""http://"", StringComparison.OrdinalIgnoreCase) && 
+        if (!url.StartsWith(""http://"", StringComparison.OrdinalIgnoreCase) &&
             !url.StartsWith(""https://"", StringComparison.OrdinalIgnoreCase))
         {
             url = ""https://"" + url;
@@ -1870,21 +1870,21 @@ public class DataSanitizationService : IDataSanitizationService
     {
         // Simple check for suspicious patterns in binary content
         // In production, integrate with a proper malware scanner
-        
+
         var contentString = Encoding.UTF8.GetString(content, 0, Math.Min(content.Length, 1024));
-        
+
         var suspiciousPatterns = new[]
         {
             ""eval("", ""<script"", ""javascript:"", ""onload="", ""onerror=""
         };
 
-        return suspiciousPatterns.Any(pattern => 
+        return suspiciousPatterns.Any(pattern =>
             contentString.Contains(pattern, StringComparison.OrdinalIgnoreCase));
     }
 }";
     }
 
-    private static string GenerateAuditLogging()
+    static string GenerateAuditLogging()
     {
         return @"// Audit Logging Service
 public interface IAuditLogger
@@ -1932,7 +1932,7 @@ public class AuditLogger : IAuditLogger
             };
 
             await _auditRepository.CreateAsync(auditLog);
-            _logger.LogInformation(""Data access logged: {Operation} on {EntityType} {EntityId}"", 
+            _logger.LogInformation(""Data access logged: {Operation} on {EntityType} {EntityId}"",
                 operation, entityType, entityId);
         }
         catch (Exception ex)
@@ -1993,10 +1993,10 @@ public class AuditLogger : IAuditLogger
             };
 
             await _auditRepository.CreateAsync(auditLog);
-            
+
             if (!success)
             {
-                _logger.LogWarning(""Failed login attempt for user: {Username} from IP: {IpAddress}"", 
+                _logger.LogWarning(""Failed login attempt for user: {Username} from IP: {IpAddress}"",
                     username, ipAddress);
             }
         }
@@ -2026,7 +2026,7 @@ public class AuditLogger : IAuditLogger
             };
 
             await _auditRepository.CreateAsync(auditLog);
-            _logger.LogWarning(""Permission change logged: {Permission} for user {UserId} by {ChangedBy}"", 
+            _logger.LogWarning(""Permission change logged: {Permission} for user {UserId} by {ChangedBy}"",
                 permission, userId, changedBy);
         }
         catch (Exception ex)
@@ -2073,10 +2073,10 @@ public class AuditLogger : IAuditLogger
         // Example user lookup - in production, query your user repository
         if (string.IsNullOrWhiteSpace(userId))
             return ""Unknown User"";
-            
+
         // Mock implementation for demonstration
-        return userId.StartsWith(""admin"") ? ""Administrator"" : 
-               userId.StartsWith(""user"") ? $""User {userId}"" : 
+        return userId.StartsWith(""admin"") ? ""Administrator"" :
+               userId.StartsWith(""user"") ? $""User {userId}"" :
                ""System User"";
     }
 
@@ -2096,7 +2096,7 @@ public class AuditLogger : IAuditLogger
     private async Task SendSecurityAlert(AuditLog auditLog)
     {
         // Implement security alerting (email, SMS, etc.)
-        _logger.LogCritical(""High-severity security event: {EventType} - {Details}"", 
+        _logger.LogCritical(""High-severity security event: {EventType} - {Details}"",
             auditLog.SubEventType, auditLog.Details);
     }
 }
@@ -2120,7 +2120,7 @@ public class AuditLog
 }";
     }
 
-    private static string GenerateComplianceInformation(DataSecurityConfiguration config)
+    static string GenerateComplianceInformation(DataSecurityConfiguration config)
     {
         return config.DataType switch
         {

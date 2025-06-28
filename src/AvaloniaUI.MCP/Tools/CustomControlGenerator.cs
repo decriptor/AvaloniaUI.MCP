@@ -264,19 +264,19 @@ protected override Size ArrangeOverride(Size finalSize)
 {{
     // Custom arrangement implementation
     var currentPosition = new Point(0, 0);
-    
+
     foreach (Control child in Children)
     {{
         if (child.IsVisible)
         {{
             var childSize = CalculateChildSize(child, finalSize);
             var childPosition = CalculateChildPosition(child, currentPosition, childSize);
-            
+
             child.Arrange(new Rect(childPosition, childSize));
             currentPosition = UpdatePosition(currentPosition, childSize);
         }}
     }}
-    
+
     return finalSize;
 }}
 ```
@@ -290,7 +290,7 @@ private Control GetOrCreateChild(int index)
 {
     if (_realizedChildren.TryGetValue(index, out var child))
         return child;
-        
+
     if (_recycledChildren.Count > 0)
     {
         child = _recycledChildren.Dequeue();
@@ -300,7 +300,7 @@ private Control GetOrCreateChild(int index)
     {
         child = CreateChildControl(index);
     }
-    
+
     _realizedChildren[index] = child;
     return child;
 }
@@ -325,16 +325,16 @@ private Control GetOrCreateChild(int index)
         }
     }
 
-    private sealed class CustomControlConfiguration
+    sealed class CustomControlConfiguration
     {
         public string Type { get; set; } = "";
         public string Name { get; set; } = "";
         public string BaseClass { get; set; } = "";
-        public List<string> Properties { get; set; } = new();
+        public List<string> Properties { get; set; } = [];
         public bool IncludeTemplate { get; set; }
     }
 
-    private static string GenerateTemplatedControl(CustomControlConfiguration config)
+    static string GenerateTemplatedControl(CustomControlConfiguration config)
     {
         string controlCode = GenerateTemplatedControlCode(config);
         string templateXaml = config.IncludeTemplate ? GenerateDefaultTemplate(config) : "";
@@ -362,7 +362,7 @@ private Control GetOrCreateChild(int index)
 
 ## Usage Example
 ```xml
-<local:{config.Name} 
+<local:{config.Name}
     {propertyBindings}
     />
 ```
@@ -387,7 +387,7 @@ Override the default template by creating a new style:
 ```";
     }
 
-    private static string GenerateUserControl(CustomControlConfiguration config)
+    static string GenerateUserControl(CustomControlConfiguration config)
     {
         string xamlCode = GenerateUserControlXaml(config);
         string codeCode = GenerateUserControlCode(config);
@@ -407,7 +407,7 @@ Override the default template by creating a new style:
 
 ## Usage Example
 ```xml
-<local:{config.Name} 
+<local:{config.Name}
     {propertyBindings}
     />
 ```
@@ -425,12 +425,12 @@ Style the UserControl using standard AvaloniaUI styling:
 ```";
     }
 
-    private static string GenerateCustomPanel(CustomControlConfiguration config)
+    static string GenerateCustomPanel(CustomControlConfiguration config)
     {
         return GenerateLayoutPanel(config.Name, "custom", "false", "true");
     }
 
-    private static string GenerateAttachedProperty(CustomControlConfiguration config)
+    static string GenerateAttachedProperty(CustomControlConfiguration config)
     {
         if (config.Properties.Count == 0)
         {
@@ -441,7 +441,7 @@ Style the UserControl using standard AvaloniaUI styling:
         return GenerateAttachedProperty(propertyName, "object", config.BaseClass, "true");
     }
 
-    private static string GenerateTemplatedControlCode(CustomControlConfiguration config)
+    static string GenerateTemplatedControlCode(CustomControlConfiguration config)
     {
         string properties = string.Join("\n\n", config.Properties.Select(GenerateControlProperty));
 
@@ -463,10 +463,10 @@ public class {config.Name} : {config.BaseClass}
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {{
         base.OnApplyTemplate(e);
-        
+
         // Get template parts
 {string.Join("\n", GetTemplateParts(config).Select(part => $"        var {part.Name.ToLowerInvariant()} = e.NameScope.Find<{part.Type}>(\"{part.Name}\");"))}
-        
+
         // Initialize control
         InitializeControl();
     }}
@@ -480,7 +480,7 @@ public class {config.Name} : {config.BaseClass}
 }}";
     }
 
-    private static string GenerateDefaultTemplate(CustomControlConfiguration config)
+    static string GenerateDefaultTemplate(CustomControlConfiguration config)
     {
         return $@"<Style Selector=""local|{config.Name}"">
     <Setter Property=""Template"">
@@ -490,7 +490,7 @@ public class {config.Name} : {config.BaseClass}
                     BorderBrush=""{{TemplateBinding BorderBrush}}""
                     BorderThickness=""{{TemplateBinding BorderThickness}}""
                     CornerRadius=""4"">
-                
+
                 <Grid>
                     <ContentPresenter Name=""PART_ContentPresenter""
                                       Content=""{{TemplateBinding Content}}""
@@ -503,7 +503,7 @@ public class {config.Name} : {config.BaseClass}
 </Style>";
     }
 
-    private static string GenerateControlStyle(CustomControlConfiguration config)
+    static string GenerateControlStyle(CustomControlConfiguration config)
     {
         return $@"<Style Selector=""local|{config.Name}"">
     <Setter Property=""Background"" Value=""{{DynamicResource ButtonBackground}}"" />
@@ -524,20 +524,20 @@ public class {config.Name} : {config.BaseClass}
 </Style>";
     }
 
-    private static string GenerateUserControlXaml(CustomControlConfiguration config)
+    static string GenerateUserControlXaml(CustomControlConfiguration config)
     {
         return $@"<UserControl xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
              x:Class=""YourApp.Controls.{config.Name}"">
-    
+
     <Border Background=""{{Binding Background, RelativeSource={{RelativeSource AncestorType=UserControl}}}}""
             BorderBrush=""{{Binding BorderBrush, RelativeSource={{RelativeSource AncestorType=UserControl}}}}""
             BorderThickness=""{{Binding BorderThickness, RelativeSource={{RelativeSource AncestorType=UserControl}}}}""
             Padding=""{{Binding Padding, RelativeSource={{RelativeSource AncestorType=UserControl}}}}"">
-        
+
         <StackPanel>
 {string.Join("\n", config.Properties.Select(p => $"            <TextBlock Text=\"{{Binding {p}, RelativeSource={{RelativeSource AncestorType=UserControl}}}}\" />"))}
-            
+
             <!-- Add your custom UI here -->
             <ContentPresenter Content=""{{Binding Content, RelativeSource={{RelativeSource AncestorType=UserControl}}}}"" />
         </StackPanel>
@@ -545,7 +545,7 @@ public class {config.Name} : {config.BaseClass}
 </UserControl>";
     }
 
-    private static string GenerateUserControlCode(CustomControlConfiguration config)
+    static string GenerateUserControlCode(CustomControlConfiguration config)
     {
         string properties = string.Join("\n\n", config.Properties.Select(GenerateUserControlProperty));
 
@@ -565,7 +565,7 @@ public partial class {config.Name} : UserControl
 }}";
     }
 
-    private static string GenerateControlProperty(string propertyName)
+    static string GenerateControlProperty(string propertyName)
     {
         string typeName = InferPropertyType(propertyName);
         return $@"    public static readonly StyledProperty<{typeName}> {propertyName}Property =
@@ -578,7 +578,7 @@ public partial class {config.Name} : UserControl
     }}";
     }
 
-    private static string GenerateUserControlProperty(string propertyName)
+    static string GenerateUserControlProperty(string propertyName)
     {
         string typeName = InferPropertyType(propertyName);
         return $@"    public static readonly StyledProperty<{typeName}> {propertyName}Property =
@@ -591,7 +591,7 @@ public partial class {config.Name} : UserControl
     }}";
     }
 
-    private static string GeneratePropertyChangedHandler(string propertyName)
+    static string GeneratePropertyChangedHandler(string propertyName)
     {
         return $@"    private static void On{propertyName}Changed(AvaloniaPropertyChangedEventArgs e)
     {{
@@ -607,7 +607,7 @@ public partial class {config.Name} : UserControl
     }}";
     }
 
-    private static string InferPropertyType(string propertyName)
+    static string InferPropertyType(string propertyName)
     {
         string lowerName = propertyName.ToLowerInvariant();
 
@@ -616,34 +616,30 @@ public partial class {config.Name} : UserControl
             return "string";
         }
 
-        if (lowerName.Contains("count") || lowerName.Contains("index") || lowerName.Contains("number"))
-        {
-            return "int";
-        }
-
-        return lowerName.Contains("is") || lowerName.Contains("can") || lowerName.Contains("has")
+        return lowerName.Contains("count") || lowerName.Contains("index") || lowerName.Contains("number")
+            ? "int"
+            : lowerName.Contains("is") || lowerName.Contains("can") || lowerName.Contains("has")
             ? "bool"
             : lowerName.Contains("width") || lowerName.Contains("height") || lowerName.Contains("size")
             ? "double"
             : lowerName.Contains("color") || lowerName.Contains("brush") ? "IBrush" : "object";
     }
 
-    private static List<(string Name, string Type, string Description)> GetTemplateParts(CustomControlConfiguration config)
+    static List<(string Name, string Type, string Description)> GetTemplateParts(CustomControlConfiguration config)
     {
-        return new List<(string, string, string)>
-        {
+        return [
             ("PART_Border", "Border", "Main border element"),
             ("PART_ContentPresenter", "ContentPresenter", "Content display area"),
             ("PART_Background", "Panel", "Background element")
-        };
+        ];
     }
 
-    private static List<string> GetVisualStates(CustomControlConfiguration config)
+    static List<string> GetVisualStates(CustomControlConfiguration config)
     {
-        return new List<string> { "Normal", "PointerOver", "Pressed", "Disabled", "Focused" };
+        return ["Normal", "PointerOver", "Pressed", "Disabled", "Focused"];
     }
 
-    private static string GenerateComplexControlTemplate(string targetControl, string templateName, List<string> states, bool animations)
+    static string GenerateComplexControlTemplate(string targetControl, string templateName, List<string> states, bool animations)
     {
         string stateGroups = GenerateVisualStateGroups(states, animations);
 
@@ -653,11 +649,11 @@ public partial class {config.Name} : UserControl
             BorderBrush=""{{TemplateBinding BorderBrush}}""
             BorderThickness=""{{TemplateBinding BorderThickness}}""
             CornerRadius=""4"">
-        
+
         <VisualStateManager.VisualStateGroups>
 {stateGroups}
         </VisualStateManager.VisualStateGroups>
-        
+
         <Grid>
             <ContentPresenter Name=""PART_ContentPresenter""
                               Content=""{{TemplateBinding Content}}""
@@ -670,7 +666,7 @@ public partial class {config.Name} : UserControl
 </ControlTemplate>";
     }
 
-    private static string GenerateVisualStateGroups(List<string> states, bool animations)
+    static string GenerateVisualStateGroups(List<string> states, bool animations)
     {
         string stateDefinitions = string.Join("\n", states.Select(state => GenerateVisualState(state, animations)));
 
@@ -679,7 +675,7 @@ public partial class {config.Name} : UserControl
             </VisualStateGroup>";
     }
 
-    private static string GenerateVisualState(string stateName, bool animations)
+    static string GenerateVisualState(string stateName, bool animations)
     {
         string storyboard = animations ? GenerateStateStoryboard(stateName) : "";
 
@@ -688,7 +684,7 @@ public partial class {config.Name} : UserControl
                 </VisualState>";
     }
 
-    private static string GenerateStateStoryboard(string stateName)
+    static string GenerateStateStoryboard(string stateName)
     {
         return stateName.ToLowerInvariant() switch
         {
@@ -711,14 +707,14 @@ public partial class {config.Name} : UserControl
         };
     }
 
-    private static string GenerateTemplateStyle(string targetControl, string templateName)
+    static string GenerateTemplateStyle(string targetControl, string templateName)
     {
         return $@"<Style Selector=""{targetControl}"">
     <Setter Property=""Template"" Value=""{{StaticResource {templateName}}}"" />
 </Style>";
     }
 
-    private static string GenerateTemplateUsage(string targetControl, string templateName)
+    static string GenerateTemplateUsage(string targetControl, string templateName)
     {
         return $@"<!-- Apply template to specific control -->
 <{targetControl} Template=""{{StaticResource {templateName}}}"" Content=""Custom Styled Control"" />
@@ -731,7 +727,7 @@ public partial class {config.Name} : UserControl
 </Style>";
     }
 
-    private static string GetStateDescription(string state)
+    static string GetStateDescription(string state)
     {
         return state switch
         {
@@ -744,7 +740,7 @@ public partial class {config.Name} : UserControl
         };
     }
 
-    private static string GenerateAttachedPropertyCode(string propertyName, string propertyType, List<string> targets, bool includeHandler)
+    static string GenerateAttachedPropertyCode(string propertyName, string propertyType, List<string> targets, bool includeHandler)
     {
         string dotNetType = ConvertPropertyType(propertyType);
         string handlerCode = includeHandler ? GenerateAttachedPropertyHandler(propertyName, dotNetType) : "";
@@ -774,7 +770,7 @@ public static class {propertyName}Extensions
 }}";
     }
 
-    private static string GenerateAttachedPropertyHandler(string propertyName, string dotNetType)
+    static string GenerateAttachedPropertyHandler(string propertyName, string dotNetType)
     {
         return $@"    private static {dotNetType} Coerce{propertyName}(AvaloniaObject sender, {dotNetType} value)
     {{
@@ -803,7 +799,7 @@ public static class {propertyName}Extensions
     }}";
     }
 
-    private static string GenerateAttachedPropertyUsage(string propertyName, string propertyType, List<string> targets)
+    static string GenerateAttachedPropertyUsage(string propertyName, string propertyType, List<string> targets)
     {
         string examples = string.Join("\n", targets.Select(target =>
             $"<{target} local:{propertyName}=\"{GetExampleValue(propertyType)}\" />"));
@@ -819,7 +815,7 @@ public static class {propertyName}Extensions
 <!-- Set in code: {propertyName}Extensions.Set{propertyName}(MyButton, {GetExampleValue(propertyType)}); -->";
     }
 
-    private static string GenerateAttachedPropertyStyling(string propertyName, List<string> targets)
+    static string GenerateAttachedPropertyStyling(string propertyName, List<string> targets)
     {
         return $@"<!-- Style based on attached property -->
 <Style Selector=""Button[local:{propertyName}=true]"">
@@ -833,7 +829,7 @@ public static class {propertyName}Extensions
 </Style>";
     }
 
-    private static string GenerateLayoutPanelCode(string panelName, string layoutStrategy, bool virtualization, bool attachedProps)
+    static string GenerateLayoutPanelCode(string panelName, string layoutStrategy, bool virtualization, bool attachedProps)
     {
         string baseClass = virtualization ? "VirtualizingPanel" : "Panel";
         string attachedPropsCode = attachedProps ? GenerateLayoutAttachedProperties(panelName, layoutStrategy) : "";
@@ -851,36 +847,36 @@ public class {panelName} : {baseClass}
     protected override Size MeasureOverride(Size availableSize)
     {{
         var totalSize = new Size();
-        
+
         foreach (Control child in Children)
         {{
             child.Measure(availableSize);
             var childDesiredSize = child.DesiredSize;
-            
+
             // Apply layout strategy
             var adjustedSize = Apply{layoutStrategy}Measure(child, childDesiredSize, availableSize);
             totalSize = CombineSizes(totalSize, adjustedSize);
         }}
-        
+
         return totalSize;
     }}
 
     protected override Size ArrangeOverride(Size finalSize)
     {{
         var currentPosition = new Point(0, 0);
-        
+
         foreach (Control child in Children)
         {{
             if (child.IsVisible)
             {{
                 var childSize = child.DesiredSize;
                 var childRect = Calculate{layoutStrategy}Position(child, currentPosition, childSize, finalSize);
-                
+
                 child.Arrange(childRect);
                 currentPosition = UpdatePosition(currentPosition, childRect, finalSize);
             }}
         }}
-        
+
         return finalSize;
     }}
 
@@ -912,7 +908,7 @@ public class {panelName} : {baseClass}
         {{
             currentPosition = new Point(0, currentPosition.Y + childSize.Height);
         }}
-        
+
         return new Rect(currentPosition, childSize);
     }}
 
@@ -921,10 +917,10 @@ public class {panelName} : {baseClass}
         var center = new Point(finalSize.Width / 2, finalSize.Height / 2);
         var radius = Math.Min(finalSize.Width, finalSize.Height) * 0.3;
         var angle = (Children.IndexOf(child) * 2 * Math.PI) / Children.Count;
-        
+
         var x = center.X + Math.Cos(angle) * radius - childSize.Width / 2;
         var y = center.Y + Math.Sin(angle) * radius - childSize.Height / 2;
-        
+
         return new Rect(new Point(x, y), childSize);
     }}
 
@@ -948,7 +944,7 @@ public class {panelName} : {baseClass}
 }}";
     }
 
-    private static string GenerateLayoutAttachedProperties(string panelName, string layoutStrategy)
+    static string GenerateLayoutAttachedProperties(string panelName, string layoutStrategy)
     {
         return layoutStrategy switch
         {
@@ -978,7 +974,7 @@ public class {panelName} : {baseClass}
         };
     }
 
-    private static string GenerateLayoutPanelUsage(string panelName, string layoutStrategy)
+    static string GenerateLayoutPanelUsage(string panelName, string layoutStrategy)
     {
         return $@"<local:{panelName}>
     <Button Content=""Item 1"" />
@@ -988,7 +984,7 @@ public class {panelName} : {baseClass}
 </local:{panelName}>";
     }
 
-    private static string GetLayoutStrategyFeatures(string strategy)
+    static string GetLayoutStrategyFeatures(string strategy)
     {
         return strategy switch
         {
@@ -1000,7 +996,7 @@ public class {panelName} : {baseClass}
         };
     }
 
-    private static string GetLayoutPerformanceInfo(string strategy, bool virtualization)
+    static string GetLayoutPerformanceInfo(string strategy, bool virtualization)
     {
         string baseInfo = strategy switch
         {
@@ -1013,7 +1009,7 @@ public class {panelName} : {baseClass}
         return virtualization ? $"{baseInfo}\n- **Virtualization enabled**: Excellent performance for large datasets" : baseInfo;
     }
 
-    private static string ConvertPropertyType(string propertyType)
+    static string ConvertPropertyType(string propertyType)
     {
         return propertyType.ToLowerInvariant() switch
         {
@@ -1026,7 +1022,7 @@ public class {panelName} : {baseClass}
         };
     }
 
-    private static string GetExampleValue(string propertyType)
+    static string GetExampleValue(string propertyType)
     {
         return propertyType.ToLowerInvariant() switch
         {

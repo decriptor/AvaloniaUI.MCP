@@ -125,12 +125,12 @@ public static class XamlValidationTool
                 // Window properties
                 { "WindowState=\"Maximized\"", "WindowState=\"Maximized\"" }, // Same in Avalonia
                 { "WindowStartupLocation=\"CenterScreen\"", "WindowStartupLocation=\"CenterScreen\"" }, // Same in Avalonia
-                
+
                 // Replace WPF-specific controls
                 { "<DataGrid", "<DataGrid" }, // Available in Avalonia
                 { "<TabControl", "<TabControl" }, // Available in Avalonia
                 { "<TreeView", "<TreeView" }, // Available in Avalonia
-                
+
                 // Replace bindings (mostly compatible)
                 { "RelativeSource={RelativeSource Self}", "RelativeSource={RelativeSource Self}" },
             };
@@ -188,7 +188,7 @@ public static class XamlValidationTool
         }
     }
 
-    private static void ValidateAvaloniaSpecificIssues(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
+    static void ValidateAvaloniaSpecificIssues(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
     {
         // Check for unsupported WPF elements
         string[] wpfOnlyElements = ["DockPanel", "UniformGrid", "Viewbox"];
@@ -228,7 +228,7 @@ public static class XamlValidationTool
         }
     }
 
-    private static void ValidateCommonPatterns(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
+    static void ValidateCommonPatterns(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
     {
         // Check for proper Window structure
         if (doc.Root?.Name.LocalName == "Window")
@@ -272,7 +272,7 @@ public static class XamlValidationTool
         }
     }
 
-    private static void ValidateNewFeatures(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
+    static void ValidateNewFeatures(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
     {
         // Check for Container Queries (11.3+)
         IEnumerable<XElement> containerQueries = doc.Descendants("Style").Where(s =>
@@ -332,10 +332,10 @@ public static class XamlValidationTool
             validationResult.Add("✓ Using TextBox.LineCount property (11.3+ feature)");
         }
     }
-    private static readonly string[] sourceArray = ["ListBox", "ListView", "DataGrid", "TreeView"];
-    private static readonly string[] sourceArray0 = ["Background", "Foreground", "FontSize", "FontWeight", "Margin", "Padding"];
+    static readonly string[] SourceArray = ["ListBox", "ListView", "DataGrid", "TreeView"];
+    static readonly string[] SourceArray0 = ["Background", "Foreground", "FontSize", "FontWeight", "Margin", "Padding"];
 
-    private static void ValidatePerformanceOptimizations(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
+    static void ValidatePerformanceOptimizations(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
     {
         // Check for compiled bindings (x:DataType)
         IEnumerable<XElement> elementsWithDataType = doc.Descendants().Where(e =>
@@ -354,7 +354,7 @@ public static class XamlValidationTool
         }
 
         // Check for virtualization on list controls
-        IEnumerable<XElement> listControls = doc.Descendants().Where(e => sourceArray.Contains(e.Name.LocalName));
+        IEnumerable<XElement> listControls = doc.Descendants().Where(e => SourceArray.Contains(e.Name.LocalName));
 
         foreach (XElement? control in listControls)
         {
@@ -369,7 +369,7 @@ public static class XamlValidationTool
 
         // Check for efficient styling patterns
         int inlineStyles = doc.Descendants().Count(e =>
-            e.Attributes().Any(a => sourceArray0.Contains(a.Name.LocalName)));
+            e.Attributes().Any(a => SourceArray0.Contains(a.Name.LocalName)));
 
         if (inlineStyles > 5)
         {

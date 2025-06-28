@@ -396,7 +396,7 @@ public static class ArchitectureTemplateTool
         }
     }
 
-    private sealed class ArchitectureConfiguration
+    sealed class ArchitectureConfiguration
     {
         public string ProjectName { get; set; } = "";
         public string Pattern { get; set; } = "";
@@ -405,7 +405,7 @@ public static class ArchitectureTemplateTool
         public bool IncludeValidation { get; set; }
     }
 
-    private static string GenerateProjectStructure(ArchitectureConfiguration config)
+    static string GenerateProjectStructure(ArchitectureConfiguration config)
     {
         return config.Pattern switch
         {
@@ -417,7 +417,7 @@ public static class ArchitectureTemplateTool
         };
     }
 
-    private static string GenerateCleanArchitectureStructure(ArchitectureConfiguration config)
+    static string GenerateCleanArchitectureStructure(ArchitectureConfiguration config)
     {
         return $@"{config.ProjectName}/
 ├── src/
@@ -452,7 +452,7 @@ public static class ArchitectureTemplateTool
     └── {config.ProjectName}.Presentation.Tests/";
     }
 
-    private static string GenerateOnionArchitectureStructure(ArchitectureConfiguration config)
+    static string GenerateOnionArchitectureStructure(ArchitectureConfiguration config)
     {
         return $@"{config.ProjectName}/
 ├── Core/
@@ -477,7 +477,7 @@ public static class ArchitectureTemplateTool
         └── Controls/";
     }
 
-    private static string GenerateHexagonalArchitectureStructure(ArchitectureConfiguration config)
+    static string GenerateHexagonalArchitectureStructure(ArchitectureConfiguration config)
     {
         return $@"{config.ProjectName}/
 ├── {config.ProjectName}.Core/
@@ -504,7 +504,7 @@ public static class ArchitectureTemplateTool
     └── Composition/";
     }
 
-    private static string GenerateLayeredArchitectureStructure(ArchitectureConfiguration config)
+    static string GenerateLayeredArchitectureStructure(ArchitectureConfiguration config)
     {
         return $@"{config.ProjectName}/
 ├── {config.ProjectName}.Presentation/
@@ -529,7 +529,7 @@ public static class ArchitectureTemplateTool
     └── Constants/";
     }
 
-    private static string GenerateBaseClasses(ArchitectureConfiguration config)
+    static string GenerateBaseClasses(ArchitectureConfiguration config)
     {
         string validationMixin = config.IncludeValidation ? GenerateValidationMixin() : "";
         string reactiveMixin = config.IncludeReactive ? GenerateReactiveMixin() : "";
@@ -571,7 +571,7 @@ public abstract class ServiceBase
         [CallerMemberName] string operationName = """")
     {{
         Logger.LogInformation(""Starting operation: {{OperationName}}"", operationName);
-        
+
         try
         {{
             var result = await operation();
@@ -639,7 +639,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
 }}";
     }
 
-    private static string GenerateValidationMixin()
+    static string GenerateValidationMixin()
     {
         return @"
     private readonly Dictionary<string, List<string>> _errors = new();
@@ -655,7 +655,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
     {
         if (string.IsNullOrEmpty(propertyName))
             return _errors.Values.SelectMany(x => x);
-            
+
         return _errors.TryGetValue(propertyName, out var errors) ? errors : Enumerable.Empty<string>();
     }
 
@@ -684,7 +684,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
     }";
     }
 
-    private static string GenerateReactiveMixin()
+    static string GenerateReactiveMixin()
     {
         return @"
     protected readonly CompositeDisposable Disposables = new();
@@ -718,7 +718,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
     }";
     }
 
-    private static string GenerateServiceLayer(ArchitectureConfiguration config)
+    static string GenerateServiceLayer(ArchitectureConfiguration config)
     {
         string diRegistration = config.IncludeDI ? GenerateDIRegistration() : "";
 
@@ -790,7 +790,7 @@ public class UserService : ServiceBase, IUserService
 {(config.IncludeDI ? diRegistration : "")}";
     }
 
-    private static string GenerateDIRegistration()
+    static string GenerateDIRegistration()
     {
         return @"
 // Dependency injection configuration
@@ -801,46 +801,46 @@ public static class ServiceCollectionExtensions
         // Register services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IOrderService, OrderService>();
-        
+
         // Register repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-        
+
         // Register infrastructure services
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IFileStorageService, FileStorageService>();
-        
+
         // Register AutoMapper
         services.AddAutoMapper(typeof(UserProfile));
-        
+
         // Register validation
         services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
-        
+
         return services;
     }
-    
+
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Register DbContext
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString(""DefaultConnection"")));
-            
+
         // Register external services
         services.AddHttpClient<IExternalApiService, ExternalApiService>();
-        
+
         return services;
     }
 }";
     }
 
-    private static string GenerateViewModelTemplates(ArchitectureConfiguration config)
+    static string GenerateViewModelTemplates(ArchitectureConfiguration config)
     {
         return $@"// Main ViewModel example
 public class MainViewModel : ViewModelBase
 {{
     private readonly IUserService _userService;
     private readonly INavigationService _navigationService;
-    
+
     private ObservableCollection<UserViewModel> _users = new();
     private UserViewModel? _selectedUser;
 
@@ -848,14 +848,14 @@ public class MainViewModel : ViewModelBase
     {{
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
-        
+
         Title = ""User Management"";
-        
+
         LoadUsersCommand = CreateCommand(LoadUsersAsync);
         CreateUserCommand = CreateCommand(CreateUserAsync);
         EditUserCommand = CreateCommand<UserViewModel>(EditUserAsync);
         DeleteUserCommand = CreateCommand<UserViewModel>(DeleteUserAsync);
-        
+
         // Load users on initialization
         LoadUsersCommand.Execute().Subscribe();
     }}
@@ -907,7 +907,7 @@ public class MainViewModel : ViewModelBase
         var result = await _navigationService.ShowConfirmationAsync(
             ""Delete User"",
             $""Are you sure you want to delete {{userViewModel.Name}}?"");
-            
+
         if (result)
         {{
             await _userService.DeleteUserAsync(userViewModel.User.Id);
@@ -926,9 +926,9 @@ public class UserDetailsViewModel : ViewModelBase
     {{
         _user = user ?? throw new ArgumentNullException(nameof(user));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        
+
         Title = $""User Details - {{user.Name}}"";
-        
+
         SaveCommand = CreateCommand(SaveAsync, CanSave());
         CancelCommand = CreateCommand(CancelAsync);
     }}
@@ -938,8 +938,8 @@ public class UserDetailsViewModel : ViewModelBase
     public string Name
     {{
         get => _user.Name;
-        set 
-        {{ 
+        set
+        {{
             if (_user.Name != value)
             {{
                 _user.Name = value;
@@ -954,8 +954,8 @@ public class UserDetailsViewModel : ViewModelBase
     public string Email
     {{
         get => _user.Email;
-        set 
-        {{ 
+        set
+        {{
             if (_user.Email != value)
             {{
                 _user.Email = value;
@@ -973,7 +973,7 @@ public class UserDetailsViewModel : ViewModelBase
         return this.WhenAnyValue(
             x => x.Name,
             x => x.Email,
-            (name, email) => !string.IsNullOrWhiteSpace(name) && 
+            (name, email) => !string.IsNullOrWhiteSpace(name) &&
                            !string.IsNullOrWhiteSpace(email) &&
                            {(config.IncludeValidation ? "!HasErrors" : "true")});
     }}
@@ -988,7 +988,7 @@ public class UserDetailsViewModel : ViewModelBase
                 Name = Name,
                 Email = Email
             }});
-            
+
             // Navigate back or show success message
         }}
         finally
@@ -1005,7 +1005,7 @@ public class UserDetailsViewModel : ViewModelBase
 }}";
     }
 
-    private static string GenerateViewTemplates(ArchitectureConfiguration config)
+    static string GenerateViewTemplates(ArchitectureConfiguration config)
     {
         return $@"<!-- MainView.axaml -->
 <UserControl xmlns=""https://github.com/avaloniaui""
@@ -1115,7 +1115,7 @@ public class UserDetailsViewModel : ViewModelBase
             <!-- Name Field -->
             <StackPanel>
                 <TextBlock Text=""Name"" Margin=""0,0,0,4"" />
-                <TextBox Text=""{{Binding Name}}"" 
+                <TextBox Text=""{{Binding Name}}""
                          Watermark=""Enter user name"" />
                 {(config.IncludeValidation ? @"<TextBlock Text=""{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}""
                            Classes=""error""
@@ -1125,7 +1125,7 @@ public class UserDetailsViewModel : ViewModelBase
             <!-- Email Field -->
             <StackPanel>
                 <TextBlock Text=""Email"" Margin=""0,0,0,4"" />
-                <TextBox Text=""{{Binding Email}}"" 
+                <TextBox Text=""{{Binding Email}}""
                          Watermark=""Enter email address"" />
                 {(config.IncludeValidation ? @"<TextBlock Text=""{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}""
                            Classes=""error""
@@ -1149,7 +1149,7 @@ public class UserDetailsViewModel : ViewModelBase
 </UserControl>";
     }
 
-    private static string GetArchitectureDescription(string pattern)
+    static string GetArchitectureDescription(string pattern)
     {
         return pattern switch
         {
@@ -1182,7 +1182,7 @@ public class UserDetailsViewModel : ViewModelBase
         };
     }
 
-    private static string GenerateMicroservicesStructure(string applicationName, List<string> services, string communicationPattern, bool gateway, bool eventSourcing)
+    static string GenerateMicroservicesStructure(string applicationName, List<string> services, string communicationPattern, bool gateway, bool eventSourcing)
     {
         string structure = $@"{applicationName}/
 ├── src/
@@ -1235,7 +1235,7 @@ public class UserDetailsViewModel : ViewModelBase
         return structure;
     }
 
-    private static string GenerateServiceTemplates(List<string> services, string communicationPattern)
+    static string GenerateServiceTemplates(List<string> services, string communicationPattern)
     {
         string firstService = services.First();
 
@@ -1248,7 +1248,7 @@ public class UserDetailsViewModel : ViewModelBase
         };
     }
 
-    private static string GenerateRestServiceTemplate(string serviceName)
+    static string GenerateRestServiceTemplate(string serviceName)
     {
         string className = serviceName.ToTitleCase();
 
@@ -1303,7 +1303,7 @@ public class {className}Controller : ControllerBase
 }}";
     }
 
-    private static string GenerateGrpcServiceTemplate(string serviceName)
+    static string GenerateGrpcServiceTemplate(string serviceName)
     {
         string className = serviceName.ToTitleCase();
 
@@ -1391,12 +1391,12 @@ message Delete{className}Request {{
 }}";
     }
 
-    private static string GenerateMessageBusServiceTemplate(string serviceName)
+    static string GenerateMessageBusServiceTemplate(string serviceName)
     {
         string className = serviceName.ToTitleCase();
 
         return $@"// {className}Service Message Bus implementation
-public class {className}MessageHandler : 
+public class {className}MessageHandler :
     IConsumer<Create{className}Command>,
     IConsumer<Update{className}Command>,
     IConsumer<Delete{className}Command>
@@ -1420,14 +1420,14 @@ public class {className}MessageHandler :
         try
         {{
             var result = await _{serviceName}Service.CreateAsync(context.Message.Data);
-            
+
             await _publishEndpoint.Publish(new {className}CreatedEvent
             {{
                 Id = result.Id,
                 Name = result.Name,
                 CreatedAt = DateTime.UtcNow
             }});
-            
+
             await context.RespondAsync(new {className}CreatedResponse {{ {className} = result }});
         }}
         catch (Exception ex)
@@ -1442,13 +1442,13 @@ public class {className}MessageHandler :
         try
         {{
             await _{serviceName}Service.UpdateAsync(context.Message.Id, context.Message.Data);
-            
+
             await _publishEndpoint.Publish(new {className}UpdatedEvent
             {{
                 Id = context.Message.Id,
                 UpdatedAt = DateTime.UtcNow
             }});
-            
+
             await context.RespondAsync(new {className}UpdatedResponse());
         }}
         catch (Exception ex)
@@ -1463,13 +1463,13 @@ public class {className}MessageHandler :
         try
         {{
             await _{serviceName}Service.DeleteAsync(context.Message.Id);
-            
+
             await _publishEndpoint.Publish(new {className}DeletedEvent
             {{
                 Id = context.Message.Id,
                 DeletedAt = DateTime.UtcNow
             }});
-            
+
             await context.RespondAsync(new {className}DeletedResponse());
         }}
         catch (Exception ex)
@@ -1495,7 +1495,7 @@ public record {className}DeletedResponse();
 public record {className}ErrorResponse(string Error);";
     }
 
-    private static string GenerateClientIntegration(string communicationPattern)
+    static string GenerateClientIntegration(string communicationPattern)
     {
         return communicationPattern.ToLowerInvariant() switch
         {
@@ -1506,7 +1506,7 @@ public record {className}ErrorResponse(string Error);";
         };
     }
 
-    private static string GenerateRestClientIntegration()
+    static string GenerateRestClientIntegration()
     {
         return @"// REST Client Service
 public class ApiClientService : IApiClientService
@@ -1526,7 +1526,7 @@ public class ApiClientService : IApiClientService
         {
             var response = await _httpClient.GetAsync(endpoint);
             response.EnsureSuccessStatusCode();
-            
+
             var json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
         }
@@ -1543,10 +1543,10 @@ public class ApiClientService : IApiClientService
         {
             var json = JsonSerializer.Serialize(data, JsonSerializerOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             var response = await _httpClient.PostAsync(endpoint, content);
             response.EnsureSuccessStatusCode();
-            
+
             var responseJson = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<T>(responseJson, JsonSerializerOptions);
         }
@@ -1572,7 +1572,7 @@ services.AddHttpClient<IApiClientService, ApiClientService>(client =>
 });";
     }
 
-    private static string GenerateGrpcClientIntegration()
+    static string GenerateGrpcClientIntegration()
     {
         return @"// gRPC Client Service
 public class GrpcClientService : IGrpcClientService
@@ -1612,7 +1612,7 @@ services.AddGrpcClient<OrderService.OrderServiceClient>(options =>
 });";
     }
 
-    private static string GenerateMessageBusClientIntegration()
+    static string GenerateMessageBusClientIntegration()
     {
         return @"// Message Bus Client Service
 public class MessageBusClientService : IMessageBusClientService
@@ -1635,9 +1635,9 @@ public class MessageBusClientService : IMessageBusClientService
     {
         var command = new CreateUserCommand(userData);
         var response = await _createUserClient.GetResponse<UserCreatedResponse, UserErrorResponse>(command);
-        
-        return response.Is<UserCreatedResponse>(out var userCreated) 
-            ? userCreated.Message 
+
+        return response.Is<UserCreatedResponse>(out var userCreated)
+            ? userCreated.Message
             : throw new InvalidOperationException(response.Message.Error);
     }
 
@@ -1658,7 +1658,7 @@ services.AddMassTransit(x =>
 {
     x.AddRequestClient<CreateUserCommand>();
     x.AddRequestClient<UpdateUserCommand>();
-    
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(configuration.GetConnectionString(""RabbitMQ""));
@@ -1667,7 +1667,7 @@ services.AddMassTransit(x =>
 });";
     }
 
-    private static string GetCommunicationDescription(string pattern)
+    static string GetCommunicationDescription(string pattern)
     {
         return pattern switch
         {
@@ -1693,7 +1693,7 @@ services.AddMassTransit(x =>
         };
     }
 
-    private static string GenerateDDDStructure(string domainName, List<string> contexts, bool cqrs, bool eventSourcing, bool domainEvents)
+    static string GenerateDDDStructure(string domainName, List<string> contexts, bool cqrs, bool eventSourcing, bool domainEvents)
     {
         string structure = $@"{domainName}/
 ├── src/
@@ -1756,7 +1756,7 @@ services.AddMassTransit(x =>
         return structure;
     }
 
-    private static string GenerateDomainLayer(string context, bool domainEvents)
+    static string GenerateDomainLayer(string context, bool domainEvents)
     {
         string className = context.ToTitleCase();
         string eventsCode = domainEvents ? GenerateDomainEventsCode(className) : "";
@@ -1779,7 +1779,7 @@ public class {className} : AggregateRoot<{className}Id>
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Status = {className}Status.Draft;
         TotalAmount = Money.Zero;
-        
+
         {(domainEvents ? $"AddDomainEvent(new {className}CreatedEvent(Id, Name));" : "")}
     }}
 
@@ -1852,7 +1852,7 @@ public class {className}Name : ValueObject
             throw new ArgumentException(""Name cannot be empty"", nameof(value));
         if (value.Length > 100)
             throw new ArgumentException(""Name cannot exceed 100 characters"", nameof(value));
-        
+
         Value = value.Trim();
     }}
 
@@ -1885,7 +1885,7 @@ public interface I{className}Repository : IRepository<{className}, {className}Id
 {eventsCode}";
     }
 
-    private static string GenerateDomainEventsCode(string className)
+    static string GenerateDomainEventsCode(string className)
     {
         return $@"
 // Domain Events
@@ -1928,14 +1928,14 @@ public class {className}ConfirmedEvent : DomainEvent
 }}";
     }
 
-    private static string GenerateApplicationLayer(string context, bool cqrs)
+    static string GenerateApplicationLayer(string context, bool cqrs)
     {
         string className = context.ToTitleCase();
 
         return cqrs ? GenerateCQRSApplicationLayer(className) : GenerateTraditionalApplicationLayer(className);
     }
 
-    private static string GenerateCQRSApplicationLayer(string className)
+    static string GenerateCQRSApplicationLayer(string className)
     {
         return $@"// Commands
 public record Create{className}Command({className}Name Name) : IRequest<{className}Id>;
@@ -1961,10 +1961,10 @@ public class Create{className}Handler : IRequestHandler<Create{className}Command
     public async Task<{className}Id> Handle(Create{className}Command request, CancellationToken cancellationToken)
     {{
         var {className.ToLowerInvariant()} = new {className}({className}Id.New(), request.Name);
-        
+
         await _{className.ToLowerInvariant()}Repository.AddAsync({className.ToLowerInvariant()});
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         return {className.ToLowerInvariant()}.Id;
     }}
 }}
@@ -1987,7 +1987,7 @@ public class Add{className}ItemHandler : IRequestHandler<Add{className}ItemComma
             throw new NotFoundException($""{className} {{request.{className}Id}} not found"");
 
         {className.ToLowerInvariant()}.AddItem(request.ProductId, request.Quantity, request.UnitPrice);
-        
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }}
 }}
@@ -2027,7 +2027,7 @@ public class {className}ItemDto
 }}";
     }
 
-    private static string GenerateTraditionalApplicationLayer(string className)
+    static string GenerateTraditionalApplicationLayer(string className)
     {
         return $@"// Application Service
 public class {className}ApplicationService : I{className}ApplicationService
@@ -2052,12 +2052,12 @@ public class {className}ApplicationService : I{className}ApplicationService
     public async Task<{className}Dto> CreateAsync(Create{className}Request request)
     {{
         var {className.ToLowerInvariant()} = new {className}({className}Id.New(), new {className}Name(request.Name));
-        
+
         await _{className.ToLowerInvariant()}Repository.AddAsync({className.ToLowerInvariant()});
         await _unitOfWork.SaveChangesAsync();
-        
+
         _logger.LogInformation(""{className} created with ID {{Id}}"", {className.ToLowerInvariant()}.Id);
-        
+
         return _mapper.Map<{className}Dto>({className.ToLowerInvariant()});
     }}
 
@@ -2077,7 +2077,7 @@ public class {className}ApplicationService : I{className}ApplicationService
             new ProductId(request.ProductId),
             new Quantity(request.Quantity),
             new Money(request.UnitPrice));
-        
+
         await _unitOfWork.SaveChangesAsync();
     }}
 
@@ -2089,7 +2089,7 @@ public class {className}ApplicationService : I{className}ApplicationService
 
         {className.ToLowerInvariant()}.Confirm();
         await _unitOfWork.SaveChangesAsync();
-        
+
         _logger.LogInformation(""{className} {{Id}} confirmed"", id);
     }}
 }}
@@ -2118,7 +2118,7 @@ public class {className}Dto
 }}";
     }
 
-    private static string GenerateInfrastructureLayer(string context, bool eventSourcing)
+    static string GenerateInfrastructureLayer(string context, bool eventSourcing)
     {
         string className = context.ToTitleCase();
         string eventStoreCode = eventSourcing ? GenerateEventStoreCode(className) : "";
@@ -2183,7 +2183,7 @@ public class {className}Configuration : IEntityTypeConfiguration<{className}>
     public void Configure(EntityTypeBuilder<{className}> builder)
     {{
         builder.HasKey(o => o.Id);
-        
+
         builder.Property(o => o.Id)
             .HasConversion(
                 id => id.Value,
@@ -2249,7 +2249,7 @@ public class UnitOfWork : IUnitOfWork
 {eventStoreCode}";
     }
 
-    private static string GenerateEventStoreCode(string className)
+    static string GenerateEventStoreCode(string className)
     {
         return $@"
 // Event Store Implementation
@@ -2336,7 +2336,7 @@ public class EventSourced{className}Repository : I{className}Repository
 }}";
     }
 
-    private static string GeneratePluginStructure(string applicationName, List<string> types, string loadingStrategy, bool mef, bool hotReload)
+    static string GeneratePluginStructure(string applicationName, List<string> types, string loadingStrategy, bool mef, bool hotReload)
     {
         string structure = $@"{applicationName}/
 ├── src/
@@ -2383,7 +2383,7 @@ public class EventSourced{className}Repository : I{className}Repository
         return structure;
     }
 
-    private static string GeneratePluginInterfaces(List<string> types)
+    static string GeneratePluginInterfaces(List<string> types)
     {
         string firstType = types.First();
         string className = firstType.ToTitleCase();
@@ -2395,10 +2395,10 @@ public interface IPlugin
     string Version {{ get; }}
     string Description {{ get; }}
     string Author {{ get; }}
-    
+
     Task InitializeAsync(IPluginContext context);
     Task ShutdownAsync();
-    
+
     bool IsCompatible(Version hostVersion);
 }}
 
@@ -2417,7 +2417,7 @@ public interface IPluginContext
     IConfiguration Configuration {{ get; }}
     ILogger Logger {{ get; }}
     string PluginDirectory {{ get; }}
-    
+
     T GetService<T>() where T : class;
     Task<T> GetServiceAsync<T>() where T : class;
     void RegisterService<T>(T service) where T : class;
@@ -2460,7 +2460,7 @@ public class {className}Capability
 }}";
     }
 
-    private static string GeneratePluginHost(string loadingStrategy, bool mef, bool hotReload)
+    static string GeneratePluginHost(string loadingStrategy, bool mef, bool hotReload)
     {
         string mefCode = mef ? GenerateMEFPluginHost() : "";
         string hotReloadCode = hotReload ? GenerateHotReloadCode() : "";
@@ -2489,7 +2489,7 @@ public class PluginManager : IPluginManager, IDisposable
     public async Task LoadPluginsAsync(string pluginDirectory)
     {{
         var pluginInfos = await _discovery.DiscoverPluginsAsync(pluginDirectory);
-        
+
         foreach (var pluginInfo in pluginInfos)
         {{
             try
@@ -2543,7 +2543,7 @@ public class PluginManager : IPluginManager, IDisposable
                 _logger.LogError(ex, ""Error shutting down plugin: {{PluginName}}"", plugin.Name);
             }}
         }}
-        
+
         _loadedPlugins.Clear();
         {(hotReload ? "_hotReloader?.Dispose();" : "")}
     }}
@@ -2568,7 +2568,7 @@ public class PluginLoader : IPluginLoader
             _loadContexts.Add(loadContext);
 
             var assembly = loadContext.LoadFromAssemblyPath(pluginInfo.AssemblyPath);
-            
+
             var pluginTypes = assembly.GetTypes()
                 .Where(t => typeof(IPlugin).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
                 .ToList();
@@ -2581,7 +2581,7 @@ public class PluginLoader : IPluginLoader
 
             var pluginType = pluginTypes.First();
             var plugin = Activator.CreateInstance(pluginType) as IPlugin;
-            
+
             return plugin;
         }}
         catch (Exception ex)
@@ -2619,7 +2619,7 @@ public class PluginLoadContext : AssemblyLoadContext
 {hotReloadCode}";
     }
 
-    private static string GenerateMEFPluginHost()
+    static string GenerateMEFPluginHost()
     {
         return @"
 // MEF Plugin Discovery
@@ -2630,9 +2630,9 @@ public class MefPluginDiscovery : IPluginDiscovery
     {
         var catalog = new DirectoryCatalog(directory, ""*.dll"");
         var container = new CompositionContainer(catalog);
-        
+
         var plugins = container.GetExports<IPlugin, IPluginMetadata>();
-        
+
         return plugins.Select(p => new PluginInfo
         {
             Name = p.Metadata.Name,
@@ -2670,7 +2670,7 @@ public class ExportPluginAttribute : ExportAttribute, IPluginMetadata
 }";
     }
 
-    private static string GenerateHotReloadCode()
+    static string GenerateHotReloadCode()
     {
         return @"
 // Hot Reload Plugin Manager
@@ -2697,7 +2697,7 @@ public class PluginHotReloader : IPluginHotReloader, IDisposable
         _watcher.Filter = ""*.dll"";
         _watcher.IncludeSubdirectories = true;
         _watcher.EnableRaisingEvents = true;
-        
+
         _logger.LogInformation(""Started watching for plugin changes in {Directory}"", directory);
         return Task.CompletedTask;
     }
@@ -2708,7 +2708,7 @@ public class PluginHotReloader : IPluginHotReloader, IDisposable
         {
             // Debounce file system events
             var lastWrite = File.GetLastWriteTime(e.FullPath);
-            if (_lastModified.TryGetValue(e.FullPath, out var previousWrite) && 
+            if (_lastModified.TryGetValue(e.FullPath, out var previousWrite) &&
                 lastWrite.Subtract(previousWrite).TotalMilliseconds < 1000)
             {
                 return;
@@ -2750,7 +2750,7 @@ public class PluginHotReloader : IPluginHotReloader, IDisposable
         // Load the updated plugin
         var loader = new PluginLoader(new NullLogger<PluginLoader>());
         var plugin = await loader.LoadPluginAsync(pluginInfo);
-        
+
         if (plugin != null)
         {
             await plugin.InitializeAsync(new PluginContext(null, pluginInfo.Directory));
@@ -2765,7 +2765,7 @@ public class PluginHotReloader : IPluginHotReloader, IDisposable
 }";
     }
 
-    private static string GenerateSamplePlugin(string type)
+    static string GenerateSamplePlugin(string type)
     {
         string className = type.ToTitleCase();
 
@@ -2790,9 +2790,9 @@ public class Sample{className}Plugin : I{className}Plugin
     {{
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _logger = context.Logger;
-        
+
         _logger.LogInformation(""Initializing {{PluginName}}"", Name);
-        
+
         // Initialize plugin resources
         return Task.CompletedTask;
     }}
@@ -2800,7 +2800,7 @@ public class Sample{className}Plugin : I{className}Plugin
     public Task ShutdownAsync()
     {{
         _logger?.LogInformation(""Shutting down {{PluginName}}"", Name);
-        
+
         // Clean up plugin resources
         return Task.CompletedTask;
     }}
@@ -2814,14 +2814,14 @@ public class Sample{className}Plugin : I{className}Plugin
     public async Task<{className}Result> Execute{className}Async({className}Input input)
     {{
         _logger?.LogInformation(""Executing {type} operation"");
-        
+
         var stopwatch = Stopwatch.StartNew();
-        
+
         try
         {{
             // Simulate {type} processing
             await Task.Delay(100, input.CancellationToken);
-            
+
             var result = new {className}Result
             {{
                 Success = true,
@@ -2829,13 +2829,13 @@ public class Sample{className}Plugin : I{className}Plugin
                 Data = $""Processed: {{input.Data}}"",
                 ExecutionTime = stopwatch.Elapsed
             }};
-            
+
             return result;
         }}
         catch (Exception ex)
         {{
             _logger?.LogError(ex, ""Error executing {type} operation"");
-            
+
             return new {className}Result
             {{
                 Success = false,
@@ -2884,13 +2884,13 @@ public class Sample{className}PluginConfig
 public class Sample{className}PluginFactory : I{className}Plugin
 {{
     private readonly IServiceProvider _serviceProvider;
-    
+
     [ImportingConstructor]
     public Sample{className}PluginFactory([Import] IServiceProvider serviceProvider)
     {{
         _serviceProvider = serviceProvider;
     }}
-    
+
     // Implement interface methods...
     public string Name => ""Sample {className} Plugin"";
     public string Version => ""1.0.0"";
@@ -2901,7 +2901,7 @@ public class Sample{className}PluginFactory : I{className}Plugin
 }}";
     }
 
-    private static string GetLoadingStrategyDescription(string strategy)
+    static string GetLoadingStrategyDescription(string strategy)
     {
         return strategy switch
         {

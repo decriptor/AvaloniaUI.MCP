@@ -128,7 +128,7 @@ public static class DataAccessPatternTool
         }
     }
 
-    private sealed class RepositoryConfiguration
+    sealed class RepositoryConfiguration
     {
         public string EntityName { get; set; } = "";
         public bool IncludeUnitOfWork { get; set; }
@@ -136,7 +136,7 @@ public static class DataAccessPatternTool
         public string DatabaseProvider { get; set; } = "";
     }
 
-    private sealed class DataAccessConfiguration
+    sealed class DataAccessConfiguration
     {
         public string ServiceName { get; set; } = "";
         public bool IncludeCaching { get; set; }
@@ -144,30 +144,30 @@ public static class DataAccessPatternTool
         public string CachingProvider { get; set; } = "";
     }
 
-    private static string GenerateEntity(RepositoryConfiguration config)
+    static string GenerateEntity(RepositoryConfiguration config)
     {
         return $@"using System.ComponentModel.DataAnnotations;
 
 public class {config.EntityName}
 {{
     public int Id {{ get; set; }}
-    
+
     [Required]
     [StringLength(100)]
     public string Name {{ get; set; }} = string.Empty;
-    
+
     [StringLength(500)]
     public string Description {{ get; set; }} = string.Empty;
-    
+
     public DateTime CreatedAt {{ get; set; }} = DateTime.UtcNow;
     public DateTime? UpdatedAt {{ get; set; }}
-    
+
     [Required]
     public string CreatedBy {{ get; set; }} = string.Empty;
     public string? UpdatedBy {{ get; set; }}
-    
+
     public bool IsActive {{ get; set; }} = true;
-    
+
     // Navigation properties
     // public virtual ICollection<Related{config.EntityName}> Related{{ get; set; }} = new List<Related{config.EntityName}>();
 }}
@@ -178,35 +178,35 @@ public class {config.EntityName}Configuration : IEntityTypeConfiguration<{config
     public void Configure(EntityTypeBuilder<{config.EntityName}> builder)
     {{
         builder.HasKey(e => e.Id);
-        
+
         builder.Property(e => e.Name)
             .IsRequired()
             .HasMaxLength(100);
-            
+
         builder.Property(e => e.Description)
             .HasMaxLength(500);
-            
+
         builder.Property(e => e.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql(""GETUTCDATE()"");
-            
+
         builder.Property(e => e.CreatedBy)
             .IsRequired()
             .HasMaxLength(50);
-            
+
         builder.Property(e => e.UpdatedBy)
             .HasMaxLength(50);
-            
+
         builder.HasIndex(e => e.Name)
             .IsUnique();
-            
+
         builder.HasIndex(e => e.CreatedAt);
         builder.HasIndex(e => e.IsActive);
     }}
 }}";
     }
 
-    private static string GenerateRepositoryInterface(RepositoryConfiguration config)
+    static string GenerateRepositoryInterface(RepositoryConfiguration config)
     {
         string specificationsCode = config.IncludeSpecifications ? GenerateSpecificationsInterface(config.EntityName) : "";
 
@@ -218,7 +218,7 @@ public class {config.EntityName}Configuration : IEntityTypeConfiguration<{config
     Task<IPagedResult<{config.EntityName}>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync(int id, CancellationToken cancellationToken = default);
     Task<int> CountActiveAsync(CancellationToken cancellationToken = default);
-    
+
     {(config.IncludeSpecifications ? $"Task<IEnumerable<{config.EntityName}>> FindAsync(ISpecification<{config.EntityName}> specification, CancellationToken cancellationToken = default);" : "")}
 }}
 
@@ -235,7 +235,7 @@ public interface IRepository<T> where T : class
 {specificationsCode}";
     }
 
-    private static string GenerateSpecificationsInterface(string entityName)
+    static string GenerateSpecificationsInterface(string entityName)
     {
         return $@"
 // Specification pattern interfaces
@@ -262,7 +262,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
 }}";
     }
 
-    private static string GenerateRepositoryImplementation(RepositoryConfiguration config)
+    static string GenerateRepositoryImplementation(RepositoryConfiguration config)
     {
         string unitOfWorkField = config.IncludeUnitOfWork ? "private readonly IUnitOfWork _unitOfWork;" : "";
         string unitOfWorkParam = config.IncludeUnitOfWork ? ", IUnitOfWork unitOfWork" : "";
@@ -314,7 +314,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
             .Where(x => x.IsActive);
 
         var totalCount = await query.CountAsync(cancellationToken);
-        
+
         var items = await query
             .OrderBy(x => x.Name)
             .Skip((pageNumber - 1) * pageSize)
@@ -342,7 +342,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
 
         entity.CreatedAt = DateTime.UtcNow;
         var result = await _context.Set<{config.EntityName}>().AddAsync(entity, cancellationToken);
-        
+
         _logger.LogInformation(""Added new {config.EntityName}: {{Name}}"", entity.Name);
         return result.Entity;
     }}
@@ -358,7 +358,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
         }}
 
         await _context.Set<{config.EntityName}>().AddRangeAsync(entityList, cancellationToken);
-        
+
         _logger.LogInformation(""Added {{Count}} {config.EntityName} entities"", entityList.Count);
         return entityList;
     }}
@@ -369,7 +369,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
 
         entity.UpdatedAt = DateTime.UtcNow;
         _context.Set<{config.EntityName}>().Update(entity);
-        
+
         _logger.LogInformation(""Updated {config.EntityName}: {{Id}}"", entity.Id);
         return Task.CompletedTask;
     }}
@@ -379,7 +379,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
         if (entity == null) throw new ArgumentNullException(nameof(entity));
 
         _context.Set<{config.EntityName}>().Remove(entity);
-        
+
         _logger.LogInformation(""Deleted {config.EntityName}: {{Id}}"", entity.Id);
         return Task.CompletedTask;
     }}
@@ -397,7 +397,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
 }}";
     }
 
-    private static string GenerateSpecificationsMethod(string entityName)
+    static string GenerateSpecificationsMethod(string entityName)
     {
         return $@"
     public async Task<IEnumerable<{entityName}>> FindAsync(ISpecification<{entityName}> specification, CancellationToken cancellationToken = default)
@@ -433,7 +433,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
     }}";
     }
 
-    private static string GenerateDbContext(RepositoryConfiguration config)
+    static string GenerateDbContext(RepositoryConfiguration config)
     {
         string connectionString = GetConnectionString(config.DatabaseProvider);
 
@@ -449,7 +449,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
 
         // Apply configurations
         modelBuilder.ApplyConfiguration(new {config.EntityName}Configuration());
-        
+
         // Global query filters
         modelBuilder.Entity<{config.EntityName}>().HasQueryFilter(e => e.IsActive);
 
@@ -476,7 +476,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
     {{
         // Auto-update audit fields
         UpdateAuditFields();
-        
+
         return await base.SaveChangesAsync(cancellationToken);
     }}
 
@@ -513,7 +513,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
 }}";
     }
 
-    private static string GetConnectionString(string provider)
+    static string GetConnectionString(string provider)
     {
         return provider switch
         {
@@ -525,7 +525,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
         };
     }
 
-    private static string GetProviderMethod(string provider)
+    static string GetProviderMethod(string provider)
     {
         return provider switch
         {
@@ -537,7 +537,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
         };
     }
 
-    private static string GenerateEFSetupInstructions(RepositoryConfiguration config)
+    static string GenerateEFSetupInstructions(RepositoryConfiguration config)
     {
         string packageReference = GetPackageReference(config.DatabaseProvider);
 
@@ -578,7 +578,7 @@ dotnet ef database update
 ```";
     }
 
-    private static string GetPackageReference(string provider)
+    static string GetPackageReference(string provider)
     {
         return provider switch
         {
@@ -590,7 +590,7 @@ dotnet ef database update
         };
     }
 
-    private static string GenerateAsyncServiceInterface(DataAccessConfiguration config)
+    static string GenerateAsyncServiceInterface(DataAccessConfiguration config)
     {
         return $@"public interface I{config.ServiceName}
 {{
@@ -601,18 +601,18 @@ dotnet ef database update
     Task<T> UpdateAsync<T>(T entity, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync<T>(string key, CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync<T>(string key, CancellationToken cancellationToken = default);
-    
+
     // Bulk operations
     Task<IEnumerable<T>> CreateBulkAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default);
     Task<bool> DeleteBulkAsync<T>(IEnumerable<string> keys, CancellationToken cancellationToken = default);
-    
+
     // Search operations
     Task<IEnumerable<T>> SearchAsync<T>(string searchTerm, CancellationToken cancellationToken = default);
     Task<IEnumerable<T>> FilterAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
 }}";
     }
 
-    private static string GenerateAsyncServiceImplementation(DataAccessConfiguration config)
+    static string GenerateAsyncServiceImplementation(DataAccessConfiguration config)
     {
         string cachingField = config.IncludeCaching ? GenerateCachingField(config.CachingProvider) : "";
         string cachingParam = config.IncludeCaching ? GenerateCachingParameter(config.CachingProvider) : "";
@@ -651,7 +651,7 @@ dotnet ef database update
 
             // Get from repository
             var result = await _repository.GetByIdAsync<T>(key, cancellationToken);
-            
+
             {(config.IncludeCaching ? $@"// Cache the result
             if (result != null)
             {{
@@ -693,10 +693,10 @@ dotnet ef database update
         var operation = async () =>
         {{
             var result = await _repository.AddAsync(entity, cancellationToken);
-            
+
             {(config.IncludeCaching ? @"// Invalidate relevant cache entries
             await InvalidateCacheAsync<T>();" : "")}
-            
+
             _logger.LogInformation(""Created new entity of type {{Type}}"", typeof(T).Name);
             return result;
         }};
@@ -711,10 +711,10 @@ dotnet ef database update
         var operation = async () =>
         {{
             var result = await _repository.UpdateAsync(entity, cancellationToken);
-            
+
             {(config.IncludeCaching ? @"// Invalidate cache
             await InvalidateCacheAsync<T>();" : "")}
-            
+
             _logger.LogInformation(""Updated entity of type {{Type}}"", typeof(T).Name);
             return result;
         }};
@@ -727,10 +727,10 @@ dotnet ef database update
         var operation = async () =>
         {{
             var result = await _repository.DeleteAsync<T>(key, cancellationToken);
-            
+
             {(config.IncludeCaching ? @"// Invalidate cache
             await InvalidateCacheAsync<T>();" : "")}
-            
+
             _logger.LogInformation(""Deleted entity with key {{Key}}"", key);
             return result;
         }};
@@ -742,7 +742,7 @@ dotnet ef database update
 }}";
     }
 
-    private static string GenerateCachingField(string provider)
+    static string GenerateCachingField(string provider)
     {
         return provider switch
         {
@@ -753,7 +753,7 @@ dotnet ef database update
         };
     }
 
-    private static string GenerateCachingParameter(string provider)
+    static string GenerateCachingParameter(string provider)
     {
         return provider switch
         {
@@ -764,12 +764,12 @@ dotnet ef database update
         };
     }
 
-    private static string GenerateCachingAssignment(string provider)
+    static string GenerateCachingAssignment(string provider)
     {
         return "_cache = cache ?? throw new ArgumentNullException(nameof(cache));";
     }
 
-    private static string GetCacheGetMethod(string provider)
+    static string GetCacheGetMethod(string provider)
     {
         return provider switch
         {
@@ -780,7 +780,7 @@ dotnet ef database update
         };
     }
 
-    private static string GetCacheSetMethod(string provider)
+    static string GetCacheSetMethod(string provider)
     {
         return provider switch
         {
@@ -791,7 +791,7 @@ dotnet ef database update
         };
     }
 
-    private static string GenerateCacheHelperMethods(string provider)
+    static string GenerateCacheHelperMethods(string provider)
     {
         return $@"
     private string GenerateCacheKey<T>(string key)
@@ -808,7 +808,7 @@ dotnet ef database update
     }}";
     }
 
-    private static string GenerateCachingImplementation(DataAccessConfiguration config)
+    static string GenerateCachingImplementation(DataAccessConfiguration config)
     {
         return $@"// Caching service implementation for {config.CachingProvider}
 public class CachingService : ICachingService
@@ -861,7 +861,7 @@ public class CachingService : ICachingService
 }}";
     }
 
-    private static string GetCacheInterface(string provider)
+    static string GetCacheInterface(string provider)
     {
         return provider switch
         {
@@ -872,7 +872,7 @@ public class CachingService : ICachingService
         };
     }
 
-    private static string GetCacheGetImplementation(string provider)
+    static string GetCacheGetImplementation(string provider)
     {
         return provider switch
         {
@@ -893,7 +893,7 @@ public class CachingService : ICachingService
         };
     }
 
-    private static string GetCacheSetImplementation(string provider)
+    static string GetCacheSetImplementation(string provider)
     {
         return provider switch
         {
@@ -910,7 +910,7 @@ public class CachingService : ICachingService
         };
     }
 
-    private static string GetCacheRemoveImplementation(string provider)
+    static string GetCacheRemoveImplementation(string provider)
     {
         return provider switch
         {
@@ -920,7 +920,7 @@ public class CachingService : ICachingService
         };
     }
 
-    private static string GenerateRetryPolicyCode()
+    static string GenerateRetryPolicyCode()
     {
         return @"// Retry policy configuration using Polly
 public static class RetryPolicies
@@ -963,13 +963,13 @@ public static class RetryPolicies
     {
         var retryPolicy = CreateDatabaseRetryPolicy();
         var circuitBreakerPolicy = CreateCircuitBreakerPolicy();
-        
+
         return Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
     }
 }
 
 // Service registration
-services.AddSingleton<IAsyncPolicy>(provider => 
+services.AddSingleton<IAsyncPolicy>(provider =>
     RetryPolicies.CreateCombinedPolicy());";
     }
 }

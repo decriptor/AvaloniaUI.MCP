@@ -39,7 +39,7 @@ public static class DiagnosticTool
 - **Successful Executions**: {metrics.GetValueOrDefault("successful_tool_executions", 0)}
 - **Success Rate**: {(double)metrics.GetValueOrDefault("tool_success_rate", 0.0):P2}
 
-## Resource Access Statistics  
+## Resource Access Statistics
 - **Total Resource Accesses**: {metrics.GetValueOrDefault("total_resource_accesses", 0)}
 - **Cache Hits**: {metrics.GetValueOrDefault("cache_hits", 0)}
 - **Cache Hit Rate**: {(double)metrics.GetValueOrDefault("cache_hit_rate", 0.0):P2}
@@ -288,7 +288,7 @@ public static class DiagnosticTool
         }
     }
 
-    private static IServiceProvider? GetServiceProvider()
+    static IServiceProvider? GetServiceProvider()
     {
         // This is a simplified way to access DI - in a real implementation,
         // you might inject the service provider or use a different approach
@@ -303,7 +303,7 @@ public static class DiagnosticTool
         }
     }
 
-    private static string GenerateHealthRecommendations(List<(string Component, bool IsHealthy, string Details)> healthStatus)
+    static string GenerateHealthRecommendations(List<(string Component, bool IsHealthy, string Details)> healthStatus)
     {
         var recommendations = new List<string>();
 
@@ -327,7 +327,7 @@ public static class DiagnosticTool
 }
 
 // Extension method to help with metrics formatting
-internal static class MetricsExtensions
+static class MetricsExtensions
 {
     public static T GetValueOrDefault<T>(this Dictionary<string, object> dict, string key, T defaultValue)
     {

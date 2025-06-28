@@ -206,7 +206,7 @@ var viewModel = container.Resolve<MyViewModel>();
 ```csharp
 // Test INotifyPropertyChanged
 var propertyChangedRaised = false;
-viewModel.PropertyChanged += (s, e) => 
+viewModel.PropertyChanged += (s, e) =>
 {{
     if (e.PropertyName == nameof(MyViewModel.MyProperty))
         propertyChangedRaised = true;
@@ -306,12 +306,12 @@ public class PerformanceMonitor
 {{
     private readonly ILogger _logger;
     private readonly MetricsCollector _metrics;
-    
+
     public void MonitorOperation(string operationName, Action operation)
     {{
         var stopwatch = Stopwatch.StartNew();
         var startMemory = GC.GetTotalMemory(false);
-        
+
         try
         {{
             operation();
@@ -321,12 +321,12 @@ public class PerformanceMonitor
             stopwatch.Stop();
             var endMemory = GC.GetTotalMemory(false);
             var memoryDelta = endMemory - startMemory;
-            
+
             _metrics.RecordOperation(operationName, stopwatch.ElapsedMilliseconds, memoryDelta);
-            
+
             if (stopwatch.ElapsedMilliseconds > 1000) // Alert if > 1 second
             {{
-                _logger.LogWarning(""Slow operation detected: {{Operation}} took {{Duration}}ms"", 
+                _logger.LogWarning(""Slow operation detected: {{Operation}} took {{Duration}}ms"",
                     operationName, stopwatch.ElapsedMilliseconds);
             }}
         }}
@@ -346,7 +346,7 @@ public class PerformanceMonitor
         }
     }
 
-    private sealed class TestConfiguration
+    sealed class TestConfiguration
     {
         public string ClassName { get; set; } = "";
         public string TestType { get; set; } = "";
@@ -354,7 +354,7 @@ public class PerformanceMonitor
         public string Framework { get; set; } = "";
     }
 
-    private static string GenerateTestClass(TestConfiguration config)
+    static string GenerateTestClass(TestConfiguration config)
     {
         string frameworkUsing = GetFrameworkUsings(config.Framework);
         string testAttribute = GetTestAttribute(config.Framework);
@@ -370,7 +370,7 @@ public class PerformanceMonitor
         };
     }
 
-    private static string GenerateViewModelTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
+    static string GenerateViewModelTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
     {
         string mockSetup = config.IncludeMocks ? GenerateViewModelMockSetup() : "";
 
@@ -471,7 +471,7 @@ public class {config.ClassName}Tests
 }}";
     }
 
-    private static string GenerateControlTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
+    static string GenerateControlTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
     {
         return $@"{frameworkUsing}
 using Avalonia;
@@ -556,7 +556,7 @@ public class {config.ClassName}Tests
         await Dispatcher.UIThread.InvokeAsync(() =>
         {{
             control.DataContext = viewModel;
-            
+
             // Act
             viewModel.TestProperty = ""Updated Value"";
         }});
@@ -578,7 +578,7 @@ public class TestViewModel : ReactiveObject
 }}";
     }
 
-    private static string GenerateServiceTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
+    static string GenerateServiceTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
     {
         string mockSetup = config.IncludeMocks ? GenerateServiceMockSetup() : "";
 
@@ -629,7 +629,7 @@ public class {config.ClassName}Tests
 }}";
     }
 
-    private static string GenerateBehaviorTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
+    static string GenerateBehaviorTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
     {
         return $@"{frameworkUsing}
 using Avalonia.Controls;
@@ -678,7 +678,7 @@ public class {config.ClassName}Tests
 }}";
     }
 
-    private static string GetFrameworkUsings(string framework)
+    static string GetFrameworkUsings(string framework)
     {
         return framework switch
         {
@@ -689,7 +689,7 @@ public class {config.ClassName}Tests
         };
     }
 
-    private static string GetTestAttribute(string framework)
+    static string GetTestAttribute(string framework)
     {
         return framework switch
         {
@@ -700,7 +700,7 @@ public class {config.ClassName}Tests
         };
     }
 
-    private static string GetFactAttribute(string framework)
+    static string GetFactAttribute(string framework)
     {
         return framework switch
         {
@@ -711,7 +711,7 @@ public class {config.ClassName}Tests
         };
     }
 
-    private static string GenerateViewModelMockSetup()
+    static string GenerateViewModelMockSetup()
     {
         return @"    private readonly Mock<IMyService> _mockService;
 
@@ -724,7 +724,7 @@ public class {config.ClassName}Tests
     }";
     }
 
-    private static string GenerateServiceMockSetup()
+    static string GenerateServiceMockSetup()
     {
         return @"    private readonly Mock<IRepository> _mockRepository;
     private readonly Mock<ILogger> _mockLogger;
@@ -733,14 +733,14 @@ public class {config.ClassName}Tests
     {
         _mockRepository = new Mock<IRepository>();
         _mockLogger = new Mock<ILogger>();
-        
+
         // Setup default mock behavior
         _mockRepository.Setup(x => x.SaveAsync(It.IsAny<MyEntity>()))
                       .Returns(Task.CompletedTask);
     }";
     }
 
-    private static string GenerateTestDependencies(TestConfiguration config)
+    static string GenerateTestDependencies(TestConfiguration config)
     {
         var packages = new List<string>
         {
@@ -759,7 +759,7 @@ public class {config.ClassName}Tests
         return string.Join("\n", packages);
     }
 
-    private static string GetTestFrameworkPackage(string framework)
+    static string GetTestFrameworkPackage(string framework)
     {
         return framework switch
         {
@@ -770,7 +770,7 @@ public class {config.ClassName}Tests
         };
     }
 
-    private static string GenerateSetupInstructions(TestConfiguration config)
+    static string GenerateSetupInstructions(TestConfiguration config)
     {
         return $@"### 1. Install Required Packages
 Add the following packages to your test project:
@@ -807,7 +807,7 @@ dotnet test --filter Category=Unit
 ```";
     }
 
-    private static string GenerateUITestClass(string targetName, List<string> scenarios, bool accessibility, string testRunner)
+    static string GenerateUITestClass(string targetName, List<string> scenarios, bool accessibility, string testRunner)
     {
         return $@"using Xunit;
 using Avalonia.Controls;
@@ -860,7 +860,7 @@ public class TestApplication : Application
 }}";
     }
 
-    private static string GenerateScenarioTest(string scenario)
+    static string GenerateScenarioTest(string scenario)
     {
         return $@"    [Fact]
     public async Task {scenario.Replace("-", "_").Replace(" ", "_")}_ShouldWorkCorrectly()
@@ -882,7 +882,7 @@ public class TestApplication : Application
     }}";
     }
 
-    private static string GenerateAccessibilityTests()
+    static string GenerateAccessibilityTests()
     {
         return @"
     [Fact]
@@ -907,7 +907,7 @@ public class TestApplication : Application
     }";
     }
 
-    private static string GeneratePageObjects(string targetName, List<string> scenarios)
+    static string GeneratePageObjects(string targetName, List<string> scenarios)
     {
         return $@"public class {targetName}PageObject
 {{
@@ -953,7 +953,7 @@ public class TestApplication : Application
 }}";
     }
 
-    private static string GenerateTestHelpers(string testRunner)
+    static string GenerateTestHelpers(string testRunner)
     {
         return @"public static class TestHelpers
 {
@@ -1002,7 +1002,7 @@ public class TestApplication : Application
 }";
     }
 
-    private static string GenerateMockImplementation(string targetInterface, string mockFramework)
+    static string GenerateMockImplementation(string targetInterface, string mockFramework)
     {
         return mockFramework.ToLowerInvariant() switch
         {
@@ -1013,7 +1013,7 @@ public class TestApplication : Application
         };
     }
 
-    private static string GenerateMoqImplementation(string targetInterface)
+    static string GenerateMoqImplementation(string targetInterface)
     {
         return $@"using Moq;
 
@@ -1022,34 +1022,34 @@ public class {targetInterface}MockSetup
     public static Mock<{targetInterface}> CreateMock()
     {{
         var mock = new Mock<{targetInterface}>();
-        
+
         // Setup default behavior
         mock.Setup(x => x.MethodAsync(It.IsAny<string>()))
             .ReturnsAsync(""default result"");
-            
+
         mock.Setup(x => x.Property)
             .Returns(""default property value"");
-            
+
         return mock;
     }}
-    
+
     public static Mock<{targetInterface}> CreateMockWithCustomBehavior()
     {{
         var mock = new Mock<{targetInterface}>();
-        
+
         // Setup custom behavior
         mock.Setup(x => x.MethodAsync(""special input""))
             .ReturnsAsync(""special result"");
-            
+
         mock.Setup(x => x.MethodAsync(It.Is<string>(s => s.StartsWith(""error""))))
             .ThrowsAsync(new InvalidOperationException(""Simulated error""));
-            
+
         return mock;
     }}
 }}";
     }
 
-    private static string GenerateNSubstituteImplementation(string targetInterface)
+    static string GenerateNSubstituteImplementation(string targetInterface)
     {
         return $@"using NSubstitute;
 
@@ -1058,29 +1058,29 @@ public class {targetInterface}MockSetup
     public static {targetInterface} CreateMock()
     {{
         var mock = Substitute.For<{targetInterface}>();
-        
+
         // Setup default behavior
         mock.MethodAsync(Arg.Any<string>()).Returns(""default result"");
         mock.Property.Returns(""default property value"");
-        
+
         return mock;
     }}
-    
+
     public static {targetInterface} CreateMockWithCustomBehavior()
     {{
         var mock = Substitute.For<{targetInterface}>();
-        
+
         // Setup custom behavior
         mock.MethodAsync(""special input"").Returns(""special result"");
         mock.MethodAsync(Arg.Is<string>(s => s.StartsWith(""error"")))
             .Returns(Task.FromException<string>(new InvalidOperationException(""Simulated error"")));
-            
+
         return mock;
     }}
 }}";
     }
 
-    private static string GenerateFakeItEasyImplementation(string targetInterface)
+    static string GenerateFakeItEasyImplementation(string targetInterface)
     {
         return $@"using FakeItEasy;
 
@@ -1089,31 +1089,31 @@ public class {targetInterface}MockSetup
     public static {targetInterface} CreateMock()
     {{
         var mock = A.Fake<{targetInterface}>();
-        
+
         // Setup default behavior
         A.CallTo(() => mock.MethodAsync(A<string>._)).Returns(""default result"");
         A.CallTo(() => mock.Property).Returns(""default property value"");
-        
+
         return mock;
     }}
-    
+
     public static {targetInterface} CreateMockWithCustomBehavior()
     {{
         var mock = A.Fake<{targetInterface}>();
-        
+
         // Setup custom behavior
         A.CallTo(() => mock.MethodAsync(""special input"")).Returns(""special result"");
         A.CallTo(() => mock.MethodAsync(A<string>.That.StartsWith(""error"")))
             .Throws<InvalidOperationException>();
-            
+
         return mock;
     }}
 }}";
     }
 
-    private static string GenerateTestDataBuilder(string targetInterface)
+    static string GenerateTestDataBuilder(string targetInterface)
     {
-        string className = targetInterface.StartsWith("I") ? targetInterface[1..] : targetInterface;
+        string className = targetInterface.StartsWith('I') ? targetInterface[1..] : targetInterface;
 
         return $@"public class {className}TestDataBuilder
 {{
@@ -1164,18 +1164,18 @@ public class {targetInterface}MockSetup
 
     // Factory methods for common scenarios
     public static {className}TestDataBuilder Default() => new();
-    
+
     public static {className}TestDataBuilder Invalid() => new {className}TestDataBuilder()
         .WithId(string.Empty)
         .WithName(string.Empty);
-        
+
     public static {className}TestDataBuilder Expired() => new {className}TestDataBuilder()
         .WithCreatedDate(DateTime.UtcNow.AddYears(-1))
         .WithInactiveStatus();
 }}";
     }
 
-    private static string GenerateFluentAssertions()
+    static string GenerateFluentAssertions()
     {
         return @"using FluentAssertions;
 
@@ -1224,7 +1224,7 @@ viewModel.Property = ""new value"";
 monitor.Should().RaisePropertyChangeFor(x => x.Property);";
     }
 
-    private static string GeneratePerformanceTestClass(string componentName, string performanceType, List<string> metrics, bool profiling)
+    static string GeneratePerformanceTestClass(string componentName, string performanceType, List<string> metrics, bool profiling)
     {
         return $@"using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
@@ -1281,13 +1281,13 @@ public class {componentName}PerformanceTests
     private void TestMemoryUsage()
     {{
         var initialMemory = GC.GetTotalMemory(false);
-        
+
         // Perform operation
         _component.LoadData(_testData);
-        
+
         var finalMemory = GC.GetTotalMemory(false);
         var memoryUsed = finalMemory - initialMemory;
-        
+
         // Memory usage should be reasonable
         Assert.True(memoryUsed < 10_000_000, $""Memory usage too high: {{memoryUsed}} bytes"");
     }}
@@ -1295,15 +1295,15 @@ public class {componentName}PerformanceTests
     private void TestRenderingPerformance()
     {{
         var stopwatch = Stopwatch.StartNew();
-        
+
         // Simulate rendering operations
         for (int i = 0; i < 60; i++) // 60 frames
         {{
             _component.Render();
         }}
-        
+
         stopwatch.Stop();
-        
+
         // Should maintain 60 FPS (16.67ms per frame)
         var averageFrameTime = stopwatch.ElapsedMilliseconds / 60.0;
         Assert.True(averageFrameTime < 16.67, $""Frame time too slow: {{averageFrameTime}}ms"");
@@ -1312,12 +1312,12 @@ public class {componentName}PerformanceTests
     private void TestStartupPerformance()
     {{
         var stopwatch = Stopwatch.StartNew();
-        
+
         var component = new {componentName}();
         component.Initialize();
-        
+
         stopwatch.Stop();
-        
+
         // Startup should be fast
         Assert.True(stopwatch.ElapsedMilliseconds < 1000, $""Startup too slow: {{stopwatch.ElapsedMilliseconds}}ms"");
     }}
@@ -1325,11 +1325,11 @@ public class {componentName}PerformanceTests
     private void TestLoadPerformance()
     {{
         var stopwatch = Stopwatch.StartNew();
-        
+
         _component.LoadData(_testData);
-        
+
         stopwatch.Stop();
-        
+
         // Load operation should complete quickly
         Assert.True(stopwatch.ElapsedMilliseconds < 5000, $""Load too slow: {{stopwatch.ElapsedMilliseconds}}ms"");
     }}
@@ -1341,7 +1341,7 @@ public class {componentName}PerformanceTests
         {{
             _component.ProcessItem(_testData.Items[i % _testData.Items.Count]);
         }}
-        
+
         // Component should remain responsive
         Assert.True(_component.IsResponsive, ""Component became unresponsive under stress"");
     }}
@@ -1363,7 +1363,7 @@ public class Program
 }}";
     }
 
-    private static string GenerateBenchmarkCode(string componentName, string performanceType)
+    static string GenerateBenchmarkCode(string componentName, string performanceType)
     {
         return $@"[MemoryDiagnoser]
 [ThreadingDiagnoser]
@@ -1408,7 +1408,7 @@ public class {componentName}Benchmarks
 }}";
     }
 
-    private static string GenerateProfilingSetup()
+    static string GenerateProfilingSetup()
     {
         return @"using System.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -1416,29 +1416,29 @@ using Microsoft.Extensions.Logging;
 public class ProfilingSetup
 {
     private readonly ILogger _logger;
-    
+
     public ProfilingSetup(ILogger logger)
     {
         _logger = logger;
     }
-    
+
     public void EnableDotNetCounters()
     {
         // Enable .NET runtime counters
         var process = Process.GetCurrentProcess();
         _logger.LogInformation(""Process ID for monitoring: {ProcessId}"", process.Id);
-        
+
         // Use dotnet-counters for monitoring:
         // dotnet-counters monitor --process-id {ProcessId} --counters System.Runtime,Microsoft.AspNetCore.Hosting
     }
-    
+
     public void EnableEventPipeTracing()
     {
         // Enable EventPipe tracing for detailed performance analysis
         // Use dotnet-trace for collection:
         // dotnet-trace collect --process-id {ProcessId} --providers Microsoft-Windows-DotNETRuntime
     }
-    
+
     public IDisposable StartPerfCounterCollection()
     {
         var perfCounters = new List<PerformanceCounter>
@@ -1447,7 +1447,7 @@ public class ProfilingSetup
             new(""Process"", ""Working Set"", Process.GetCurrentProcess().ProcessName),
             new("".NET CLR Memory"", ""# Total committed Bytes"", Process.GetCurrentProcess().ProcessName)
         };
-        
+
         var timer = new Timer(state =>
         {
             foreach (var counter in perfCounters)
@@ -1456,7 +1456,7 @@ public class ProfilingSetup
                 _logger.LogInformation(""{CounterName}: {Value}"", counter.CounterName, value);
             }
         }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
-        
+
         return new DisposableAction(() =>
         {
             timer.Dispose();
@@ -1469,12 +1469,12 @@ public class ProfilingSetup
 public class DisposableAction : IDisposable
 {
     private readonly Action _action;
-    
+
     public DisposableAction(Action action)
     {
         _action = action;
     }
-    
+
     public void Dispose() => _action();
 }";
     }

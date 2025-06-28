@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+
 using AvaloniaUI.MCP.Services;
 
 using Microsoft.Extensions.DependencyInjection;

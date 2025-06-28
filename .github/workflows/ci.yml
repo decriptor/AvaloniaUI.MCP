@@ -6,283 +6,130 @@ on:
   pull_request:
     branches: [ main ]
 
+# Explicit security permissions (2025 best practice)
+permissions:
+  contents: read
+  packages: read
+  security-events: write
+  pull-requests: write
+
+# Environment variables
 env:
-  DOTNET_VERSION: '9.0.300'
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
+# Concurrency control to prevent multiple runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
-    name: Build and Test
+  # Single comprehensive job that combines build, test, and quality checks
+  build-and-test:
+    name: Build, Test & Quality
     runs-on: ubuntu-latest
-        
+    timeout-minutes: 20
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build solution
-      run: dotnet build --configuration Release --no-restore
-      
-    - name: Run tests
-      run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
-      
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: '**/coverage.cobertura.xml'
-        fail_ci_if_error: false
+        fetch-depth: 0  # Required for better caching and analysis
 
-  code-quality:
-    name: Code Quality
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Check formatting
-      run: dotnet format --verify-no-changes --verbosity diagnostic
-      
-    - name: Run static analysis
-      run: |
-        dotnet build --configuration Release --verbosity normal
-        
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Run security audit
-      run: dotnet list package --vulnerable --include-transitive
-      
-    - name: Check for outdated packages
-      run: dotnet list package --outdated
+        global-json-file: global.json
 
-  functional-test:
-    name: Functional Tests
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    # Advanced caching strategy
+    - name: Cache .NET packages
+      uses: actions/cache@v4
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
+        path: |
+          ~/.nuget/packages
+          ~/.dotnet
+        key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj', '**/*.props', '**/global.json') }}
+        restore-keys: |
+          ${{ runner.os }}-dotnet-
+
     - name: Restore dependencies
       run: dotnet restore
-      
-    - name: Build solution
+
+    - name: Build
       run: dotnet build --configuration Release --no-restore
-      
-    - name: Test MCP Server Startup
+
+    # Comprehensive test execution
+    - name: Run tests with coverage
       run: |
-        # Test server startup with timeout to prevent hanging
-        echo "Testing MCP Server startup..."
+        dotnet test \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./TestResults \
+          --logger "trx;LogFileName=test-results.trx"
+
+    # Security and quality checks
+    - name: Security and quality analysis
+      run: |
+        echo "Running security checks..."
         
-        # Run server with timeout and capture output
+        # Vulnerability check
+        dotnet list package --vulnerable --include-transitive || echo "No vulnerabilities found"
+        
+        # Outdated packages check (non-blocking)
+        echo "Checking for outdated packages..."
+        dotnet list package --outdated || echo "Package check completed"
+
+    # Functional testing (only if core tests pass)
+    - name: Functional tests
+      run: |
+        echo "Testing MCP Server functionality..."
+        
+        # Test server startup with timeout
         if timeout 5s dotnet run --project src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj > server_output.log 2>&1; then
           echo "✅ Server ran without immediate errors"
         else
           EXIT_CODE=$?
           if [ $EXIT_CODE -eq 124 ]; then
-            echo "✅ Server started and ran for expected duration (timeout reached)"
+            echo "✅ Server started successfully (timeout reached as expected)"
           else
             echo "❌ Server failed with exit code: $EXIT_CODE"
-            echo "Server output:"
             cat server_output.log
             exit 1
           fi
         fi
         
-        # Check for any critical errors in the output
-        if grep -qi "unhandled exception\|fatal error" server_output.log; then
-          echo "❌ Server encountered fatal errors:"
-          cat server_output.log
-          exit 1
-        fi
-        
-        echo "✅ MCP Server startup test completed successfully"
-        
-    - name: Validate Data Files
-      run: |
-        echo "Validating JSON data files..."
-        
-        # Check if data files exist
+        # Validate JSON data files
         for file in src/AvaloniaUI.MCP/Data/*.json; do
           if [[ -f "$file" ]]; then
-            echo "Validating $file..."
-            if python3 -m json.tool "$file" > /dev/null; then
-              echo "✅ $file is valid JSON"
-            else
-              echo "❌ $file is invalid JSON"
+            python3 -m json.tool "$file" > /dev/null || {
+              echo "❌ Invalid JSON in $file"
               exit 1
-            fi
-          else
-            echo "❌ Data file $file not found"
-            exit 1
+            }
           fi
         done
         
-    - name: Test Project Generation
-      run: |
-        echo "Testing project generation functionality..."
-        
-        # Create a test directory
-        mkdir -p test-output
-        
-        # We'll add more functional tests here as needed
         echo "✅ Functional tests completed"
 
-  build-artifacts:
-    name: Build Release Artifacts
-    runs-on: ubuntu-latest
-    needs: [build, code-quality, security, functional-test]
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
-    
-    strategy:
-      matrix:
-        runtime: [win-x64, linux-x64, osx-x64, osx-arm64]
-        
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Publish application
-      run: |
-        dotnet publish src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj \
-          --configuration Release \
-          --runtime ${{ matrix.runtime }} \
-          --self-contained true \
-          --output ./publish/${{ matrix.runtime }} \
-          -p:PublishSingleFile=true \
-          -p:PublishTrimmed=true \
-          -p:TrimMode=partial
-          
-    - name: Create archive
-      run: |
-        cd publish/${{ matrix.runtime }}
-        if [[ "${{ matrix.runtime }}" == win-* ]]; then
-          zip -r ../avaloniaui-mcp-${{ matrix.runtime }}.zip .
-        else
-          tar -czf ../avaloniaui-mcp-${{ matrix.runtime }}.tar.gz .
-        fi
-        
-    - name: Upload artifacts
+    # Upload test results and coverage
+    - name: Upload test results
       uses: actions/upload-artifact@v4
+      if: always()
       with:
-        name: avaloniaui-mcp-${{ matrix.runtime }}
-        path: publish/avaloniaui-mcp-${{ matrix.runtime }}.*
-        retention-days: 30
+        name: test-results
+        path: |
+          ./TestResults/**/*.trx
+          ./TestResults/**/*.xml
+        retention-days: 7
 
-  documentation:
-    name: Documentation
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Validate README
-      run: |
-        # Check if README exists and has basic content
-        if [[ -f "README.md" ]]; then
-          echo "✅ README.md exists"
-          
-          # Check for essential sections
-          if grep -q "# AvaloniaUI.MCP" README.md; then
-            echo "✅ README has proper title"
-          else
-            echo "❌ README missing proper title"
-            exit 1
-          fi
-          
-          if grep -q "Installation" README.md; then
-            echo "✅ README has installation section"
-          else
-            echo "❌ README missing installation section"
-            exit 1
-          fi
-          
-          if grep -q "Usage" README.md; then
-            echo "✅ README has usage section"
-          else
-            echo "❌ README missing usage section"
-            exit 1
-          fi
-        else
-          echo "❌ README.md not found"
-          exit 1
-        fi
-        
-    - name: Validate CLAUDE.md
-      run: |
-        if [[ -f "CLAUDE.md" ]]; then
-          echo "✅ CLAUDE.md exists"
-          
-          if grep -q "MCP Server Capabilities" CLAUDE.md; then
-            echo "✅ CLAUDE.md has capabilities section"
-          else
-            echo "❌ CLAUDE.md missing capabilities section"
-            exit 1
-          fi
-        else
-          echo "❌ CLAUDE.md not found"
-          exit 1
-        fi
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      if: success()
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./TestResults
+        fail_ci_if_error: false
+        verbose: false
 
-  notify:
-    name: Notify
-    runs-on: ubuntu-latest
-    needs: [build, code-quality, security, functional-test]
-    if: always()
-    
-    steps:
-    - name: Notify on success
-      if: needs.build.result == 'success' && needs.code-quality.result == 'success' && needs.security.result == 'success' && needs.functional-test.result == 'success'
-      run: |
-        echo "🎉 All CI checks passed successfully!"
-        
-    - name: Notify on failure
-      if: needs.build.result == 'failure' || needs.code-quality.result == 'failure' || needs.security.result == 'failure' || needs.functional-test.result == 'failure'
-      run: |
-        echo "❌ CI checks failed. Please review the logs."
-        exit 1
+

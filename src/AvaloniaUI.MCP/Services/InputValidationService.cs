@@ -7,27 +7,27 @@ namespace AvaloniaUI.MCP.Services;
 /// </summary>
 public static partial class InputValidationService
 {
-    private static readonly Regex ValidProjectNameRegex = MyRegex();
-    private static readonly Regex ValidColorHexRegex = MyRegex1();
-    private static readonly Regex ValidIdentifierRegex = MyRegex2();
-    private static readonly Regex ValidCssClassRegex = new(@"^[a-zA-Z_-][a-zA-Z0-9_-]*$", RegexOptions.Compiled);
+    static readonly Regex ValidProjectNameRegex = MyRegex();
+    static readonly Regex ValidColorHexRegex = MyRegex1();
+    static readonly Regex ValidIdentifierRegex = MyRegex2();
+    static readonly Regex ValidCssClassRegex = MyRegex3();
 
-    private static readonly HashSet<string> ValidTemplateTypes = new(StringComparer.OrdinalIgnoreCase)
+    static readonly HashSet<string> ValidTemplateTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "mvvm", "basic", "crossplatform", "cross-platform"
     };
 
-    private static readonly HashSet<string> ValidThemeTypes = new(StringComparer.OrdinalIgnoreCase)
+    static readonly HashSet<string> ValidThemeTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "light", "dark", "auto"
     };
 
-    private static readonly HashSet<string> ValidControlTypes = new(StringComparer.OrdinalIgnoreCase)
+    static readonly HashSet<string> ValidControlTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "templated", "usercontrol", "panel", "attached-property"
     };
 
-    private static readonly HashSet<string> ValidComponentTypes = new(StringComparer.OrdinalIgnoreCase)
+    static readonly HashSet<string> ValidComponentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "form", "navigation", "data-table", "modal", "notification"
     };
@@ -345,10 +345,15 @@ public static partial class InputValidationService
 
     [GeneratedRegex(@"^[a-zA-Z][a-zA-Z0-9_.-]{0,127}$", RegexOptions.Compiled)]
     private static partial Regex MyRegex();
+
     [GeneratedRegex(@"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})$", RegexOptions.Compiled)]
     private static partial Regex MyRegex1();
+
     [GeneratedRegex(@"^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled)]
     private static partial Regex MyRegex2();
+
+    [GeneratedRegex(@"^[a-zA-Z_-][a-zA-Z0-9_-]*$", RegexOptions.Compiled)]
+    private static partial Regex MyRegex3();
 }
 
 /// <summary>
@@ -359,7 +364,7 @@ public class ValidationResult
     public bool IsValid { get; }
     public string ErrorMessage { get; }
 
-    private ValidationResult(bool isValid, string errorMessage = "")
+    ValidationResult(bool isValid, string errorMessage = "")
     {
         IsValid = isValid;
         ErrorMessage = errorMessage;

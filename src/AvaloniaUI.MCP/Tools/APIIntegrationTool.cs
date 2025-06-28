@@ -143,7 +143,7 @@ else
         }
     }
 
-    private sealed class ApiConfiguration
+    sealed class ApiConfiguration
     {
         public string ApiType { get; set; } = "";
         public string BaseUrl { get; set; } = "";
@@ -151,7 +151,7 @@ else
         public bool IncludeRetryPolicies { get; set; }
     }
 
-    private sealed class ModelConfiguration
+    sealed class ModelConfiguration
     {
         public string ModelType { get; set; } = "";
         public string EntityName { get; set; } = "";
@@ -159,7 +159,7 @@ else
         public bool IncludeJsonSerialization { get; set; }
     }
 
-    private static string GenerateClientService(ApiConfiguration config)
+    static string GenerateClientService(ApiConfiguration config)
     {
         return config.ApiType switch
         {
@@ -171,7 +171,7 @@ else
         };
     }
 
-    private static string GenerateRestClient(ApiConfiguration config)
+    static string GenerateRestClient(ApiConfiguration config)
     {
         return $@"// REST API Client Service
 public interface IApiClientService
@@ -197,12 +197,12 @@ public class ApiClientService : IApiClientService
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         {(config.IncludeAuthentication ? "_authService = authService ?? throw new ArgumentNullException(nameof(authService));" : "")}
-        
+
         _httpClient.BaseAddress = new Uri(""{config.BaseUrl}"");
         _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue(""application/json""));
-        
+
         _jsonOptions = new JsonSerializerOptions
         {{
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -216,9 +216,9 @@ public class ApiClientService : IApiClientService
         try
         {{
             {(config.IncludeAuthentication ? "await EnsureAuthenticatedAsync();" : "")}
-            
+
             _logger.LogDebug(""Making GET request to: {{Endpoint}}"", endpoint);
-            
+
             var response = await _httpClient.GetAsync(endpoint, cancellationToken);
             return await ProcessResponseAsync<T>(response);
         }}
@@ -244,12 +244,12 @@ public class ApiClientService : IApiClientService
         try
         {{
             {(config.IncludeAuthentication ? "await EnsureAuthenticatedAsync();" : "")}
-            
+
             _logger.LogDebug(""Making POST request to: {{Endpoint}}"", endpoint);
-            
+
             var json = JsonSerializer.Serialize(data, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             var response = await _httpClient.PostAsync(endpoint, content, cancellationToken);
             return await ProcessResponseAsync<T>(response);
         }}
@@ -270,12 +270,12 @@ public class ApiClientService : IApiClientService
         try
         {{
             {(config.IncludeAuthentication ? "await EnsureAuthenticatedAsync();" : "")}
-            
+
             _logger.LogDebug(""Making PUT request to: {{Endpoint}}"", endpoint);
-            
+
             var json = JsonSerializer.Serialize(data, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             var response = await _httpClient.PutAsync(endpoint, content, cancellationToken);
             return await ProcessResponseAsync<T>(response);
         }}
@@ -291,9 +291,9 @@ public class ApiClientService : IApiClientService
         try
         {{
             {(config.IncludeAuthentication ? "await EnsureAuthenticatedAsync();" : "")}
-            
+
             _logger.LogDebug(""Making DELETE request to: {{Endpoint}}"", endpoint);
-            
+
             var response = await _httpClient.DeleteAsync(endpoint, cancellationToken);
             return await ProcessResponseAsync<T>(response);
         }}
@@ -305,19 +305,19 @@ public class ApiClientService : IApiClientService
     }}
 
     public async Task<ApiResponse<TResponse>> PostAsync<TRequest, TResponse>(
-        string endpoint, 
-        TRequest data, 
+        string endpoint,
+        TRequest data,
         CancellationToken cancellationToken = default)
     {{
         try
         {{
             {(config.IncludeAuthentication ? "await EnsureAuthenticatedAsync();" : "")}
-            
+
             _logger.LogDebug(""Making typed POST request to: {{Endpoint}}"", endpoint);
-            
+
             var json = JsonSerializer.Serialize(data, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             var response = await _httpClient.PostAsync(endpoint, content, cancellationToken);
             return await ProcessResponseAsync<TResponse>(response);
         }}
@@ -331,7 +331,7 @@ public class ApiClientService : IApiClientService
     private async Task<ApiResponse<T>> ProcessResponseAsync<T>(HttpResponseMessage response)
     {{
         var content = await response.Content.ReadAsStringAsync();
-        
+
         if (response.IsSuccessStatusCode)
         {{
             try
@@ -347,9 +347,9 @@ public class ApiClientService : IApiClientService
         }}
         else
         {{
-            _logger.LogWarning(""API request failed with status {{StatusCode}}: {{Content}}"", 
+            _logger.LogWarning(""API request failed with status {{StatusCode}}: {{Content}}"",
                 response.StatusCode, content);
-            
+
             var errorMessage = await ExtractErrorMessageAsync(content);
             return ApiResponse<T>.Failure(errorMessage);
         }}
@@ -374,7 +374,7 @@ public class ApiClientService : IApiClientService
         var token = await _authService.GetAccessTokenAsync();
         if (!string.IsNullOrEmpty(token))
         {
-            _httpClient.DefaultRequestHeaders.Authorization = 
+            _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(""Bearer"", token);
         }
     }" : "")}
@@ -418,7 +418,7 @@ public class ApiErrorResponse
 }}";
     }
 
-    private static string GenerateGraphQLClient(ApiConfiguration config)
+    static string GenerateGraphQLClient(ApiConfiguration config)
     {
         return $@"// GraphQL Client Service
 public interface IGraphQLClientService
@@ -438,12 +438,12 @@ public class GraphQLClientService : IGraphQLClientService
     {{
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        
+
         _httpClient.BaseAddress = new Uri(""{config.BaseUrl}"");
         _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue(""application/json""));
-        
+
         _jsonOptions = new JsonSerializerOptions
         {{
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -452,8 +452,8 @@ public class GraphQLClientService : IGraphQLClientService
     }}
 
     public async Task<GraphQLResponse<T>> QueryAsync<T>(
-        string query, 
-        object? variables = null, 
+        string query,
+        object? variables = null,
         CancellationToken cancellationToken = default)
     {{
         try
@@ -465,13 +465,13 @@ public class GraphQLClientService : IGraphQLClientService
             }};
 
             _logger.LogDebug(""Executing GraphQL query: {{Query}}"", query);
-            
+
             var json = JsonSerializer.Serialize(request, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             var response = await _httpClient.PostAsync(""graphql"", content, cancellationToken);
             var responseContent = await response.Content.ReadAsStringAsync();
-            
+
             if (response.IsSuccessStatusCode)
             {{
                 var graphqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(responseContent, _jsonOptions);
@@ -479,7 +479,7 @@ public class GraphQLClientService : IGraphQLClientService
             }}
             else
             {{
-                _logger.LogWarning(""GraphQL request failed: {{StatusCode}} - {{Content}}"", 
+                _logger.LogWarning(""GraphQL request failed: {{StatusCode}} - {{Content}}"",
                     response.StatusCode, responseContent);
                 return GraphQLResponse<T>.Failure($""Request failed: {{response.StatusCode}}"");
             }}
@@ -492,8 +492,8 @@ public class GraphQLClientService : IGraphQLClientService
     }}
 
     public async Task<GraphQLResponse<T>> MutationAsync<T>(
-        string mutation, 
-        object? variables = null, 
+        string mutation,
+        object? variables = null,
         CancellationToken cancellationToken = default)
     {{
         try
@@ -505,13 +505,13 @@ public class GraphQLClientService : IGraphQLClientService
             }};
 
             _logger.LogDebug(""Executing GraphQL mutation: {{Mutation}}"", mutation);
-            
+
             var json = JsonSerializer.Serialize(request, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             var response = await _httpClient.PostAsync(""graphql"", content, cancellationToken);
             var responseContent = await response.Content.ReadAsStringAsync();
-            
+
             if (response.IsSuccessStatusCode)
             {{
                 var graphqlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(responseContent, _jsonOptions);
@@ -578,7 +578,7 @@ public class GraphQLLocation
 }}";
     }
 
-    private static string GenerateGrpcClient(ApiConfiguration config)
+    static string GenerateGrpcClient(ApiConfiguration config)
     {
         return @"// gRPC Client Service
 public interface IGrpcClientService
@@ -606,14 +606,14 @@ public class GrpcClientService : IGrpcClientService
     public GrpcClientService(ILogger<GrpcClientService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        
+
         // Configure gRPC channel
         var channelOptions = new GrpcChannelOptions
         {
             MaxReceiveMessageSize = 4 * 1024 * 1024, // 4MB
             MaxSendMessageSize = 4 * 1024 * 1024,    // 4MB
         };
-        
+
         _channel = GrpcChannel.ForAddress(""" + config.BaseUrl + @""", channelOptions);
     }
 
@@ -631,16 +631,16 @@ public class GrpcClientService : IGrpcClientService
                 cancellationToken: cancellationToken);
 
             _logger.LogDebug(""Making gRPC call for {RequestType}"", typeof(TRequest).Name);
-            
+
             var call = method(request, callOptions);
             var response = await call.ResponseAsync;
-            
+
             _logger.LogDebug(""gRPC call completed for {RequestType}"", typeof(TRequest).Name);
             return response;
         }
         catch (RpcException ex)
         {
-            _logger.LogError(ex, ""gRPC call failed for {RequestType}: {StatusCode} - {Detail}"", 
+            _logger.LogError(ex, ""gRPC call failed for {RequestType}: {StatusCode} - {Detail}"",
                 typeof(TRequest).Name, ex.StatusCode, ex.Status.Detail);
             throw;
         }
@@ -669,9 +669,9 @@ public class GrpcClientService : IGrpcClientService
             }
             catch (RpcException ex) when (attempt < maxRetries && IsRetryableStatus(ex.StatusCode))
             {
-                _logger.LogWarning(""gRPC call failed on attempt {Attempt}/{MaxRetries}, retrying in {Delay}ms"", 
+                _logger.LogWarning(""gRPC call failed on attempt {Attempt}/{MaxRetries}, retrying in {Delay}ms"",
                     attempt, maxRetries, delay.TotalMilliseconds);
-                
+
                 await Task.Delay(delay, cancellationToken);
                 delay = TimeSpan.FromMilliseconds(delay.TotalMilliseconds * 2); // Exponential backoff
             }
@@ -696,7 +696,7 @@ public class GrpcClientService : IGrpcClientService
 }";
     }
 
-    private static string GenerateWebhookClient(ApiConfiguration config)
+    static string GenerateWebhookClient(ApiConfiguration config)
     {
         return @"// Webhook Client Service
 public interface IWebhookClientService
@@ -716,7 +716,7 @@ public class WebhookClientService : IWebhookClientService
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        
+
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -730,15 +730,15 @@ public class WebhookClientService : IWebhookClientService
         {
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             // Add webhook headers
             content.Headers.Add(""X-Webhook-Timestamp"", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString());
             content.Headers.Add(""X-Webhook-Event"", typeof(T).Name);
-            
+
             _logger.LogDebug(""Sending webhook to {Url}"", webhookUrl);
-            
+
             var response = await _httpClient.PostAsync(webhookUrl, content, cancellationToken);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 _logger.LogInformation(""Webhook delivered successfully to {Url}"", webhookUrl);
@@ -758,28 +758,28 @@ public class WebhookClientService : IWebhookClientService
     }
 
     public async Task<bool> SendWebhookWithSignatureAsync<T>(
-        string webhookUrl, 
-        T payload, 
-        string secret, 
+        string webhookUrl,
+        T payload,
+        string secret,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             // Generate HMAC signature
             var signature = GenerateHmacSignature(json, secret);
-            
+
             // Add webhook headers
             content.Headers.Add(""X-Webhook-Timestamp"", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString());
             content.Headers.Add(""X-Webhook-Event"", typeof(T).Name);
             content.Headers.Add(""X-Webhook-Signature"", $""sha256={signature}"");
-            
+
             _logger.LogDebug(""Sending signed webhook to {Url}"", webhookUrl);
-            
+
             var response = await _httpClient.PostAsync(webhookUrl, content, cancellationToken);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 _logger.LogInformation(""Signed webhook delivered successfully to {Url}"", webhookUrl);
@@ -799,19 +799,19 @@ public class WebhookClientService : IWebhookClientService
     }
 
     public async Task<WebhookDeliveryResult> SendWebhookWithRetryAsync<T>(
-        string webhookUrl, 
-        T payload, 
+        string webhookUrl,
+        T payload,
         CancellationToken cancellationToken = default)
     {
         const int maxRetries = 3;
         var delays = new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15) };
-        
+
         for (int attempt = 0; attempt < maxRetries; attempt++)
         {
             try
             {
                 var success = await SendWebhookAsync(webhookUrl, payload, cancellationToken);
-                
+
                 if (success)
                 {
                     return new WebhookDeliveryResult
@@ -821,20 +821,20 @@ public class WebhookClientService : IWebhookClientService
                         DeliveredAt = DateTime.UtcNow
                     };
                 }
-                
+
                 if (attempt < maxRetries - 1)
                 {
                     var delay = delays[attempt];
-                    _logger.LogInformation(""Webhook delivery failed, retrying in {Delay} seconds (attempt {Attempt}/{MaxRetries})"", 
+                    _logger.LogInformation(""Webhook delivery failed, retrying in {Delay} seconds (attempt {Attempt}/{MaxRetries})"",
                         delay.TotalSeconds, attempt + 1, maxRetries);
-                    
+
                     await Task.Delay(delay, cancellationToken);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ""Error on webhook delivery attempt {Attempt}"", attempt + 1);
-                
+
                 if (attempt == maxRetries - 1)
                 {
                     return new WebhookDeliveryResult
@@ -847,7 +847,7 @@ public class WebhookClientService : IWebhookClientService
                 }
             }
         }
-        
+
         return new WebhookDeliveryResult
         {
             IsSuccess = false,
@@ -861,7 +861,7 @@ public class WebhookClientService : IWebhookClientService
     {
         var keyBytes = Encoding.UTF8.GetBytes(secret);
         var payloadBytes = Encoding.UTF8.GetBytes(payload);
-        
+
         using var hmac = new HMACSHA256(keyBytes);
         var hashBytes = hmac.ComputeHash(payloadBytes);
         return Convert.ToHexString(hashBytes).ToLowerInvariant();
@@ -878,7 +878,7 @@ public class WebhookDeliveryResult
 }";
     }
 
-    private static string GenerateGenericHttpClient(ApiConfiguration config)
+    static string GenerateGenericHttpClient(ApiConfiguration config)
     {
         return @"// Generic HTTP Client Service
 public interface IGenericHttpClientService
@@ -898,7 +898,7 @@ public class GenericHttpClientService : IGenericHttpClientService
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        
+
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -911,11 +911,11 @@ public class GenericHttpClientService : IGenericHttpClientService
         try
         {
             _logger.LogDebug(""Sending {Method} request to {Url}"", request.Method, request.RequestUri);
-            
+
             var response = await _httpClient.SendAsync(request, cancellationToken);
-            
+
             _logger.LogDebug(""Received response {StatusCode} from {Url}"", response.StatusCode, request.RequestUri);
-            
+
             return response;
         }
         catch (Exception ex)
@@ -931,7 +931,7 @@ public class GenericHttpClientService : IGenericHttpClientService
         {
             var response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
-            
+
             var json = await response.Content.ReadAsStringAsync(cancellationToken);
             return JsonSerializer.Deserialize<T>(json, _jsonOptions);
         }
@@ -948,7 +948,7 @@ public class GenericHttpClientService : IGenericHttpClientService
         {
             var json = JsonSerializer.Serialize(data, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
-            
+
             return await _httpClient.PostAsync(url, content, cancellationToken);
         }
         catch (Exception ex)
@@ -960,7 +960,7 @@ public class GenericHttpClientService : IGenericHttpClientService
 }";
     }
 
-    private static string GenerateAuthenticationService(ApiConfiguration config)
+    static string GenerateAuthenticationService(ApiConfiguration config)
     {
         return @"// API Authentication Service
 public interface IApiAuthenticationService
@@ -995,7 +995,7 @@ public class ApiAuthenticationService : IApiAuthenticationService
         try
         {
             var token = await _secureStorage.GetAsync(""access_token"");
-            
+
             if (string.IsNullOrEmpty(token))
             {
                 _logger.LogDebug(""No access token found in secure storage"");
@@ -1006,7 +1006,7 @@ public class ApiAuthenticationService : IApiAuthenticationService
             if (IsTokenExpired(token))
             {
                 _logger.LogDebug(""Access token is expired, attempting refresh"");
-                
+
                 var refreshSuccess = await RefreshTokenAsync();
                 if (refreshSuccess)
                 {
@@ -1051,7 +1051,7 @@ public class ApiAuthenticationService : IApiAuthenticationService
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
 
             var response = await _httpClient.PostAsync(""/oauth/token"", content);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -1060,7 +1060,7 @@ public class ApiAuthenticationService : IApiAuthenticationService
                 if (tokenResponse?.AccessToken != null)
                 {
                     await _secureStorage.SetAsync(""access_token"", tokenResponse.AccessToken);
-                    
+
                     if (!string.IsNullOrEmpty(tokenResponse.RefreshToken))
                     {
                         await _secureStorage.SetAsync(""refresh_token"", tokenResponse.RefreshToken);
@@ -1099,7 +1099,7 @@ public class ApiAuthenticationService : IApiAuthenticationService
             var content = new StringContent(json, Encoding.UTF8, ""application/json"");
 
             var response = await _httpClient.PostAsync(""/oauth/token"", content);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -1108,7 +1108,7 @@ public class ApiAuthenticationService : IApiAuthenticationService
                 if (tokenResponse?.AccessToken != null)
                 {
                     await _secureStorage.SetAsync(""access_token"", tokenResponse.AccessToken);
-                    
+
                     if (!string.IsNullOrEmpty(tokenResponse.RefreshToken))
                     {
                         await _secureStorage.SetAsync(""refresh_token"", tokenResponse.RefreshToken);
@@ -1135,7 +1135,7 @@ public class ApiAuthenticationService : IApiAuthenticationService
         {
             await _secureStorage.RemoveAsync(""access_token"");
             await _secureStorage.RemoveAsync(""refresh_token"");
-            
+
             _logger.LogInformation(""User logged out successfully"");
         }
         catch (Exception ex)
@@ -1208,7 +1208,7 @@ public class AuthenticationSettings
 }";
     }
 
-    private static string GenerateRetryPolicyCode()
+    static string GenerateRetryPolicyCode()
     {
         return @"// Retry Policy Configuration using Polly
 public static class RetryPolicies
@@ -1225,7 +1225,7 @@ public static class RetryPolicies
                 onRetry: (outcome, timespan, retryCount, context) =>
                 {
                     var logger = context.GetLogger();
-                    logger?.LogWarning(""Retry {RetryCount} after {Delay}ms for {OperationKey}"", 
+                    logger?.LogWarning(""Retry {RetryCount} after {Delay}ms for {OperationKey}"",
                         retryCount, timespan.TotalMilliseconds, context.OperationKey);
                 });
     }
@@ -1242,7 +1242,7 @@ public static class RetryPolicies
                 onRetry: (exception, timespan, retryCount, context) =>
                 {
                     var logger = context.GetLogger();
-                    logger?.LogWarning(exception, ""Retry {RetryCount} after {Delay}ms for {OperationKey}"", 
+                    logger?.LogWarning(exception, ""Retry {RetryCount} after {Delay}ms for {OperationKey}"",
                         retryCount, timespan.TotalMilliseconds, context.OperationKey);
                 });
     }
@@ -1269,7 +1269,7 @@ public static class RetryPolicies
     {
         var retryPolicy = CreateHttpRetryPolicy();
         var circuitBreakerPolicy = CreateCircuitBreakerPolicy();
-        
+
         return Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
     }
 }
@@ -1280,7 +1280,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApiClient(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<AuthenticationSettings>(configuration.GetSection(""Authentication""));
-        
+
         services.AddHttpClient<IApiClientService, ApiClientService>(client =>
         {
             client.Timeout = TimeSpan.FromSeconds(30);
@@ -1289,13 +1289,13 @@ public static class ServiceCollectionExtensions
         .AddPolicyHandler(RetryPolicies.CreateCombinedPolicy());
 
         services.AddScoped<IApiAuthenticationService, ApiAuthenticationService>();
-        
+
         return services;
     }
 }";
     }
 
-    private static string GenerateModelClasses(ModelConfiguration config)
+    static string GenerateModelClasses(ModelConfiguration config)
     {
         return config.ModelType switch
         {
@@ -1307,7 +1307,7 @@ public static class ServiceCollectionExtensions
         };
     }
 
-    private static string GenerateRequestModels(ModelConfiguration config)
+    static string GenerateRequestModels(ModelConfiguration config)
     {
         string validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
         string jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
@@ -1393,7 +1393,7 @@ public class Delete{config.EntityName}Request
 }}";
     }
 
-    private static string GenerateResponseModels(ModelConfiguration config)
+    static string GenerateResponseModels(ModelConfiguration config)
     {
         string jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
 
@@ -1512,7 +1512,7 @@ public class ErrorResponse
 }}";
     }
 
-    private static string GenerateEntityModels(ModelConfiguration config)
+    static string GenerateEntityModels(ModelConfiguration config)
     {
         string validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
         string jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
@@ -1600,7 +1600,7 @@ public class {config.EntityName}Filter
 }}";
     }
 
-    private static string GenerateDtoModels(ModelConfiguration config)
+    static string GenerateDtoModels(ModelConfiguration config)
     {
         string validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
         string jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
@@ -1722,7 +1722,7 @@ public class {config.EntityName}Statistics
 }}";
     }
 
-    private static string GenerateGenericModels(ModelConfiguration config)
+    static string GenerateGenericModels(ModelConfiguration config)
     {
         return $@"// Generic Models for {config.EntityName}
 
@@ -1735,18 +1735,18 @@ public class {config.EntityName}Model
 }}";
     }
 
-    private static string GetValidationAttributes()
+    static string GetValidationAttributes()
     {
         return @"[Required(ErrorMessage = ""This field is required"")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = ""Length must be between 2 and 100 characters"")]";
     }
 
-    private static string GetJsonAttributes()
+    static string GetJsonAttributes()
     {
         return @"[JsonPropertyName(""name"")]";
     }
 
-    private static string GenerateValidationCode(ModelConfiguration config)
+    static string GenerateValidationCode(ModelConfiguration config)
     {
         return @"// Validation Extensions and Custom Validators
 public static class ValidationExtensions
@@ -1812,7 +1812,7 @@ public class ValidEnumAttribute : ValidationAttribute
 }";
     }
 
-    private static string GenerateSerializationConfig()
+    static string GenerateSerializationConfig()
     {
         return @"// JSON Serialization Configuration
 public static class JsonSerializationConfig
@@ -1899,7 +1899,7 @@ public static class SerializationExtensions
 }";
     }
 
-    private static string GenerateSetupInstructions(ApiConfiguration config)
+    static string GenerateSetupInstructions(ApiConfiguration config)
     {
         return $@"### 1. Install Required Packages
 ```xml

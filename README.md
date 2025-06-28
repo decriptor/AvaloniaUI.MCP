@@ -6,13 +6,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://decriptor.github.io/AvaloniaUI.MCP)
 
-**Professional Model Context Protocol Server for AvaloniaUI Development**
+## Professional Model Context Protocol Server for AvaloniaUI Development
 
 A comprehensive MCP server providing enterprise-grade tools, resources, and guidance for building cross-platform AvaloniaUI applications.
 
 ## 🚀 Features
 
 ### 🛠️ **15+ Development Tools**
+
 - **Project Generation** - MVVM, basic, and cross-platform templates
 - **XAML Validation** - Syntax checking and best practices enforcement
 - **Security Patterns** - Secure authentication and data protection
@@ -20,12 +21,14 @@ A comprehensive MCP server providing enterprise-grade tools, resources, and guid
 - **Migration Support** - Complete WPF to AvaloniaUI conversion assistance
 
 ### 📚 **Extensive Knowledge Base**
+
 - **500+ Controls** - Complete AvaloniaUI controls reference
 - **Design Patterns** - MVVM, reactive programming, and architectural guidance
 - **Best Practices** - Industry-standard development practices
 - **Code Examples** - Real-world implementation examples
 
 ### 🔒 **Enterprise Features**
+
 - **Telemetry & Monitoring** - Real-time performance metrics and health checks
 - **Caching System** - Intelligent resource caching for 80%+ hit rates
 - **Input Validation** - Comprehensive parameter validation and sanitization
@@ -33,6 +36,7 @@ A comprehensive MCP server providing enterprise-grade tools, resources, and guid
 - **Audit Logging** - Complete operation tracking and compliance support
 
 ### ⚡ **High Performance**
+
 - **< 100ms Response Times** - Optimized for production workloads
 - **Async Operations** - Non-blocking file and network operations
 - **Memory Efficient** - Minimal footprint with intelligent resource management
@@ -41,6 +45,7 @@ A comprehensive MCP server providing enterprise-grade tools, resources, and guid
 ## 📖 Quick Start
 
 ### Prerequisites
+
 - **.NET 9.0 SDK** or later
 - **MCP-compatible client** (Claude Desktop, VS Code with MCP extension)
 
@@ -71,8 +76,8 @@ Add to your MCP client configuration:
     "avalonia": {
       "command": "dotnet",
       "args": [
-        "run", 
-        "--project", 
+        "run",
+        "--project",
         "/path/to/AvaloniaUI.MCP/src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj"
       ],
       "cwd": "/path/to/AvaloniaUI.MCP"
@@ -85,7 +90,7 @@ Add to your MCP client configuration:
 
 Try these commands with your MCP client:
 
-```
+```text
 "Create a new AvaloniaUI MVVM project called MyApp"
 "Validate this XAML code for best practices"
 "Generate JWT authentication pattern with high security"
@@ -117,7 +122,7 @@ Try these commands with your MCP client:
 
 ## 🏗️ Architecture
 
-```
+```text
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   MCP Client    │    │  AvaloniaUI.MCP  │    │  Knowledge Base │
 │  (Claude, VSC)  │◄──►│     Server       │◄──►│   (JSON Files)  │
@@ -134,6 +139,7 @@ Try these commands with your MCP client:
 ```
 
 Built with:
+
 - **.NET 9.0** - Latest runtime with performance optimizations
 - **MCP Protocol** - Official Microsoft Model Context Protocol SDK
 - **OpenTelemetry** - Enterprise observability and monitoring
@@ -166,6 +172,7 @@ dotnet test --filter Category=Integration
 ```
 
 Test categories:
+
 - **Unit Tests** - Individual component testing
 - **Integration Tests** - Tool interaction testing
 - **Performance Tests** - Load and response time testing
@@ -174,6 +181,7 @@ Test categories:
 ## 🔒 Security
 
 Enterprise-grade security features:
+
 - **Input Validation** - All parameters validated against strict schemas
 - **Secure Patterns** - Defensive security pattern generation
 - **Audit Logging** - Complete operation tracking
@@ -194,6 +202,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 6. **Submit pull request**
 
 ### Areas for Contribution
+
 - 🛠️ New tools and features
 - 📚 Documentation improvements
 - 🐛 Bug fixes and optimizations
@@ -216,7 +225,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **📖 Documentation**: [GitHub Pages](https://decriptor.github.io/AvaloniaUI.MCP)
 - **🐛 Bug Reports**: [GitHub Issues](https://github.com/decriptor/AvaloniaUI.MCP/issues)
 - **💬 Discussions**: [GitHub Discussions](https://github.com/decriptor/AvaloniaUI.MCP/discussions)
-- **📧 Email**: sshaw@decriptor.com
+- **📧 Email**: [sshaw@decriptor.com](mailto:sshaw@decriptor.com)
 
 ---
 

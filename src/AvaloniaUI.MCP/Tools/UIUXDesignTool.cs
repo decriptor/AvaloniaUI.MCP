@@ -197,15 +197,15 @@ public static class UIUXDesignTool
         }
     }
 
-    private sealed class ResponsiveConfiguration
+    sealed class ResponsiveConfiguration
     {
         public string LayoutType { get; set; } = "";
-        public List<string> TargetDevices { get; set; } = new();
+        public List<string> TargetDevices { get; set; } = [];
         public bool IncludeTouchGestures { get; set; }
         public string BreakpointStrategy { get; set; } = "";
     }
 
-    private sealed class UXConfiguration
+    sealed class UXConfiguration
     {
         public string PatternType { get; set; } = "";
         public string AnimationStyle { get; set; } = "";
@@ -213,7 +213,7 @@ public static class UIUXDesignTool
         public string FeedbackTiming { get; set; } = "";
     }
 
-    private sealed class DesignSystemConfiguration
+    sealed class DesignSystemConfiguration
     {
         public string BrandStyle { get; set; } = "";
         public string ColorPalette { get; set; } = "";
@@ -221,7 +221,7 @@ public static class UIUXDesignTool
         public bool IncludeComponents { get; set; }
     }
 
-    private static string GenerateResponsiveLayout(ResponsiveConfiguration config)
+    static string GenerateResponsiveLayout(ResponsiveConfiguration config)
     {
         return config.LayoutType switch
         {
@@ -233,7 +233,7 @@ public static class UIUXDesignTool
         };
     }
 
-    private static string GenerateFluidGrid(ResponsiveConfiguration config)
+    static string GenerateFluidGrid(ResponsiveConfiguration config)
     {
         return @"<Grid>
     <Grid.Styles>
@@ -241,7 +241,7 @@ public static class UIUXDesignTool
             <Setter Property=""ColumnDefinitions"" Value=""*,*,*,*"" />
             <Setter Property=""RowDefinitions"" Value=""Auto,*,Auto"" />
         </Style>
-        
+
         <!-- Mobile Breakpoint -->
         <Style Selector=""Grid"" x:Key=""Mobile"">
             <Style.Setters>
@@ -249,7 +249,7 @@ public static class UIUXDesignTool
                 <Setter Property=""RowDefinitions"" Value=""Auto,Auto,Auto,Auto,*,Auto"" />
             </Style.Setters>
         </Style>
-        
+
         <!-- Tablet Breakpoint -->
         <Style Selector=""Grid"" x:Key=""Tablet"">
             <Style.Setters>
@@ -258,29 +258,29 @@ public static class UIUXDesignTool
             </Style.Setters>
         </Style>
     </Grid.Styles>
-    
+
     <!-- Header -->
     <Border Grid.Column=""0"" Grid.ColumnSpan=""4"" Grid.Row=""0""
             Background=""{StaticResource HeaderBrush}""
             Padding=""20,16"">
-        <TextBlock Text=""Responsive Header"" 
+        <TextBlock Text=""Responsive Header""
                    Classes=""heading1""
                    HorizontalAlignment=""Center"" />
     </Border>
-    
+
     <!-- Main Content Grid -->
     <Grid Grid.Column=""0"" Grid.ColumnSpan=""4"" Grid.Row=""1""
           Margin=""20"" RowDefinitions=""*"" ColumnDefinitions=""2*,*"">
-        
+
         <ScrollViewer Grid.Column=""0"" Padding=""0,0,20,0"">
             <StackPanel Spacing=""16"">
                 <TextBlock Text=""Main Content Area"" Classes=""heading2"" />
-                <TextBlock Text=""This content adapts to different screen sizes using fluid grids and responsive breakpoints."" 
+                <TextBlock Text=""This content adapts to different screen sizes using fluid grids and responsive breakpoints.""
                            TextWrapping=""Wrap"" />
             </StackPanel>
         </ScrollViewer>
-        
-        <Border Grid.Column=""1"" 
+
+        <Border Grid.Column=""1""
                 Background=""{StaticResource SidebarBrush}""
                 Padding=""16"">
             <StackPanel Spacing=""12"">
@@ -289,18 +289,18 @@ public static class UIUXDesignTool
             </StackPanel>
         </Border>
     </Grid>
-    
+
     <!-- Footer -->
     <Border Grid.Column=""0"" Grid.ColumnSpan=""4"" Grid.Row=""2""
             Background=""{StaticResource FooterBrush}""
             Padding=""20,12"">
-        <TextBlock Text=""Footer Content"" 
+        <TextBlock Text=""Footer Content""
                    HorizontalAlignment=""Center"" />
     </Border>
 </Grid>";
     }
 
-    private static string GenerateAdaptivePanels(ResponsiveConfiguration config)
+    static string GenerateAdaptivePanels(ResponsiveConfiguration config)
     {
         return @"<Panel>
     <!-- Adaptive Panel Container -->
@@ -319,7 +319,7 @@ public static class UIUXDesignTool
                 <Setter Property=""Spacing"" Value=""32"" />
             </Breakpoint>
         </AdaptiveContainer.Breakpoints>
-        
+
         <!-- Primary Panel -->
         <Panel Classes=""primary-panel"">
             <Panel.Styles>
@@ -329,15 +329,15 @@ public static class UIUXDesignTool
                     <Setter Property=""MinHeight"" Value=""300"" />
                 </Style>
             </Panel.Styles>
-            
+
             <StackPanel Spacing=""16"">
                 <TextBlock Text=""Primary Content"" Classes=""heading2"" />
-                <TextBlock Text=""This panel adapts its layout based on available screen space."" 
+                <TextBlock Text=""This panel adapts its layout based on available screen space.""
                            TextWrapping=""Wrap"" />
                 <Button Content=""Action Button"" Classes=""primary"" />
             </StackPanel>
         </Panel>
-        
+
         <!-- Secondary Panel -->
         <Panel Classes=""secondary-panel"">
             <Panel.Styles>
@@ -347,10 +347,10 @@ public static class UIUXDesignTool
                     <Setter Property=""MinHeight"" Value=""200"" />
                 </Style>
             </Panel.Styles>
-            
+
             <StackPanel Spacing=""12"">
                 <TextBlock Text=""Secondary Content"" Classes=""heading3"" />
-                <TextBlock Text=""Supporting information and actions."" 
+                <TextBlock Text=""Supporting information and actions.""
                            TextWrapping=""Wrap"" />
                 <Button Content=""Secondary Action"" Classes=""secondary"" />
             </StackPanel>
@@ -359,19 +359,19 @@ public static class UIUXDesignTool
 </Panel>";
     }
 
-    private static string GenerateResponsiveNavigation(ResponsiveConfiguration config)
+    static string GenerateResponsiveNavigation(ResponsiveConfiguration config)
     {
         return @"<DockPanel LastChildFill=""True"">
     <!-- Navigation Header -->
-    <Border DockPanel.Dock=""Top"" 
+    <Border DockPanel.Dock=""Top""
             Background=""{StaticResource NavigationBrush}""
             Padding=""16,12"">
         <Grid ColumnDefinitions=""*,Auto"">
-            <TextBlock Grid.Column=""0"" 
-                       Text=""Application Name"" 
+            <TextBlock Grid.Column=""0""
+                       Text=""Application Name""
                        Classes=""logo""
                        VerticalAlignment=""Center"" />
-            
+
             <!-- Mobile Menu Toggle -->
             <Button Grid.Column=""1""
                     x:Name=""MenuToggle""
@@ -381,7 +381,7 @@ public static class UIUXDesignTool
                     Command=""{Binding ToggleMenuCommand}"" />
         </Grid>
     </Border>
-    
+
     <!-- Navigation Menu -->
     <Border DockPanel.Dock=""Left""
             x:Name=""NavigationPanel""
@@ -394,7 +394,7 @@ public static class UIUXDesignTool
                 <Setter Property=""Width"" Value=""250"" />
                 <Setter Property=""IsVisible"" Value=""True"" />
             </Style>
-            
+
             <!-- Mobile Navigation Overlay -->
             <Style Selector=""Border"" x:Key=""Mobile"">
                 <Setter Property=""Width"" Value=""280"" />
@@ -402,7 +402,7 @@ public static class UIUXDesignTool
                 <Setter Property=""ZIndex"" Value=""1000"" />
             </Style>
         </Border.Styles>
-        
+
         <ScrollViewer>
             <StackPanel Spacing=""8"" Margin=""16"">
                 <Button Content=""Dashboard"" Classes=""nav-item"" />
@@ -415,27 +415,27 @@ public static class UIUXDesignTool
             </StackPanel>
         </ScrollViewer>
     </Border>
-    
+
     <!-- Main Content Area -->
     <ScrollViewer Padding=""24"">
         <StackPanel Spacing=""20"">
             <TextBlock Text=""Main Content"" Classes=""heading1"" />
-            <TextBlock Text=""The navigation adapts to screen size - showing as a sidebar on desktop and a slide-out menu on mobile."" 
+            <TextBlock Text=""The navigation adapts to screen size - showing as a sidebar on desktop and a slide-out menu on mobile.""
                        TextWrapping=""Wrap"" />
         </StackPanel>
     </ScrollViewer>
 </DockPanel>";
     }
 
-    private static string GenerateFlexibleForms(ResponsiveConfiguration config)
+    static string GenerateFlexibleForms(ResponsiveConfiguration config)
     {
         return @"<ScrollViewer>
     <Panel Margin=""20"" MaxWidth=""800"">
         <StackPanel Spacing=""24"">
             <!-- Form Header -->
-            <TextBlock Text=""Responsive Form"" Classes=""heading1"" 
+            <TextBlock Text=""Responsive Form"" Classes=""heading1""
                        HorizontalAlignment=""Center"" />
-            
+
             <!-- Form Grid Container -->
             <Grid x:Name=""FormGrid"">
                 <Grid.Styles>
@@ -444,43 +444,43 @@ public static class UIUXDesignTool
                         <Setter Property=""ColumnDefinitions"" Value=""*,20,*"" />
                         <Setter Property=""RowDefinitions"" Value=""Auto,Auto,Auto,Auto,Auto"" />
                     </Style>
-                    
+
                     <!-- Mobile Layout: 1 column -->
                     <Style Selector=""Grid"" x:Key=""Mobile"">
                         <Setter Property=""ColumnDefinitions"" Value=""*"" />
                         <Setter Property=""RowDefinitions"" Value=""Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"" />
                     </Style>
                 </Grid.Styles>
-                
+
                 <!-- First Name -->
                 <StackPanel Grid.Row=""0"" Grid.Column=""0"" Spacing=""8"">
                     <TextBlock Text=""First Name"" Classes=""form-label"" />
-                    <TextBox Watermark=""Enter first name"" 
+                    <TextBox Watermark=""Enter first name""
                              Classes=""form-input"" />
                 </StackPanel>
-                
+
                 <!-- Last Name -->
                 <StackPanel Grid.Row=""0"" Grid.Column=""2"" Spacing=""8"">
                     <TextBlock Text=""Last Name"" Classes=""form-label"" />
-                    <TextBox Watermark=""Enter last name"" 
+                    <TextBox Watermark=""Enter last name""
                              Classes=""form-input"" />
                 </StackPanel>
-                
+
                 <!-- Email (Full Width) -->
-                <StackPanel Grid.Row=""1"" Grid.Column=""0"" Grid.ColumnSpan=""3"" 
+                <StackPanel Grid.Row=""1"" Grid.Column=""0"" Grid.ColumnSpan=""3""
                             Spacing=""8"" Margin=""0,16,0,0"">
                     <TextBlock Text=""Email Address"" Classes=""form-label"" />
-                    <TextBox Watermark=""Enter email address"" 
+                    <TextBox Watermark=""Enter email address""
                              Classes=""form-input"" />
                 </StackPanel>
-                
+
                 <!-- Phone -->
                 <StackPanel Grid.Row=""2"" Grid.Column=""0"" Spacing=""8"" Margin=""0,16,0,0"">
                     <TextBlock Text=""Phone Number"" Classes=""form-label"" />
-                    <TextBox Watermark=""(555) 123-4567"" 
+                    <TextBox Watermark=""(555) 123-4567""
                              Classes=""form-input"" />
                 </StackPanel>
-                
+
                 <!-- Country -->
                 <StackPanel Grid.Row=""2"" Grid.Column=""2"" Spacing=""8"" Margin=""0,16,0,0"">
                     <TextBlock Text=""Country"" Classes=""form-label"" />
@@ -490,23 +490,23 @@ public static class UIUXDesignTool
                         <ComboBoxItem Content=""United Kingdom"" />
                     </ComboBox>
                 </StackPanel>
-                
+
                 <!-- Message (Full Width) -->
-                <StackPanel Grid.Row=""3"" Grid.Column=""0"" Grid.ColumnSpan=""3"" 
+                <StackPanel Grid.Row=""3"" Grid.Column=""0"" Grid.ColumnSpan=""3""
                             Spacing=""8"" Margin=""0,16,0,0"">
                     <TextBlock Text=""Message"" Classes=""form-label"" />
-                    <TextBox AcceptsReturn=""True"" 
-                             Height=""120"" 
+                    <TextBox AcceptsReturn=""True""
+                             Height=""120""
                              TextWrapping=""Wrap""
-                             Watermark=""Enter your message..."" 
+                             Watermark=""Enter your message...""
                              Classes=""form-input"" />
                 </StackPanel>
-                
+
                 <!-- Form Actions -->
-                <StackPanel Grid.Row=""4"" Grid.Column=""0"" Grid.ColumnSpan=""3"" 
-                            Orientation=""Horizontal"" 
+                <StackPanel Grid.Row=""4"" Grid.Column=""0"" Grid.ColumnSpan=""3""
+                            Orientation=""Horizontal""
                             HorizontalAlignment=""Right""
-                            Spacing=""12"" 
+                            Spacing=""12""
                             Margin=""0,24,0,0"">
                     <Button Content=""Cancel"" Classes=""secondary"" />
                     <Button Content=""Submit"" Classes=""primary"" />
@@ -517,7 +517,7 @@ public static class UIUXDesignTool
 </ScrollViewer>";
     }
 
-    private static string GenerateGenericResponsiveLayout(ResponsiveConfiguration config)
+    static string GenerateGenericResponsiveLayout(ResponsiveConfiguration config)
     {
         return @"<Grid>
     <!-- Generic responsive layout with flexible columns -->
@@ -526,14 +526,14 @@ public static class UIUXDesignTool
         <ColumnDefinition Width=""Auto"" />
         <ColumnDefinition Width=""*"" />
     </Grid.ColumnDefinitions>
-    
+
     <ContentPresenter Grid.Column=""0"" Content=""{Binding MainContent}"" />
     <GridSplitter Grid.Column=""1"" Width=""4"" />
     <ContentPresenter Grid.Column=""2"" Content=""{Binding SideContent}"" />
 </Grid>";
     }
 
-    private static string GenerateBreakpointSystem(ResponsiveConfiguration config)
+    static string GenerateBreakpointSystem(ResponsiveConfiguration config)
     {
         return @"// Responsive Breakpoint Service
 public class BreakpointService : INotifyPropertyChanged
@@ -611,7 +611,7 @@ public abstract class ResponsiveUserControl : UserControl
 }";
     }
 
-    private static string GenerateTouchGestureHandlers()
+    static string GenerateTouchGestureHandlers()
     {
         return @"// Touch Gesture Handler Service
 public class TouchGestureService
@@ -622,7 +622,7 @@ public class TouchGestureService
     {
         var config = GetOrCreateConfiguration(control);
         config.SwipeHandler = onSwipe;
-        
+
         control.PointerPressed += OnPointerPressed;
         control.PointerMoved += OnPointerMoved;
         control.PointerReleased += OnPointerReleased;
@@ -632,7 +632,7 @@ public class TouchGestureService
     {
         var config = GetOrCreateConfiguration(control);
         config.PinchHandler = onPinch;
-        
+
         // Register multi-touch events
         control.PointerPressed += OnPointerPressed;
         control.PointerMoved += OnPointerMoved;
@@ -644,7 +644,7 @@ public class TouchGestureService
         var config = GetOrCreateConfiguration(control);
         config.TapHandler = onTap;
         config.DoubleTapHandler = onDoubleTap;
-        
+
         control.Tapped += (s, e) => onTap?.Invoke();
         control.DoubleTapped += (s, e) => onDoubleTap?.Invoke();
     }
@@ -675,7 +675,7 @@ public class TouchGestureService
         {
             var currentPoint = e.GetPosition(control);
             var distance = CalculateDistance(config.StartPoint, currentPoint);
-            
+
             // Handle swipe detection
             if (distance > 50) // Minimum swipe distance
             {
@@ -737,7 +737,7 @@ public enum SwipeDirection
 }";
     }
 
-    private static string GenerateDeviceAdaptation(ResponsiveConfiguration config)
+    static string GenerateDeviceAdaptation(ResponsiveConfiguration config)
     {
         return @"// Device Adaptation Service
 public class DeviceAdaptationService
@@ -827,7 +827,7 @@ public class DeviceProfile
 }";
     }
 
-    private static string GenerateUXPatternImplementation(UXConfiguration config)
+    static string GenerateUXPatternImplementation(UXConfiguration config)
     {
         return config.PatternType switch
         {
@@ -840,7 +840,7 @@ public class DeviceProfile
         };
     }
 
-    private static string GenerateLoadingStates(UXConfiguration config)
+    static string GenerateLoadingStates(UXConfiguration config)
     {
         return @"<!-- Loading States Pattern -->
 <UserControl xmlns=""https://github.com/avaloniaui"">
@@ -850,27 +850,27 @@ public class DeviceProfile
             <Setter Property=""Opacity"" Value=""0.95"" />
             <Setter Property=""IsVisible"" Value=""{Binding IsLoading}"" />
         </Style>
-        
+
         <Style Selector=""ProgressBar.skeleton"">
             <Setter Property=""IsIndeterminate"" Value=""True"" />
             <Setter Property=""Height"" Value=""4"" />
             <Setter Property=""Background"" Value=""Transparent"" />
         </Style>
-        
+
         <Style Selector=""ContentControl.shimmer"">
             <Setter Property=""Background"" Value=""{StaticResource ShimmerBrush}"" />
             <Setter Property=""Opacity"" Value=""0.7"" />
         </Style>
     </UserControl.Styles>
-    
+
     <Grid>
         <!-- Main Content -->
-        <ContentPresenter Content=""{Binding MainContent}"" 
+        <ContentPresenter Content=""{Binding MainContent}""
                          IsVisible=""{Binding !IsLoading}"" />
-        
+
         <!-- Loading Overlay -->
         <Border Classes=""loading-container"">
-            <StackPanel HorizontalAlignment=""Center"" 
+            <StackPanel HorizontalAlignment=""Center""
                        VerticalAlignment=""Center""
                        Spacing=""16"">
                 <!-- Spinner -->
@@ -895,12 +895,12 @@ public class DeviceProfile
                         </Style>
                     </Border.Styles>
                 </Border>
-                
+
                 <!-- Loading Text -->
-                <TextBlock Text=""{Binding LoadingMessage}"" 
+                <TextBlock Text=""{Binding LoadingMessage}""
                           HorizontalAlignment=""Center""
                           Classes=""body1"" />
-                
+
                 <!-- Progress Bar -->
                 <ProgressBar Value=""{Binding LoadingProgress}""
                             Width=""200""
@@ -908,9 +908,9 @@ public class DeviceProfile
                             IsVisible=""{Binding ShowProgress}"" />
             </StackPanel>
         </Border>
-        
+
         <!-- Skeleton Loading (Alternative) -->
-        <StackPanel IsVisible=""{Binding UseSkeletonLoading}"" 
+        <StackPanel IsVisible=""{Binding UseSkeletonLoading}""
                    Spacing=""12"" Margin=""20"">
             <ContentControl Classes=""shimmer"" Height=""24"" />
             <ContentControl Classes=""shimmer"" Height=""16"" Width=""200"" />
@@ -921,57 +921,57 @@ public class DeviceProfile
 </UserControl>";
     }
 
-    private static string GenerateErrorHandling(UXConfiguration config)
+    static string GenerateErrorHandling(UXConfiguration config)
     {
         return @"<!-- Error Handling Pattern -->
 <UserControl xmlns=""https://github.com/avaloniaui"">
     <Grid>
         <!-- Main Content -->
-        <ContentPresenter Content=""{Binding MainContent}"" 
+        <ContentPresenter Content=""{Binding MainContent}""
                          IsVisible=""{Binding !HasError}"" />
-        
+
         <!-- Error States -->
         <StackPanel IsVisible=""{Binding HasError}""
                    HorizontalAlignment=""Center""
                    VerticalAlignment=""Center""
                    Spacing=""20"" Margin=""40"">
-            
+
             <!-- Error Icon -->
             <Border Width=""64"" Height=""64""
                    Background=""{StaticResource ErrorBrush}""
                    CornerRadius=""32"">
-                <TextBlock Text=""⚠️"" 
+                <TextBlock Text=""⚠️""
                           FontSize=""32""
                           HorizontalAlignment=""Center""
                           VerticalAlignment=""Center"" />
             </Border>
-            
+
             <!-- Error Title -->
-            <TextBlock Text=""{Binding ErrorTitle}"" 
+            <TextBlock Text=""{Binding ErrorTitle}""
                       Classes=""heading2""
                       HorizontalAlignment=""Center""
                       TextAlignment=""Center"" />
-            
+
             <!-- Error Description -->
-            <TextBlock Text=""{Binding ErrorDescription}"" 
+            <TextBlock Text=""{Binding ErrorDescription}""
                       Classes=""body1""
                       HorizontalAlignment=""Center""
                       TextAlignment=""Center""
                       TextWrapping=""Wrap""
                       MaxWidth=""400"" />
-            
+
             <!-- Error Actions -->
-            <StackPanel Orientation=""Horizontal"" 
+            <StackPanel Orientation=""Horizontal""
                        HorizontalAlignment=""Center""
                        Spacing=""12"">
-                <Button Content=""Try Again"" 
+                <Button Content=""Try Again""
                        Command=""{Binding RetryCommand}""
                        Classes=""primary"" />
-                <Button Content=""Report Issue"" 
+                <Button Content=""Report Issue""
                        Command=""{Binding ReportCommand}""
                        Classes=""secondary"" />
             </StackPanel>
-            
+
             <!-- Technical Details (Expandable) -->
             <Expander Header=""Technical Details""
                      IsVisible=""{Binding ShowTechnicalDetails}"">
@@ -984,7 +984,7 @@ public class DeviceProfile
                 </Border>
             </Expander>
         </StackPanel>
-        
+
         <!-- Inline Error Banner -->
         <Border DockPanel.Dock=""Top""
                Background=""{StaticResource ErrorBackgroundBrush}""
@@ -992,11 +992,11 @@ public class DeviceProfile
                BorderThickness=""0,0,0,1""
                IsVisible=""{Binding ShowInlineError}"">
             <Grid Margin=""16,12"" ColumnDefinitions=""Auto,*,Auto"">
-                <TextBlock Grid.Column=""0"" 
-                          Text=""⚠️"" 
+                <TextBlock Grid.Column=""0""
+                          Text=""⚠️""
                           VerticalAlignment=""Center""
                           Margin=""0,0,12,0"" />
-                <TextBlock Grid.Column=""1"" 
+                <TextBlock Grid.Column=""1""
                           Text=""{Binding InlineErrorMessage}""
                           VerticalAlignment=""Center""
                           TextWrapping=""Wrap"" />
@@ -1010,14 +1010,14 @@ public class DeviceProfile
 </UserControl>";
     }
 
-    private static string GenerateFeedbackSystem(UXConfiguration config)
+    static string GenerateFeedbackSystem(UXConfiguration config)
     {
         return @"<!-- Feedback System Pattern -->
 <UserControl xmlns=""https://github.com/avaloniaui"">
     <Grid>
         <!-- Main Content -->
         <ContentPresenter Content=""{Binding MainContent}"" />
-        
+
         <!-- Toast Notifications -->
         <ItemsControl Items=""{Binding ToastNotifications}""
                      VerticalAlignment=""Top""
@@ -1048,9 +1048,9 @@ public class DeviceProfile
                                 </Style.Animations>
                             </Style>
                         </Border.Styles>
-                        
+
                         <Grid ColumnDefinitions=""Auto,*,Auto"">
-                            <TextBlock Grid.Column=""0"" 
+                            <TextBlock Grid.Column=""0""
                                       Text=""{Binding Icon}""
                                       VerticalAlignment=""Center""
                                       Margin=""0,0,12,0"" />
@@ -1071,7 +1071,7 @@ public class DeviceProfile
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        
+
         <!-- Progress Feedback -->
         <Border Background=""{StaticResource OverlayBrush}""
                IsVisible=""{Binding ShowProgressFeedback}"">
@@ -1085,7 +1085,7 @@ public class DeviceProfile
                           HorizontalAlignment=""Center"" />
             </StackPanel>
         </Border>
-        
+
         <!-- Status Bar -->
         <Border DockPanel.Dock=""Bottom""
                Background=""{StaticResource StatusBarBrush}""
@@ -1093,13 +1093,13 @@ public class DeviceProfile
                BorderThickness=""0,1,0,0""
                IsVisible=""{Binding ShowStatusBar}"">
             <Grid Margin=""16,8"" ColumnDefinitions=""*,Auto"">
-                <TextBlock Grid.Column=""0"" 
+                <TextBlock Grid.Column=""0""
                           Text=""{Binding StatusMessage}""
                           VerticalAlignment=""Center"" />
-                <StackPanel Grid.Column=""1"" 
+                <StackPanel Grid.Column=""1""
                            Orientation=""Horizontal""
                            Spacing=""8"">
-                    <TextBlock Text=""{Binding ConnectedUsersCount}"" 
+                    <TextBlock Text=""{Binding ConnectedUsersCount}""
                               VerticalAlignment=""Center"" />
                     <Ellipse Width=""8"" Height=""8""
                             Fill=""{Binding ConnectionStatusBrush}"" />
@@ -1110,7 +1110,7 @@ public class DeviceProfile
 </UserControl>";
     }
 
-    private static string GenerateProgressiveDisclosure(UXConfiguration config)
+    static string GenerateProgressiveDisclosure(UXConfiguration config)
     {
         return @"<!-- Progressive Disclosure Pattern -->
 <UserControl xmlns=""https://github.com/avaloniaui"">
@@ -1119,19 +1119,19 @@ public class DeviceProfile
             <!-- Primary Information -->
             <StackPanel Spacing=""12"">
                 <TextBlock Text=""Essential Information"" Classes=""heading2"" />
-                <TextBlock Text=""This is the most important content that users need to see immediately."" 
+                <TextBlock Text=""This is the most important content that users need to see immediately.""
                           TextWrapping=""Wrap"" />
                 <Button Content=""Primary Action"" Classes=""primary"" />
             </StackPanel>
-            
+
             <!-- Secondary Information (Expandable) -->
-            <Expander Header=""Show More Details"" 
+            <Expander Header=""Show More Details""
                      Classes=""progressive-disclosure"">
                 <StackPanel Spacing=""12"" Margin=""0,12,0,0"">
                     <TextBlock Text=""Additional Details"" Classes=""heading3"" />
-                    <TextBlock Text=""This secondary information is available when users need it, but doesn't clutter the initial view."" 
+                    <TextBlock Text=""This secondary information is available when users need it, but doesn't clutter the initial view.""
                               TextWrapping=""Wrap"" />
-                    
+
                     <!-- Nested Progressive Disclosure -->
                     <Expander Header=""Advanced Options"">
                         <StackPanel Spacing=""8"" Margin=""0,8,0,0"">
@@ -1146,11 +1146,11 @@ public class DeviceProfile
                     </Expander>
                 </StackPanel>
             </Expander>
-            
+
             <!-- Step-by-Step Disclosure -->
             <StackPanel Spacing=""16"">
                 <TextBlock Text=""Step-by-Step Process"" Classes=""heading2"" />
-                
+
                 <!-- Step 1 -->
                 <Border Classes=""step-container active"">
                     <StackPanel Spacing=""8"">
@@ -1158,38 +1158,38 @@ public class DeviceProfile
                             <Border Grid.Column=""0"" Classes=""step-number"">
                                 <TextBlock Text=""1"" />
                             </Border>
-                            <TextBlock Grid.Column=""1"" 
-                                      Text=""Basic Information"" 
+                            <TextBlock Grid.Column=""1""
+                                      Text=""Basic Information""
                                       Classes=""step-title""
                                       VerticalAlignment=""Center"" />
                         </Grid>
                         <StackPanel Spacing=""8"" IsVisible=""{Binding Step1Expanded}"">
                             <TextBox Watermark=""Enter your name"" />
                             <TextBox Watermark=""Enter your email"" />
-                            <Button Content=""Continue to Step 2"" 
+                            <Button Content=""Continue to Step 2""
                                    Command=""{Binding ExpandStep2Command}""
                                    Classes=""primary"" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
-                
+
                 <!-- Step 2 -->
-                <Border Classes=""step-container"" 
+                <Border Classes=""step-container""
                        IsEnabled=""{Binding Step2Enabled}"">
                     <StackPanel Spacing=""8"">
                         <Grid ColumnDefinitions=""Auto,*"">
                             <Border Grid.Column=""0"" Classes=""step-number"">
                                 <TextBlock Text=""2"" />
                             </Border>
-                            <TextBlock Grid.Column=""1"" 
-                                      Text=""Preferences"" 
+                            <TextBlock Grid.Column=""1""
+                                      Text=""Preferences""
                                       Classes=""step-title""
                                       VerticalAlignment=""Center"" />
                         </Grid>
                         <StackPanel Spacing=""8"" IsVisible=""{Binding Step2Expanded}"">
                             <CheckBox Content=""Receive notifications"" />
                             <CheckBox Content=""Enable dark mode"" />
-                            <Button Content=""Complete Setup"" 
+                            <Button Content=""Complete Setup""
                                    Command=""{Binding CompleteCommand}""
                                    Classes=""primary"" />
                         </StackPanel>
@@ -1201,7 +1201,7 @@ public class DeviceProfile
 </UserControl>";
     }
 
-    private static string GenerateMicroInteractionComponents(UXConfiguration config)
+    static string GenerateMicroInteractionComponents(UXConfiguration config)
     {
         return @"<!-- Micro-Interactions Pattern -->
 <UserControl xmlns=""https://github.com/avaloniaui"">
@@ -1217,7 +1217,7 @@ public class DeviceProfile
                 </Animation>
             </Style.Animations>
         </Style>
-        
+
         <!-- Click Feedback -->
         <Style Selector=""Button.interactive:pressed"">
             <Style.Animations>
@@ -1228,7 +1228,7 @@ public class DeviceProfile
                 </Animation>
             </Style.Animations>
         </Style>
-        
+
         <!-- Focus Animations -->
         <Style Selector=""TextBox:focus"">
             <Style.Animations>
@@ -1240,7 +1240,7 @@ public class DeviceProfile
                 </Animation>
             </Style.Animations>
         </Style>
-        
+
         <!-- Loading Pulse -->
         <Style Selector=""Border.pulse"">
             <Style.Animations>
@@ -1258,7 +1258,7 @@ public class DeviceProfile
             </Style.Animations>
         </Style>
     </UserControl.Styles>
-    
+
     <StackPanel Spacing=""20"" Margin=""20"">
         <!-- Interactive Buttons -->
         <StackPanel Spacing=""12"">
@@ -1269,7 +1269,7 @@ public class DeviceProfile
                 <Button Content=""Loading..."" Classes=""pulse"" IsEnabled=""False"" />
             </StackPanel>
         </StackPanel>
-        
+
         <!-- Form Interactions -->
         <StackPanel Spacing=""12"">
             <TextBlock Text=""Form Interactions"" Classes=""heading2"" />
@@ -1277,7 +1277,7 @@ public class DeviceProfile
             <ToggleSwitch Content=""Toggle with smooth transition"" />
             <Slider Value=""50"" ToolTip.Tip=""Drag for instant feedback"" />
         </StackPanel>
-        
+
         <!-- Feedback Cards -->
         <StackPanel Spacing=""12"">
             <TextBlock Text=""Card Interactions"" Classes=""heading2"" />
@@ -1286,17 +1286,17 @@ public class DeviceProfile
                    Padding=""16"" CornerRadius=""8"">
                 <StackPanel Spacing=""8"">
                     <TextBlock Text=""Interactive Card"" Classes=""subtitle"" />
-                    <TextBlock Text=""Hover over this card to see micro-interactions in action."" 
+                    <TextBlock Text=""Hover over this card to see micro-interactions in action.""
                               TextWrapping=""Wrap"" />
                 </StackPanel>
             </Border>
         </StackPanel>
-        
+
         <!-- Progress Feedback -->
         <StackPanel Spacing=""12"">
             <TextBlock Text=""Progress Feedback"" Classes=""heading2"" />
-            <ProgressBar Value=""{Binding ProgressValue}"" 
-                        Height=""8"" 
+            <ProgressBar Value=""{Binding ProgressValue}""
+                        Height=""8""
                         CornerRadius=""4"">
                 <ProgressBar.Styles>
                     <Style Selector=""ProgressBar"">
@@ -1315,20 +1315,20 @@ public class DeviceProfile
 </UserControl>";
     }
 
-    private static string GenerateGenericUXPattern(UXConfiguration config)
+    static string GenerateGenericUXPattern(UXConfiguration config)
     {
         return @"<!-- Generic UX Pattern -->
 <UserControl xmlns=""https://github.com/avaloniaui"">
     <StackPanel Spacing=""16"" Margin=""20"">
         <TextBlock Text=""UX Pattern Component"" Classes=""heading1"" />
-        <TextBlock Text=""This is a generic UX pattern that can be customized for specific use cases."" 
+        <TextBlock Text=""This is a generic UX pattern that can be customized for specific use cases.""
                   TextWrapping=""Wrap"" />
         <Button Content=""Interact"" Classes=""primary"" />
     </StackPanel>
 </UserControl>";
     }
 
-    private static string GenerateUserGuidanceSystem(UXConfiguration config)
+    static string GenerateUserGuidanceSystem(UXConfiguration config)
     {
         return @"// User Guidance Service
 public class UserGuidanceService
@@ -1343,12 +1343,12 @@ public class UserGuidanceService
     {
         _currentFlow = steps.Select(s => s.Id).ToList();
         _currentStepIndex = 0;
-        
+
         foreach (var step in steps)
         {
             _guidanceSteps[step.Id] = step;
         }
-        
+
         ShowCurrentStep();
     }
 
@@ -1420,12 +1420,12 @@ public void StartOnboarding()
         new() { Id = ""navigation"", Title = ""Navigation"", Description = ""Use this menu to navigate."", TargetElement = ""MainMenu"" },
         new() { Id = ""actions"", Title = ""Actions"", Description = ""Click here for main actions."", TargetElement = ""ActionButton"" }
     };
-    
+
     _guidanceService.StartGuidedFlow(""onboarding"", steps);
 }";
     }
 
-    private static string GenerateMicroInteractions(UXConfiguration config)
+    static string GenerateMicroInteractions(UXConfiguration config)
     {
         return @"// Micro-Interactions Service
 public class MicroInteractionsService
@@ -1433,8 +1433,8 @@ public class MicroInteractionsService
     public void AttachHoverEffect(Control control, TimeSpan duration = default)
     {
         if (duration == default) duration = TimeSpan.FromMilliseconds(200);
-        
-        control.PointerEnter += (s, e) => 
+
+        control.PointerEnter += (s, e) =>
         {
             var animation = new Animation
             {
@@ -1447,8 +1447,8 @@ public class MicroInteractionsService
             };
             animation.RunAsync(control);
         };
-        
-        control.PointerLeave += (s, e) => 
+
+        control.PointerLeave += (s, e) =>
         {
             var animation = new Animation
             {
@@ -1477,9 +1477,9 @@ public class MicroInteractionsService
                         .Setters = { new Setter(Visual.RenderTransformProperty, new ScaleTransform(0.95, 0.95)) }
                 }
             };
-            
+
             await scaleDown.RunAsync(button);
-            
+
             // Scale back up
             var scaleUp = new Animation
             {
@@ -1490,7 +1490,7 @@ public class MicroInteractionsService
                         .Setters = { new Setter(Visual.RenderTransformProperty, new ScaleTransform(1.0, 1.0)) }
                 }
             };
-            
+
             await scaleUp.RunAsync(button);
         };
     }
@@ -1513,7 +1513,7 @@ public class MicroInteractionsService
                         .Setters = { new Setter(Visual.OpacityProperty, 1.0) }
                 }
             };
-            
+
             pulseAnimation.RunAsync(control);
         }
         else
@@ -1531,29 +1531,29 @@ public class MicroInteractionsService
             Children =
             {
                 new KeyFrame { Cue = Cue.Parse(""0%"") }
-                    .Setters = { 
+                    .Setters = {
                         new Setter(Visual.RenderTransformProperty, new ScaleTransform(1.0, 1.0)),
                         new Setter(Border.BackgroundProperty, Brushes.Transparent)
                     },
                 new KeyFrame { Cue = Cue.Parse(""30%"") }
-                    .Setters = { 
+                    .Setters = {
                         new Setter(Visual.RenderTransformProperty, new ScaleTransform(1.1, 1.1)),
                         new Setter(Border.BackgroundProperty, Brushes.LightGreen)
                     },
                 new KeyFrame { Cue = Cue.Parse(""100%"") }
-                    .Setters = { 
+                    .Setters = {
                         new Setter(Visual.RenderTransformProperty, new ScaleTransform(1.0, 1.0)),
                         new Setter(Border.BackgroundProperty, Brushes.Transparent)
                     }
             }
         };
-        
+
         successAnimation.RunAsync(control).ContinueWith(_ => onComplete?.Invoke());
     }
 }";
     }
 
-    private static string GenerateUsabilityGuidelines(UXConfiguration config)
+    static string GenerateUsabilityGuidelines(UXConfiguration config)
     {
         return @"## Usability Guidelines
 
@@ -1565,7 +1565,7 @@ public class MicroInteractionsService
 
 ### Animation Timing
 - **Subtle**: 100-200ms for micro-interactions
-- **Moderate**: 200-500ms for transitions and state changes  
+- **Moderate**: 200-500ms for transitions and state changes
 - **Bold**: 500ms+ for dramatic state changes and onboarding
 
 ### Touch Targets
@@ -1586,7 +1586,7 @@ public class MicroInteractionsService
 - **Tone**: Use helpful, not blame-focused language";
     }
 
-    private static string GenerateColorSystem(DesignSystemConfiguration config)
+    static string GenerateColorSystem(DesignSystemConfiguration config)
     {
         return config.ColorPalette switch
         {
@@ -1598,7 +1598,7 @@ public class MicroInteractionsService
         };
     }
 
-    private static string GenerateMonochromeColors()
+    static string GenerateMonochromeColors()
     {
         return @"<!-- Monochrome Color System -->
 <ResourceDictionary xmlns=""https://github.com/avaloniaui"">
@@ -1606,22 +1606,22 @@ public class MicroInteractionsService
     <SolidColorBrush x:Key=""PrimaryBrush"" Color=""#000000"" />
     <SolidColorBrush x:Key=""PrimaryLightBrush"" Color=""#333333"" />
     <SolidColorBrush x:Key=""PrimaryDarkBrush"" Color=""#000000"" />
-    
+
     <!-- Secondary Colors -->
     <SolidColorBrush x:Key=""SecondaryBrush"" Color=""#666666"" />
     <SolidColorBrush x:Key=""SecondaryLightBrush"" Color=""#999999"" />
     <SolidColorBrush x:Key=""SecondaryDarkBrush"" Color=""#333333"" />
-    
+
     <!-- Neutral Colors -->
     <SolidColorBrush x:Key=""BackgroundBrush"" Color=""#FFFFFF"" />
     <SolidColorBrush x:Key=""SurfaceBrush"" Color=""#F8F8F8"" />
     <SolidColorBrush x:Key=""BorderBrush"" Color=""#E0E0E0"" />
-    
+
     <!-- Text Colors -->
     <SolidColorBrush x:Key=""TextPrimaryBrush"" Color=""#000000"" />
     <SolidColorBrush x:Key=""TextSecondaryBrush"" Color=""#666666"" />
     <SolidColorBrush x:Key=""TextDisabledBrush"" Color=""#CCCCCC"" />
-    
+
     <!-- Accent Colors -->
     <SolidColorBrush x:Key=""AccentBrush"" Color=""#000000"" />
     <SolidColorBrush x:Key=""SuccessBrush"" Color=""#4A4A4A"" />
@@ -1630,7 +1630,7 @@ public class MicroInteractionsService
 </ResourceDictionary>";
     }
 
-    private static string GenerateVibrantColors()
+    static string GenerateVibrantColors()
     {
         return @"<!-- Vibrant Color System -->
 <ResourceDictionary xmlns=""https://github.com/avaloniaui"">
@@ -1638,17 +1638,17 @@ public class MicroInteractionsService
     <SolidColorBrush x:Key=""PrimaryBrush"" Color=""#FF6B35"" />
     <SolidColorBrush x:Key=""PrimaryLightBrush"" Color=""#FF8A65"" />
     <SolidColorBrush x:Key=""PrimaryDarkBrush"" Color=""#D84315"" />
-    
+
     <!-- Secondary Colors -->
     <SolidColorBrush x:Key=""SecondaryBrush"" Color=""#2196F3"" />
     <SolidColorBrush x:Key=""SecondaryLightBrush"" Color=""#64B5F6"" />
     <SolidColorBrush x:Key=""SecondaryDarkBrush"" Color=""#1976D2"" />
-    
+
     <!-- Neutral Colors -->
     <SolidColorBrush x:Key=""BackgroundBrush"" Color=""#FFFFFF"" />
     <SolidColorBrush x:Key=""SurfaceBrush"" Color=""#FAFAFA"" />
     <SolidColorBrush x:Key=""BorderBrush"" Color=""#E0E0E0"" />
-    
+
     <!-- Accent Colors -->
     <SolidColorBrush x:Key=""AccentBrush"" Color=""#9C27B0"" />
     <SolidColorBrush x:Key=""SuccessBrush"" Color=""#4CAF50"" />
@@ -1657,7 +1657,7 @@ public class MicroInteractionsService
 </ResourceDictionary>";
     }
 
-    private static string GeneratePastelColors()
+    static string GeneratePastelColors()
     {
         return @"<!-- Pastel Color System -->
 <ResourceDictionary xmlns=""https://github.com/avaloniaui"">
@@ -1665,17 +1665,17 @@ public class MicroInteractionsService
     <SolidColorBrush x:Key=""PrimaryBrush"" Color=""#E8A87C"" />
     <SolidColorBrush x:Key=""PrimaryLightBrush"" Color=""#F4C2A1"" />
     <SolidColorBrush x:Key=""PrimaryDarkBrush"" Color=""#D4956B"" />
-    
+
     <!-- Secondary Colors -->
     <SolidColorBrush x:Key=""SecondaryBrush"" Color=""#B8E6B8"" />
     <SolidColorBrush x:Key=""SecondaryLightBrush"" Color=""#D4F1D4"" />
     <SolidColorBrush x:Key=""SecondaryDarkBrush"" Color=""#A3D9A3"" />
-    
+
     <!-- Neutral Colors -->
     <SolidColorBrush x:Key=""BackgroundBrush"" Color=""#FEFEFE"" />
     <SolidColorBrush x:Key=""SurfaceBrush"" Color=""#F9F9F9"" />
     <SolidColorBrush x:Key=""BorderBrush"" Color=""#E8E8E8"" />
-    
+
     <!-- Accent Colors -->
     <SolidColorBrush x:Key=""AccentBrush"" Color=""#C8A2C8"" />
     <SolidColorBrush x:Key=""SuccessBrush"" Color=""#A8E6CF"" />
@@ -1684,7 +1684,7 @@ public class MicroInteractionsService
 </ResourceDictionary>";
     }
 
-    private static string GenerateDarkColors()
+    static string GenerateDarkColors()
     {
         return @"<!-- Dark Color System -->
 <ResourceDictionary xmlns=""https://github.com/avaloniaui"">
@@ -1692,22 +1692,22 @@ public class MicroInteractionsService
     <SolidColorBrush x:Key=""PrimaryBrush"" Color=""#BB86FC"" />
     <SolidColorBrush x:Key=""PrimaryLightBrush"" Color=""#CBA6FC"" />
     <SolidColorBrush x:Key=""PrimaryDarkBrush"" Color=""#9965F4"" />
-    
+
     <!-- Secondary Colors -->
     <SolidColorBrush x:Key=""SecondaryBrush"" Color=""#03DAC6"" />
     <SolidColorBrush x:Key=""SecondaryLightBrush"" Color=""#66FFF9"" />
     <SolidColorBrush x:Key=""SecondaryDarkBrush"" Color=""#00A693"" />
-    
+
     <!-- Background Colors -->
     <SolidColorBrush x:Key=""BackgroundBrush"" Color=""#121212"" />
     <SolidColorBrush x:Key=""SurfaceBrush"" Color=""#1E1E1E"" />
     <SolidColorBrush x:Key=""BorderBrush"" Color=""#333333"" />
-    
+
     <!-- Text Colors -->
     <SolidColorBrush x:Key=""TextPrimaryBrush"" Color=""#FFFFFF"" />
     <SolidColorBrush x:Key=""TextSecondaryBrush"" Color=""#B3B3B3"" />
     <SolidColorBrush x:Key=""TextDisabledBrush"" Color=""#666666"" />
-    
+
     <!-- Accent Colors -->
     <SolidColorBrush x:Key=""AccentBrush"" Color=""#BB86FC"" />
     <SolidColorBrush x:Key=""SuccessBrush"" Color=""#4CAF50"" />
@@ -1716,7 +1716,7 @@ public class MicroInteractionsService
 </ResourceDictionary>";
     }
 
-    private static string GenerateModernColors()
+    static string GenerateModernColors()
     {
         return @"<!-- Modern Color System -->
 <ResourceDictionary xmlns=""https://github.com/avaloniaui"">
@@ -1724,22 +1724,22 @@ public class MicroInteractionsService
     <SolidColorBrush x:Key=""PrimaryBrush"" Color=""#6366F1"" />
     <SolidColorBrush x:Key=""PrimaryLightBrush"" Color=""#8B5CF6"" />
     <SolidColorBrush x:Key=""PrimaryDarkBrush"" Color=""#4F46E5"" />
-    
+
     <!-- Secondary Colors -->
     <SolidColorBrush x:Key=""SecondaryBrush"" Color=""#06B6D4"" />
     <SolidColorBrush x:Key=""SecondaryLightBrush"" Color=""#22D3EE"" />
     <SolidColorBrush x:Key=""SecondaryDarkBrush"" Color=""#0891B2"" />
-    
+
     <!-- Neutral Colors -->
     <SolidColorBrush x:Key=""BackgroundBrush"" Color=""#FFFFFF"" />
     <SolidColorBrush x:Key=""SurfaceBrush"" Color=""#F8FAFC"" />
     <SolidColorBrush x:Key=""BorderBrush"" Color=""#E2E8F0"" />
-    
+
     <!-- Text Colors -->
     <SolidColorBrush x:Key=""TextPrimaryBrush"" Color=""#1E293B"" />
     <SolidColorBrush x:Key=""TextSecondaryBrush"" Color=""#64748B"" />
     <SolidColorBrush x:Key=""TextDisabledBrush"" Color=""#CBD5E1"" />
-    
+
     <!-- Accent Colors -->
     <SolidColorBrush x:Key=""AccentBrush"" Color=""#8B5CF6"" />
     <SolidColorBrush x:Key=""SuccessBrush"" Color=""#10B981"" />
@@ -1748,7 +1748,7 @@ public class MicroInteractionsService
 </ResourceDictionary>";
     }
 
-    private static string GenerateTypographySystem(DesignSystemConfiguration config)
+    static string GenerateTypographySystem(DesignSystemConfiguration config)
     {
         int baseSize = config.TypographyScale switch
         {
@@ -1763,7 +1763,7 @@ public class MicroInteractionsService
     <FontFamily x:Key=""PrimaryFont"">Inter, Segoe UI, Arial, sans-serif</FontFamily>
     <FontFamily x:Key=""HeadingFont"">Inter, Segoe UI, Arial, sans-serif</FontFamily>
     <FontFamily x:Key=""MonospaceFont"">Consolas, Monaco, monospace</FontFamily>
-    
+
     <!-- Typography Styles -->
     <Style Selector=""TextBlock.heading1"" x:Key=""Heading1"">
         <Setter Property=""FontFamily"" Value=""{{StaticResource HeadingFont}}"" />
@@ -1772,7 +1772,7 @@ public class MicroInteractionsService
         <Setter Property=""LineHeight"" Value=""{baseSize * 3}"" />
         <Setter Property=""Foreground"" Value=""{{StaticResource TextPrimaryBrush}}"" />
     </Style>
-    
+
     <Style Selector=""TextBlock.heading2"" x:Key=""Heading2"">
         <Setter Property=""FontFamily"" Value=""{{StaticResource HeadingFont}}"" />
         <Setter Property=""FontSize"" Value=""{baseSize * 2}"" />
@@ -1780,7 +1780,7 @@ public class MicroInteractionsService
         <Setter Property=""LineHeight"" Value=""{baseSize * 2.5}"" />
         <Setter Property=""Foreground"" Value=""{{StaticResource TextPrimaryBrush}}"" />
     </Style>
-    
+
     <Style Selector=""TextBlock.heading3"" x:Key=""Heading3"">
         <Setter Property=""FontFamily"" Value=""{{StaticResource HeadingFont}}"" />
         <Setter Property=""FontSize"" Value=""{baseSize * 1.5}"" />
@@ -1788,7 +1788,7 @@ public class MicroInteractionsService
         <Setter Property=""LineHeight"" Value=""{baseSize * 2}"" />
         <Setter Property=""Foreground"" Value=""{{StaticResource TextPrimaryBrush}}"" />
     </Style>
-    
+
     <Style Selector=""TextBlock.subtitle"" x:Key=""Subtitle"">
         <Setter Property=""FontFamily"" Value=""{{StaticResource PrimaryFont}}"" />
         <Setter Property=""FontSize"" Value=""{baseSize * 1.25}"" />
@@ -1796,7 +1796,7 @@ public class MicroInteractionsService
         <Setter Property=""LineHeight"" Value=""{baseSize * 1.75}"" />
         <Setter Property=""Foreground"" Value=""{{StaticResource TextPrimaryBrush}}"" />
     </Style>
-    
+
     <Style Selector=""TextBlock.body1"" x:Key=""Body1"">
         <Setter Property=""FontFamily"" Value=""{{StaticResource PrimaryFont}}"" />
         <Setter Property=""FontSize"" Value=""{baseSize}"" />
@@ -1804,7 +1804,7 @@ public class MicroInteractionsService
         <Setter Property=""LineHeight"" Value=""{baseSize * 1.5}"" />
         <Setter Property=""Foreground"" Value=""{{StaticResource TextPrimaryBrush}}"" />
     </Style>
-    
+
     <Style Selector=""TextBlock.body2"" x:Key=""Body2"">
         <Setter Property=""FontFamily"" Value=""{{StaticResource PrimaryFont}}"" />
         <Setter Property=""FontSize"" Value=""{baseSize * 0.875}"" />
@@ -1812,7 +1812,7 @@ public class MicroInteractionsService
         <Setter Property=""LineHeight"" Value=""{baseSize * 1.25}"" />
         <Setter Property=""Foreground"" Value=""{{StaticResource TextSecondaryBrush}}"" />
     </Style>
-    
+
     <Style Selector=""TextBlock.caption"" x:Key=""Caption"">
         <Setter Property=""FontFamily"" Value=""{{StaticResource PrimaryFont}}"" />
         <Setter Property=""FontSize"" Value=""{baseSize * 0.75}"" />
@@ -1820,7 +1820,7 @@ public class MicroInteractionsService
         <Setter Property=""LineHeight"" Value=""{baseSize}"" />
         <Setter Property=""Foreground"" Value=""{{StaticResource TextSecondaryBrush}}"" />
     </Style>
-    
+
     <Style Selector=""TextBlock.code"" x:Key=""Code"">
         <Setter Property=""FontFamily"" Value=""{{StaticResource MonospaceFont}}"" />
         <Setter Property=""FontSize"" Value=""{baseSize * 0.875}"" />
@@ -1831,13 +1831,13 @@ public class MicroInteractionsService
 </ResourceDictionary>";
     }
 
-    private static string GenerateSpacingSystem(DesignSystemConfiguration config)
+    static string GenerateSpacingSystem(DesignSystemConfiguration config)
     {
         return @"<!-- Spacing System -->
 <ResourceDictionary xmlns=""https://github.com/avaloniaui"">
     <!-- Base Spacing Unit (8px) -->
     <x:Double x:Key=""SpacingUnit"">8</x:Double>
-    
+
     <!-- Spacing Scale -->
     <Thickness x:Key=""Spacing0"">0</Thickness>
     <Thickness x:Key=""Spacing1"">4</Thickness>
@@ -1851,7 +1851,7 @@ public class MicroInteractionsService
     <Thickness x:Key=""Spacing12"">48</Thickness>
     <Thickness x:Key=""Spacing16"">64</Thickness>
     <Thickness x:Key=""Spacing20"">80</Thickness>
-    
+
     <!-- Border Radius -->
     <CornerRadius x:Key=""RadiusNone"">0</CornerRadius>
     <CornerRadius x:Key=""RadiusSmall"">4</CornerRadius>
@@ -1859,7 +1859,7 @@ public class MicroInteractionsService
     <CornerRadius x:Key=""RadiusLarge"">12</CornerRadius>
     <CornerRadius x:Key=""RadiusXLarge"">16</CornerRadius>
     <CornerRadius x:Key=""RadiusFull"">9999</CornerRadius>
-    
+
     <!-- Shadows -->
     <BoxShadow x:Key=""ShadowSmall"">0 1 3 rgba(0,0,0,0.12)</BoxShadow>
     <BoxShadow x:Key=""ShadowMedium"">0 4 6 rgba(0,0,0,0.1)</BoxShadow>
@@ -1868,7 +1868,7 @@ public class MicroInteractionsService
 </ResourceDictionary>";
     }
 
-    private static string GenerateComponentLibrary(DesignSystemConfiguration config)
+    static string GenerateComponentLibrary(DesignSystemConfiguration config)
     {
         return @"<!-- Component Library -->
 <ResourceDictionary xmlns=""https://github.com/avaloniaui"">
@@ -1882,7 +1882,7 @@ public class MicroInteractionsService
         <Setter Property=""BorderThickness"" Value=""0"" />
         <Setter Property=""MinHeight"" Value=""44"" />
     </Style>
-    
+
     <Style Selector=""Button.secondary"" x:Key=""SecondaryButton"">
         <Setter Property=""Background"" Value=""Transparent"" />
         <Setter Property=""Foreground"" Value=""{StaticResource PrimaryBrush}"" />
@@ -1893,7 +1893,7 @@ public class MicroInteractionsService
         <Setter Property=""FontWeight"" Value=""Medium"" />
         <Setter Property=""MinHeight"" Value=""44"" />
     </Style>
-    
+
     <!-- Card Style -->
     <Style Selector=""Border.card"" x:Key=""Card"">
         <Setter Property=""Background"" Value=""{StaticResource SurfaceBrush}"" />
@@ -1903,7 +1903,7 @@ public class MicroInteractionsService
         <Setter Property=""Padding"" Value=""{StaticResource Spacing6}"" />
         <Setter Property=""BoxShadow"" Value=""{StaticResource ShadowSmall}"" />
     </Style>
-    
+
     <!-- Form Input Styles -->
     <Style Selector=""TextBox.form-input"" x:Key=""FormInput"">
         <Setter Property=""Padding"" Value=""{StaticResource Spacing3}"" />
@@ -1912,7 +1912,7 @@ public class MicroInteractionsService
         <Setter Property=""BorderBrush"" Value=""{StaticResource BorderBrush}"" />
         <Setter Property=""MinHeight"" Value=""44"" />
     </Style>
-    
+
     <Style Selector=""TextBlock.form-label"" x:Key=""FormLabel"">
         <Setter Property=""FontWeight"" Value=""Medium"" />
         <Setter Property=""Foreground"" Value=""{StaticResource TextPrimaryBrush}"" />

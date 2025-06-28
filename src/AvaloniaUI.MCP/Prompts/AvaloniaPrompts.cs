@@ -320,7 +320,7 @@ Please proceed with implementing responsive design following these guidelines.";
         return Task.FromResult(prompt);
     }
 
-    private static string GetPlatformConsiderations(string targetPlatforms)
+    static string GetPlatformConsiderations(string targetPlatforms)
     {
         return targetPlatforms.ToLower(System.Globalization.CultureInfo.CurrentCulture) switch
         {
@@ -347,7 +347,7 @@ Please proceed with implementing responsive design following these guidelines.";
         };
     }
 
-    private static string GetDiagnosticSteps(string issueType)
+    static string GetDiagnosticSteps(string issueType)
     {
         return issueType.ToLower(System.Globalization.CultureInfo.CurrentCulture) switch
         {
@@ -392,7 +392,7 @@ Please proceed with implementing responsive design following these guidelines.";
         };
     }
 
-    private static string GetCommonSolutions(string issueType)
+    static string GetCommonSolutions(string issueType)
     {
         return issueType.ToLower(System.Globalization.CultureInfo.CurrentCulture) switch
         {
@@ -433,7 +433,7 @@ Please proceed with implementing responsive design following these guidelines.";
         };
     }
 
-    private static string GetPlatformSpecificConsiderations(string targetDevices)
+    static string GetPlatformSpecificConsiderations(string targetDevices)
     {
         return targetDevices.ToLower(System.Globalization.CultureInfo.CurrentCulture) switch
         {

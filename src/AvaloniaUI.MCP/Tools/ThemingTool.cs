@@ -221,7 +221,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
         }
     }
 
-    private sealed class ThemeConfiguration
+    sealed class ThemeConfiguration
     {
         public string Name { get; set; } = "";
         public string Type { get; set; } = "light";
@@ -231,14 +231,14 @@ Application.Current.Styles.Add(new {themeName}Theme());
         public bool IncludeEffects { get; set; } = true;
     }
 
-    private sealed class ColorInfo
+    sealed class ColorInfo
     {
         public string Name { get; set; } = "";
         public string Hex { get; set; } = "";
         public string Description { get; set; } = "";
     }
 
-    private static string ValidateColor(string color)
+    static string ValidateColor(string color)
     {
         if (string.IsNullOrEmpty(color))
         {
@@ -248,7 +248,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
         color = color.Trim();
 
         // Handle hex colors
-        if (color.StartsWith("#"))
+        if (color.StartsWith('#'))
         {
             if (color.Length is 7 or 9) // #RRGGBB or #AARRGGBB
             {
@@ -277,7 +277,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
             : throw new ArgumentException($"Invalid color format: {color}");
     }
 
-    private static string GenerateSecondaryColor(string primaryColor)
+    static string GenerateSecondaryColor(string primaryColor)
     {
         // Simple complementary color generation
         return primaryColor switch
@@ -289,7 +289,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
         };
     }
 
-    private static string GenerateThemeXaml(ThemeConfiguration theme)
+    static string GenerateThemeXaml(ThemeConfiguration theme)
     {
         bool isDark = theme.Type == "dark";
         string textColor = isDark ? "#FFFFFF" : "#000000";
@@ -298,7 +298,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
 
         return $@"<Styles xmlns=""https://github.com/avaloniaui""
         xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
-    
+
     <!-- {theme.Name} Theme Resources -->
     <Style.Resources>
         <!-- Color Palette -->
@@ -308,11 +308,11 @@ Application.Current.Styles.Add(new {themeName}Theme());
         <SolidColorBrush x:Key=""ThemeTextBrush"" Color=""{textColor}"" />
         <SolidColorBrush x:Key=""ThemeSurfaceBrush"" Color=""{surfaceColor}"" />
         <SolidColorBrush x:Key=""ThemeBorderBrush"" Color=""{borderColor}"" />
-        
+
         <!-- Corner Radius -->
         <CornerRadius x:Key=""ThemeCornerRadius"">4</CornerRadius>
         <CornerRadius x:Key=""ThemeCardCornerRadius"">8</CornerRadius>
-        
+
         <!-- Spacing -->
         <Thickness x:Key=""ThemePadding"">12,8</Thickness>
         <Thickness x:Key=""ThemeMargin"">8</Thickness>
@@ -338,7 +338,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
 </Styles>";
     }
 
-    private static string GenerateThemeCode(ThemeConfiguration theme)
+    static string GenerateThemeCode(ThemeConfiguration theme)
     {
         return $@"using Avalonia.Styling;
 
@@ -353,7 +353,7 @@ public class {theme.Name}Theme : Styles
             Source = new Uri(""/Themes/{theme.Name}Theme.axaml"", UriKind.Relative)
         }});
     }}
-    
+
     public static void Apply()
     {{
         if (Application.Current?.Styles != null)
@@ -365,7 +365,7 @@ public class {theme.Name}Theme : Styles
 }}";
     }
 
-    private static string GenerateColorPalette(ThemeConfiguration theme)
+    static string GenerateColorPalette(ThemeConfiguration theme)
     {
         return $@"
 ### Primary Colors
@@ -379,7 +379,7 @@ public class {theme.Name}Theme : Styles
 - **Border**: {(theme.Type == "dark" ? "#464647" : "#CCCCCC")}";
     }
 
-    private static List<ColorInfo> GenerateColorSchemeColors(string baseColor, string schemeType, int colorCount)
+    static List<ColorInfo> GenerateColorSchemeColors(string baseColor, string schemeType, int colorCount)
     {
         // Simplified color scheme generation
         return [.. new List<ColorInfo>
@@ -392,7 +392,7 @@ public class {theme.Name}Theme : Styles
         }.Take(colorCount)];
     }
 
-    private static string GenerateSelectorXaml(List<string> selectors, string controlType)
+    static string GenerateSelectorXaml(List<string> selectors, string controlType)
     {
         return $@"<Window.Styles>
 {string.Join("\n", selectors.Select(selector => $@"    <!-- {selector} -->
@@ -412,7 +412,7 @@ public class {theme.Name}Theme : Styles
 </StackPanel>";
     }
 
-    private static string GenerateAccessibilityNotes()
+    static string GenerateAccessibilityNotes()
     {
         return @"
 ### Contrast Ratios

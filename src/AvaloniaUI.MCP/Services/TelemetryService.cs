@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
+
 using Microsoft.Extensions.Logging;
 
 namespace AvaloniaUI.MCP.Services;
@@ -42,27 +43,27 @@ public interface ITelemetryService
 
 public class TelemetryService : ITelemetryService, IDisposable
 {
-    private readonly ILogger<TelemetryService> _logger;
-    private readonly Meter _meter;
-    private readonly ActivitySource _activitySource;
+    readonly ILogger<TelemetryService> _logger;
+    readonly Meter _meter;
+    readonly ActivitySource _activitySource;
 
     // Counters
-    private readonly Counter<long> _toolExecutionCounter;
-    private readonly Counter<long> _resourceAccessCounter;
-    private readonly Counter<long> _validationCounter;
-    private readonly Counter<long> _errorCounter;
+    readonly Counter<long> _toolExecutionCounter;
+    readonly Counter<long> _resourceAccessCounter;
+    readonly Counter<long> _validationCounter;
+    readonly Counter<long> _errorCounter;
 
     // Histograms
-    private readonly Histogram<double> _toolExecutionDuration;
+    readonly Histogram<double> _toolExecutionDuration;
 
     // Tracking metrics
-    private long _totalToolExecutions;
-    private long _successfulToolExecutions;
-    private long _totalResourceAccesses;
-    private long _cacheHits;
-    private long _totalValidations;
-    private long _successfulValidations;
-    private readonly Lock _metricsLock = new();
+    long _totalToolExecutions;
+    long _successfulToolExecutions;
+    long _totalResourceAccesses;
+    long _cacheHits;
+    long _totalValidations;
+    long _successfulValidations;
+    readonly Lock _metricsLock = new();
 
     public TelemetryService(ILogger<TelemetryService> logger)
     {
@@ -191,8 +192,7 @@ public class TelemetryService : ITelemetryService, IDisposable
 
         if (!success && !string.IsNullOrEmpty(errorDetails))
         {
-            _logger.LogWarning("Validation failed: {ValidationType} - Details: {ErrorDetails}",
-                validationType, errorDetails);
+            _logger.LogWarning("Validation failed: {ValidationType} - Details: {ErrorDetails}", validationType, errorDetails);
         }
     }
 
@@ -207,10 +207,9 @@ public class TelemetryService : ITelemetryService, IDisposable
             _ => LogLevel.Debug
         };
 
-        if (properties?.Any() == true)
+        if (properties?.Count > 0)
         {
-            _logger.Log(logLevel, "Server event: {EventType} - Properties: {@Properties}",
-                eventType, properties);
+            _logger.Log(logLevel, "Server event: {EventType} - Properties: {@Properties}", eventType, properties);
         }
         else
         {
@@ -294,14 +293,14 @@ public static class TelemetryExtensions
     }
 }
 
-internal sealed class ToolExecutionScope(ITelemetryService telemetry, string toolName) : IDisposable
+sealed class ToolExecutionScope(ITelemetryService telemetry, string toolName) : IDisposable
 {
-    private readonly ITelemetryService _telemetry = telemetry;
-    private readonly string _toolName = toolName;
-    private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-    private readonly Activity? _activity = telemetry.StartActivity($"tool_execution_{toolName}");
-    private bool _success = true;
-    private string? _errorMessage;
+    readonly ITelemetryService _telemetry = telemetry;
+    readonly string _toolName = toolName;
+    readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+    readonly Activity? _activity = telemetry.StartActivity($"tool_execution_{toolName}");
+    bool _success = true;
+    string? _errorMessage;
 
     public void MarkFailure(string errorMessage)
     {
@@ -317,12 +316,12 @@ internal sealed class ToolExecutionScope(ITelemetryService telemetry, string too
     }
 }
 
-internal sealed class ValidationScope(ITelemetryService telemetry, string validationType) : IDisposable
+sealed class ValidationScope(ITelemetryService telemetry, string validationType) : IDisposable
 {
-    private readonly ITelemetryService _telemetry = telemetry;
-    private readonly string _validationType = validationType;
-    private bool _success = true;
-    private string? _errorDetails;
+    readonly ITelemetryService _telemetry = telemetry;
+    readonly string _validationType = validationType;
+    bool _success = true;
+    string? _errorDetails;
 
     public void MarkFailure(string errorDetails)
     {

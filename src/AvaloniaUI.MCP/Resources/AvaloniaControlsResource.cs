@@ -54,7 +54,7 @@ public static class AvaloniaControlsResource
         });
     }
 
-    private static string FormatControlsReference(JsonElement controlsData)
+    static string FormatControlsReference(JsonElement controlsData)
     {
         string result = "# AvaloniaUI Controls Reference\\n\\n";
 
@@ -75,7 +75,7 @@ public static class AvaloniaControlsResource
         return result;
     }
 
-    private static string? FindControlInfo(JsonElement controlsData, string controlName)
+    static string? FindControlInfo(JsonElement controlsData, string controlName)
     {
         if (controlsData.TryGetProperty("avaloniaui_controls", out JsonElement controls))
         {
@@ -93,7 +93,7 @@ public static class AvaloniaControlsResource
         return null;
     }
 
-    private static string FormatControlInfo(string controlName, JsonElement controlData)
+    static string FormatControlInfo(string controlName, JsonElement controlData)
     {
         string result = $"### {controlName}\\n\\n";
 
@@ -127,7 +127,7 @@ public static class AvaloniaControlsResource
         return result;
     }
 
-    private static string FormatCategoryName(string categoryName)
+    static string FormatCategoryName(string categoryName)
     {
         return categoryName.Replace("_", " ")
             .Split(' ')
