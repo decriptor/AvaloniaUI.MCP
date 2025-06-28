@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 
+using AvaloniaUI.MCP.Services;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -16,7 +18,7 @@ public static class AnimationTool
         [Description("Delay before animation starts in milliseconds")] int delay = 0,
         [Description("Number of iterations (use -1 for infinite)")] int iterations = 1)
     {
-        try
+        return ErrorHandlingService.SafeExecute(nameof(GenerateAnimation), () =>
         {
             var animationConfig = new AnimationConfiguration
             {
@@ -84,11 +86,7 @@ public static class AnimationTool
 - **Property Changes**: Bind to ViewModel properties
 - **User Interactions**: Mouse, touch, keyboard events
 - **State Changes**: Data-driven animations";
-        }
-        catch (Exception ex)
-        {
-            return $"Error generating animation: {ex.Message}";
-        }
+        });
     }
 
     [McpServerTool, Description("Creates page transitions for navigation between views")]

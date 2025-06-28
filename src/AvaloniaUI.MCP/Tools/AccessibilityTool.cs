@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 
+using AvaloniaUI.MCP.Services;
+
 using ModelContextProtocol.Server;
 
 namespace AvaloniaUI.MCP.Tools;
@@ -14,7 +16,7 @@ public static class AccessibilityTool
         [Description("Include keyboard navigation: 'true' or 'false'")] string includeKeyboardNav = "true",
         [Description("Include screen reader support: 'true' or 'false'")] string includeScreenReader = "true")
     {
-        try
+        return ErrorHandlingService.SafeExecute(nameof(GenerateAccessibleComponent), () =>
         {
             var config = new AccessibilityConfiguration
             {
@@ -29,42 +31,27 @@ public static class AccessibilityTool
             string keyboardHandler = config.IncludeKeyboardNavigation ? GenerateKeyboardNavigationCode(config) : "";
             string testingChecklist = GenerateAccessibilityTestingChecklist(config);
 
-            return $@"# Accessible Component: {componentType}
-
-## Configuration
-- **Component Type**: {config.ComponentType}
-- **WCAG Level**: {config.WcagLevel}
-- **Keyboard Navigation**: {config.IncludeKeyboardNavigation}
-- **Screen Reader Support**: {config.IncludeScreenReaderSupport}
-
-## Accessible Component XAML
-```xml
-{componentXaml}
-```
-
-## Accessibility Helper Classes
-```csharp
-{accessibilityHelpers}
-```
-
-{(config.IncludeKeyboardNavigation ? $@"## Keyboard Navigation Handler
-```csharp
-{keyboardHandler}
-```" : "")}
-
-## Accessibility Testing Checklist
-{testingChecklist}
-
-## WCAG {config.WcagLevel} Compliance Notes
-- **Contrast Ratio**: Minimum 4.5:1 for normal text, 3:1 for large text
-- **Keyboard Navigation**: All interactive elements must be keyboard accessible
-- **Screen Reader**: Proper ARIA labels and roles for assistive technology
-- **Focus Management**: Clear visual focus indicators and logical tab order";
-        }
-        catch (Exception ex)
-        {
-            return $"Error generating accessible component: {ex.Message}";
-        }
+            return MarkdownOutputBuilder
+                .Create($"Accessible Component: {componentType}")
+                .AddConfiguration(
+                    ("Component Type", config.ComponentType),
+                    ("WCAG Level", config.WcagLevel),
+                    ("Keyboard Navigation", config.IncludeKeyboardNavigation),
+                    ("Screen Reader Support", config.IncludeScreenReaderSupport))
+                .AddCodeSection("Accessible Component XAML", "xml", componentXaml)
+                .AddCodeSection("Accessibility Helper Classes", "csharp", accessibilityHelpers)
+                .AddIf(config.IncludeKeyboardNavigation, builder => 
+                    builder.AddCodeSection("Keyboard Navigation Handler", "csharp", keyboardHandler))
+                .AddSection("Accessibility Testing Checklist", testingChecklist)
+                .AddSection($"WCAG {config.WcagLevel} Compliance Notes", string.Join("\n", new[]
+                {
+                    "- **Contrast Ratio**: Minimum 4.5:1 for normal text, 3:1 for large text",
+                    "- **Keyboard Navigation**: All interactive elements must be keyboard accessible", 
+                    "- **Screen Reader**: Proper ARIA labels and roles for assistive technology",
+                    "- **Focus Management**: Clear visual focus indicators and logical tab order"
+                }))
+                .Build();
+        });
     }
 
     private sealed class AccessibilityConfiguration

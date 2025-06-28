@@ -249,7 +249,7 @@ public class TelemetryServiceTests : IDisposable
 
     public void Dispose()
     {
-        throw new NotImplementedException();
+        // No cleanup needed for this test class
     }
 }
 

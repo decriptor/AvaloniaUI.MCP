@@ -266,7 +266,7 @@ public class AccessibilityToolTests
         string result = AccessibilityTool.GenerateAccessibleComponent("form", "AA", "invalid", "invalid");
 
         // Assert
-        StringAssert.Contains(result, "Error generating accessible component", "Result should contain error message for invalid boolean parameters");
+        StringAssert.Contains(result, "❌ Error", "Result should contain error message for invalid boolean parameters");
     }
 
     [TestMethod]
