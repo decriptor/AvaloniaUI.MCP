@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 
 using AvaloniaUI.MCP.Services;
@@ -22,15 +22,15 @@ public static class DiagnosticTool
         try
         {
             // Try to get telemetry service from DI container if available
-            var serviceProvider = GetServiceProvider();
-            var telemetry = serviceProvider?.GetService<ITelemetryService>();
+            IServiceProvider? serviceProvider = GetServiceProvider();
+            ITelemetryService? telemetry = serviceProvider?.GetService<ITelemetryService>();
 
             if (telemetry == null)
             {
                 return "# ⚠️ Server Metrics Unavailable\n\nTelemetry service is not configured or available.";
             }
 
-            var metrics = telemetry.GetMetricsSnapshot();
+            Dictionary<string, object> metrics = telemetry.GetMetricsSnapshot();
 
             return $@"# 📊 AvaloniaUI MCP Server Metrics
 
@@ -74,8 +74,8 @@ public static class DiagnosticTool
             var healthStatus = new List<(string Component, bool IsHealthy, string Details)>();
 
             // Check telemetry service
-            var serviceProvider = GetServiceProvider();
-            var telemetry = serviceProvider?.GetService<ITelemetryService>();
+            IServiceProvider? serviceProvider = GetServiceProvider();
+            ITelemetryService? telemetry = serviceProvider?.GetService<ITelemetryService>();
             healthStatus.Add(("Telemetry Service", telemetry != null,
                 telemetry != null ? "✅ Available" : "❌ Not configured"));
 
@@ -84,7 +84,7 @@ public static class DiagnosticTool
             string validationDetails = "";
             try
             {
-                var testResult = InputValidationService.ValidateProjectName("TestProject");
+                ValidationResult testResult = InputValidationService.ValidateProjectName("TestProject");
                 validationAvailable = true;
                 validationDetails = "✅ Available (static)";
             }
@@ -99,7 +99,7 @@ public static class DiagnosticTool
             string errorHandlingDetails = "";
             try
             {
-                var testResult = ErrorHandlingService.SafeExecute("test", () => "success");
+                string testResult = ErrorHandlingService.SafeExecute("test", () => "success");
                 errorHandlingAvailable = !string.IsNullOrEmpty(testResult);
                 errorHandlingDetails = "✅ Available (static)";
             }
@@ -116,7 +116,7 @@ public static class DiagnosticTool
             {
                 // Test cache functionality by using existing methods
                 ResourceCacheService.CacheProcessedResource("health_check_test", "test_value");
-                var testResult = ResourceCacheService.GetOrLoadResource("health_check_test", () => "fallback");
+                string testResult = ResourceCacheService.GetOrLoadResource("health_check_test", () => "fallback");
                 cacheHealthy = testResult == "test_value";
                 cacheDetails = cacheHealthy ? "✅ Operational" : "⚠️ Cache not working as expected";
 
@@ -130,8 +130,8 @@ public static class DiagnosticTool
             healthStatus.Add(("Resource Cache", cacheHealthy, cacheDetails));
 
             // Check memory pressure
-            var totalMemory = GC.GetTotalMemory(false);
-            var memoryPressure = totalMemory > 500 * 1024 * 1024; // 500MB threshold
+            long totalMemory = GC.GetTotalMemory(false);
+            bool memoryPressure = totalMemory > 500 * 1024 * 1024; // 500MB threshold
             healthStatus.Add(("Memory Usage", !memoryPressure,
                 memoryPressure ? $"⚠️ High: {totalMemory / 1024 / 1024:F2} MB" : $"✅ Normal: {totalMemory / 1024 / 1024:F2} MB"));
 
@@ -140,7 +140,7 @@ public static class DiagnosticTool
             string fileSystemDetails = "";
             try
             {
-                var tempPath = Path.GetTempFileName();
+                string tempPath = Path.GetTempFileName();
                 File.WriteAllText(tempPath, "health check");
                 File.Delete(tempPath);
                 fileSystemHealthy = true;
@@ -152,17 +152,17 @@ public static class DiagnosticTool
             }
             healthStatus.Add(("File System", fileSystemHealthy, fileSystemDetails));
 
-            var overallHealthy = healthStatus.All(h => h.IsHealthy);
-            var healthIcon = overallHealthy ? "✅" : "⚠️";
+            bool overallHealthy = healthStatus.All(h => h.IsHealthy);
+            string healthIcon = overallHealthy ? "✅" : "⚠️";
 
-            var result = $@"# {healthIcon} AvaloniaUI MCP Server Health Check
+            string result = $@"# {healthIcon} AvaloniaUI MCP Server Health Check
 
 ## Overall Status: {(overallHealthy ? "HEALTHY" : "DEGRADED")}
 
 ## Component Health
 ";
 
-            foreach (var (component, isHealthy, details) in healthStatus)
+            foreach ((string component, bool isHealthy, string details) in healthStatus)
             {
                 result += $"- **{component}**: {details}\n";
             }
@@ -189,10 +189,10 @@ public static class DiagnosticTool
     {
         try
         {
-            var serviceProvider = GetServiceProvider();
-            var loggerFactory = serviceProvider?.GetService<ILoggerFactory>();
-            var logger = loggerFactory?.CreateLogger("DiagnosticTool");
-            var telemetry = serviceProvider?.GetService<ITelemetryService>();
+            IServiceProvider? serviceProvider = GetServiceProvider();
+            ILoggerFactory? loggerFactory = serviceProvider?.GetService<ILoggerFactory>();
+            ILogger? logger = loggerFactory?.CreateLogger("DiagnosticTool");
+            ITelemetryService? telemetry = serviceProvider?.GetService<ITelemetryService>();
 
             if (logger == null)
             {
@@ -200,7 +200,7 @@ public static class DiagnosticTool
             }
 
             // Test logging at specified level
-            var level = logLevel.ToLowerInvariant() switch
+            LogLevel level = logLevel.ToLowerInvariant() switch
             {
                 "trace" => LogLevel.Trace,
                 "debug" => LogLevel.Debug,
@@ -210,14 +210,14 @@ public static class DiagnosticTool
                 _ => LogLevel.Information
             };
 
-            var testMessage = $"Logging test - {message}";
+            string testMessage = $"Logging test - {message}";
             logger.Log(level, testMessage);
 
             // Test telemetry if available
             string telemetryResult = "";
             if (telemetry != null)
             {
-                using var scope = telemetry.CreateToolExecutionScope("diagnostic_test");
+                using IDisposable scope = telemetry.CreateToolExecutionScope("diagnostic_test");
                 telemetry.RecordServerEvent("logging_test", new Dictionary<string, object>
                 {
                     ["log_level"] = logLevel,
@@ -251,22 +251,22 @@ public static class DiagnosticTool
     {
         try
         {
-            var beforeMemory = GC.GetTotalMemory(false);
-            var beforeGen0 = GC.CollectionCount(0);
-            var beforeGen1 = GC.CollectionCount(1);
-            var beforeGen2 = GC.CollectionCount(2);
+            long beforeMemory = GC.GetTotalMemory(false);
+            int beforeGen0 = GC.CollectionCount(0);
+            int beforeGen1 = GC.CollectionCount(1);
+            int beforeGen2 = GC.CollectionCount(2);
 
             // Force garbage collection
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
 
-            var afterMemory = GC.GetTotalMemory(false);
-            var afterGen0 = GC.CollectionCount(0);
-            var afterGen1 = GC.CollectionCount(1);
-            var afterGen2 = GC.CollectionCount(2);
+            long afterMemory = GC.GetTotalMemory(false);
+            int afterGen0 = GC.CollectionCount(0);
+            int afterGen1 = GC.CollectionCount(1);
+            int afterGen2 = GC.CollectionCount(2);
 
-            var memoryFreed = beforeMemory - afterMemory;
+            long memoryFreed = beforeMemory - afterMemory;
 
             return $@"# 🧹 Garbage Collection Completed
 
@@ -307,9 +307,9 @@ public static class DiagnosticTool
     {
         var recommendations = new List<string>();
 
-        foreach (var (component, isHealthy, details) in healthStatus.Where(h => !h.IsHealthy))
+        foreach ((string component, bool isHealthy, string details) in healthStatus.Where(h => !h.IsHealthy))
         {
-            var recommendation = component switch
+            string recommendation = component switch
             {
                 "Telemetry Service" => "• Configure telemetry service in Program.cs for monitoring",
                 "Validation Service" => "• Register validation service for input validation",
@@ -331,10 +331,6 @@ internal static class MetricsExtensions
 {
     public static T GetValueOrDefault<T>(this Dictionary<string, object> dict, string key, T defaultValue)
     {
-        if (dict.TryGetValue(key, out var value) && value is T typedValue)
-        {
-            return typedValue;
-        }
-        return defaultValue;
+        return dict.TryGetValue(key, out object? value) && value is T typedValue ? typedValue : defaultValue;
     }
 }

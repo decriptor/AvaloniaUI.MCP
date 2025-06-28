@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -22,11 +22,11 @@ public static class CustomControlGenerator
                 Type = controlType.ToLowerInvariant(),
                 Name = controlName,
                 BaseClass = baseClass,
-                Properties = properties.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim()).ToList(),
+                Properties = [.. properties.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim())],
                 IncludeTemplate = bool.Parse(includeTemplate)
             };
 
-            var result = config.Type switch
+            string result = config.Type switch
             {
                 "templated" => GenerateTemplatedControl(config),
                 "usercontrol" => GenerateUserControl(config),
@@ -53,11 +53,11 @@ public static class CustomControlGenerator
         try
         {
             var states = visualStates.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
-            var animations = bool.Parse(includeAnimations);
+            bool animations = bool.Parse(includeAnimations);
 
-            var template = GenerateComplexControlTemplate(targetControl, templateName, states, animations);
-            var styleCode = GenerateTemplateStyle(targetControl, templateName);
-            var usageExample = GenerateTemplateUsage(targetControl, templateName);
+            string template = GenerateComplexControlTemplate(targetControl, templateName, states, animations);
+            string styleCode = GenerateTemplateStyle(targetControl, templateName);
+            string usageExample = GenerateTemplateUsage(targetControl, templateName);
 
             return $@"# Custom Control Template: {templateName} for {targetControl}
 
@@ -155,11 +155,11 @@ The template includes smooth transitions between the following states:
         try
         {
             var targets = targetControls.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToList();
-            var handler = bool.Parse(includeHandler);
+            bool handler = bool.Parse(includeHandler);
 
-            var attachedPropertyCode = GenerateAttachedPropertyCode(propertyName, propertyType, targets, handler);
-            var usageExamples = GenerateAttachedPropertyUsage(propertyName, propertyType, targets);
-            var stylingIntegration = GenerateAttachedPropertyStyling(propertyName, targets);
+            string attachedPropertyCode = GenerateAttachedPropertyCode(propertyName, propertyType, targets, handler);
+            string usageExamples = GenerateAttachedPropertyUsage(propertyName, propertyType, targets);
+            string stylingIntegration = GenerateAttachedPropertyStyling(propertyName, targets);
 
             return $@"# Attached Property: {propertyName}
 
@@ -224,12 +224,12 @@ public static void SetBehavior(Control element, IBehavior behavior)
     {
         try
         {
-            var virtualization = bool.Parse(includeVirtualization);
-            var attachedProps = bool.Parse(supportAttached);
+            bool virtualization = bool.Parse(includeVirtualization);
+            bool attachedProps = bool.Parse(supportAttached);
 
-            var panelCode = GenerateLayoutPanelCode(panelName, layoutStrategy, virtualization, attachedProps);
-            var usageExample = GenerateLayoutPanelUsage(panelName, layoutStrategy);
-            var attachedProperties = attachedProps ? GenerateLayoutAttachedProperties(panelName, layoutStrategy) : "";
+            string panelCode = GenerateLayoutPanelCode(panelName, layoutStrategy, virtualization, attachedProps);
+            string usageExample = GenerateLayoutPanelUsage(panelName, layoutStrategy);
+            string attachedProperties = attachedProps ? GenerateLayoutAttachedProperties(panelName, layoutStrategy) : "";
 
             return $@"# Custom Layout Panel: {panelName}
 
@@ -325,7 +325,7 @@ private Control GetOrCreateChild(int index)
         }
     }
 
-    private class CustomControlConfiguration
+    private sealed class CustomControlConfiguration
     {
         public string Type { get; set; } = "";
         public string Name { get; set; } = "";
@@ -336,12 +336,12 @@ private Control GetOrCreateChild(int index)
 
     private static string GenerateTemplatedControl(CustomControlConfiguration config)
     {
-        var controlCode = GenerateTemplatedControlCode(config);
-        var templateXaml = config.IncludeTemplate ? GenerateDefaultTemplate(config) : "";
-        var styleXaml = GenerateControlStyle(config);
-        var propertyBindings = string.Join("\n    ", config.Properties.Select(p => $"{p}=\"{{Binding {p}}}\""));
-        var templateParts = string.Join("\n", GetTemplateParts(config).Select(part => $"- **{part.Name}**: {part.Description}"));
-        var visualStates = string.Join("\n", GetVisualStates(config).Select(state => $"- **{state}**: Standard visual state"));
+        string controlCode = GenerateTemplatedControlCode(config);
+        string templateXaml = config.IncludeTemplate ? GenerateDefaultTemplate(config) : "";
+        string styleXaml = GenerateControlStyle(config);
+        string propertyBindings = string.Join("\n    ", config.Properties.Select(p => $"{p}=\"{{Binding {p}}}\""));
+        string templateParts = string.Join("\n", GetTemplateParts(config).Select(part => $"- **{part.Name}**: {part.Description}"));
+        string visualStates = string.Join("\n", GetVisualStates(config).Select(state => $"- **{state}**: Standard visual state"));
 
         return $@"# Templated Control: {config.Name}
 
@@ -389,9 +389,9 @@ Override the default template by creating a new style:
 
     private static string GenerateUserControl(CustomControlConfiguration config)
     {
-        var xamlCode = GenerateUserControlXaml(config);
-        var codeCode = GenerateUserControlCode(config);
-        var propertyBindings = string.Join("\n    ", config.Properties.Select(p => $"{p}=\"{{Binding {p}}}\""));
+        string xamlCode = GenerateUserControlXaml(config);
+        string codeCode = GenerateUserControlCode(config);
+        string propertyBindings = string.Join("\n    ", config.Properties.Select(p => $"{p}=\"{{Binding {p}}}\""));
 
         return $@"# User Control: {config.Name}
 
@@ -433,15 +433,17 @@ Style the UserControl using standard AvaloniaUI styling:
     private static string GenerateAttachedProperty(CustomControlConfiguration config)
     {
         if (config.Properties.Count == 0)
+        {
             throw new ArgumentException("Attached property requires at least one property definition");
+        }
 
-        var propertyName = config.Properties.First();
+        string propertyName = config.Properties.First();
         return GenerateAttachedProperty(propertyName, "object", config.BaseClass, "true");
     }
 
     private static string GenerateTemplatedControlCode(CustomControlConfiguration config)
     {
-        var properties = string.Join("\n\n", config.Properties.Select(GenerateControlProperty));
+        string properties = string.Join("\n\n", config.Properties.Select(GenerateControlProperty));
 
         return $@"using Avalonia;
 using Avalonia.Controls;
@@ -545,7 +547,7 @@ public class {config.Name} : {config.BaseClass}
 
     private static string GenerateUserControlCode(CustomControlConfiguration config)
     {
-        var properties = string.Join("\n\n", config.Properties.Select(GenerateUserControlProperty));
+        string properties = string.Join("\n\n", config.Properties.Select(GenerateUserControlProperty));
 
         return $@"using Avalonia;
 using Avalonia.Controls;
@@ -565,7 +567,7 @@ public partial class {config.Name} : UserControl
 
     private static string GenerateControlProperty(string propertyName)
     {
-        var typeName = InferPropertyType(propertyName);
+        string typeName = InferPropertyType(propertyName);
         return $@"    public static readonly StyledProperty<{typeName}> {propertyName}Property =
         AvaloniaProperty.Register<{propertyName}, {typeName}>(nameof({propertyName}));
 
@@ -578,7 +580,7 @@ public partial class {config.Name} : UserControl
 
     private static string GenerateUserControlProperty(string propertyName)
     {
-        var typeName = InferPropertyType(propertyName);
+        string typeName = InferPropertyType(propertyName);
         return $@"    public static readonly StyledProperty<{typeName}> {propertyName}Property =
         AvaloniaProperty.Register<{propertyName}, {typeName}>(nameof({propertyName}));
 
@@ -607,20 +609,26 @@ public partial class {config.Name} : UserControl
 
     private static string InferPropertyType(string propertyName)
     {
-        var lowerName = propertyName.ToLowerInvariant();
+        string lowerName = propertyName.ToLowerInvariant();
 
         if (lowerName.Contains("text") || lowerName.Contains("title") || lowerName.Contains("name"))
+        {
             return "string";
-        if (lowerName.Contains("count") || lowerName.Contains("index") || lowerName.Contains("number"))
-            return "int";
-        if (lowerName.Contains("is") || lowerName.Contains("can") || lowerName.Contains("has"))
-            return "bool";
-        if (lowerName.Contains("width") || lowerName.Contains("height") || lowerName.Contains("size"))
-            return "double";
-        if (lowerName.Contains("color") || lowerName.Contains("brush"))
-            return "IBrush";
+        }
 
-        return "object";
+        if (lowerName.Contains("count") || lowerName.Contains("index") || lowerName.Contains("number"))
+        {
+            return "int";
+        }
+
+        if (lowerName.Contains("is") || lowerName.Contains("can") || lowerName.Contains("has"))
+        {
+            return "bool";
+        }
+
+        return lowerName.Contains("width") || lowerName.Contains("height") || lowerName.Contains("size")
+            ? "double"
+            : lowerName.Contains("color") || lowerName.Contains("brush") ? "IBrush" : "object";
     }
 
     private static List<(string Name, string Type, string Description)> GetTemplateParts(CustomControlConfiguration config)
@@ -640,7 +648,7 @@ public partial class {config.Name} : UserControl
 
     private static string GenerateComplexControlTemplate(string targetControl, string templateName, List<string> states, bool animations)
     {
-        var stateGroups = GenerateVisualStateGroups(states, animations);
+        string stateGroups = GenerateVisualStateGroups(states, animations);
 
         return $@"<ControlTemplate x:Key=""{templateName}"" TargetType=""{targetControl}"">
     <Border Name=""PART_Border""
@@ -667,7 +675,7 @@ public partial class {config.Name} : UserControl
 
     private static string GenerateVisualStateGroups(List<string> states, bool animations)
     {
-        var stateDefinitions = string.Join("\n", states.Select(state => GenerateVisualState(state, animations)));
+        string stateDefinitions = string.Join("\n", states.Select(state => GenerateVisualState(state, animations)));
 
         return $@"            <VisualStateGroup x:Name=""CommonStates"">
 {stateDefinitions}
@@ -676,7 +684,7 @@ public partial class {config.Name} : UserControl
 
     private static string GenerateVisualState(string stateName, bool animations)
     {
-        var storyboard = animations ? GenerateStateStoryboard(stateName) : "";
+        string storyboard = animations ? GenerateStateStoryboard(stateName) : "";
 
         return $@"                <VisualState x:Name=""{stateName}"">
 {storyboard}
@@ -741,8 +749,8 @@ public partial class {config.Name} : UserControl
 
     private static string GenerateAttachedPropertyCode(string propertyName, string propertyType, List<string> targets, bool includeHandler)
     {
-        var dotNetType = ConvertPropertyType(propertyType);
-        var handlerCode = includeHandler ? GenerateAttachedPropertyHandler(propertyName, dotNetType) : "";
+        string dotNetType = ConvertPropertyType(propertyType);
+        string handlerCode = includeHandler ? GenerateAttachedPropertyHandler(propertyName, dotNetType) : "";
 
         return $@"using Avalonia;
 using Avalonia.Controls;
@@ -800,7 +808,7 @@ public static class {propertyName}Extensions
 
     private static string GenerateAttachedPropertyUsage(string propertyName, string propertyType, List<string> targets)
     {
-        var examples = string.Join("\n", targets.Select(target =>
+        string examples = string.Join("\n", targets.Select(target =>
             $"<{target} local:{propertyName}=\"{GetExampleValue(propertyType)}\" />"));
 
         return $@"<!-- Basic usage -->
@@ -830,8 +838,8 @@ public static class {propertyName}Extensions
 
     private static string GenerateLayoutPanelCode(string panelName, string layoutStrategy, bool virtualization, bool attachedProps)
     {
-        var baseClass = virtualization ? "VirtualizingPanel" : "Panel";
-        var attachedPropsCode = attachedProps ? GenerateLayoutAttachedProperties(panelName, layoutStrategy) : "";
+        string baseClass = virtualization ? "VirtualizingPanel" : "Panel";
+        string attachedPropsCode = attachedProps ? GenerateLayoutAttachedProperties(panelName, layoutStrategy) : "";
 
         return $@"using Avalonia;
 using Avalonia.Controls;
@@ -997,7 +1005,7 @@ public class {panelName} : {baseClass}
 
     private static string GetLayoutPerformanceInfo(string strategy, bool virtualization)
     {
-        var baseInfo = strategy switch
+        string baseInfo = strategy switch
         {
             "flow" => "Good performance for moderate item counts",
             "circular" => "Excellent performance, fixed calculation complexity",

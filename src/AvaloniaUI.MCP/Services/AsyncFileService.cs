@@ -1,4 +1,4 @@
-namespace AvaloniaUI.MCP.Services;
+﻿namespace AvaloniaUI.MCP.Services;
 
 /// <summary>
 /// Provides async file operations for improved performance and responsiveness
@@ -10,12 +10,12 @@ public static class AsyncFileService
     /// </summary>
     public static async Task WriteAllFilesAsync(IEnumerable<(string FilePath, string Content)> files)
     {
-        var writeTasks = files.Select(async file =>
+        IEnumerable<Task> writeTasks = files.Select(async file =>
         {
             try
             {
                 // Ensure directory exists
-                var directory = Path.GetDirectoryName(file.FilePath);
+                string? directory = Path.GetDirectoryName(file.FilePath);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
@@ -41,7 +41,7 @@ public static class AsyncFileService
         try
         {
             // Ensure directory exists
-            var directory = Path.GetDirectoryName(filePath);
+            string? directory = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
@@ -60,14 +60,16 @@ public static class AsyncFileService
     /// </summary>
     public static async Task<Dictionary<string, string>> ReadAllFilesAsync(IEnumerable<string> filePaths)
     {
-        var readTasks = filePaths.Select(async filePath =>
+        IEnumerable<Task<KeyValuePair<string, string>>> readTasks = filePaths.Select(async filePath =>
         {
             try
             {
                 if (!File.Exists(filePath))
+                {
                     throw new FileNotFoundException($"File not found: {filePath}");
+                }
 
-                var content = await File.ReadAllTextAsync(filePath);
+                string content = await File.ReadAllTextAsync(filePath);
                 return new KeyValuePair<string, string>(filePath, content);
             }
             catch (Exception ex)
@@ -76,7 +78,7 @@ public static class AsyncFileService
             }
         });
 
-        var results = await Task.WhenAll(readTasks);
+        KeyValuePair<string, string>[] results = await Task.WhenAll(readTasks);
         return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 
@@ -87,10 +89,9 @@ public static class AsyncFileService
     {
         try
         {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException($"File not found: {filePath}");
-
-            return await File.ReadAllTextAsync(filePath);
+            return !File.Exists(filePath)
+                ? throw new FileNotFoundException($"File not found: {filePath}")
+                : await File.ReadAllTextAsync(filePath);
         }
         catch (Exception ex)
         {
@@ -103,13 +104,13 @@ public static class AsyncFileService
     /// </summary>
     public static async Task<Dictionary<string, bool>> CheckFilesExistAsync(IEnumerable<string> filePaths)
     {
-        var checkTasks = filePaths.Select(async filePath =>
+        IEnumerable<Task<KeyValuePair<string, bool>>> checkTasks = filePaths.Select(async filePath =>
         {
             await Task.Yield(); // Allow for async behavior even though File.Exists is sync
             return new KeyValuePair<string, bool>(filePath, File.Exists(filePath));
         });
 
-        var results = await Task.WhenAll(checkTasks);
+        KeyValuePair<string, bool>[] results = await Task.WhenAll(checkTasks);
         return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 
@@ -132,7 +133,7 @@ public static class AsyncFileService
     /// </summary>
     public static async Task CreateDirectoriesAsync(IEnumerable<string> directoryPaths)
     {
-        var createTasks = directoryPaths.Select(CreateDirectoryAsync);
+        IEnumerable<Task> createTasks = directoryPaths.Select(CreateDirectoryAsync);
         await Task.WhenAll(createTasks);
     }
 
@@ -141,12 +142,12 @@ public static class AsyncFileService
     /// </summary>
     public static async Task CopyFilesAsync(IEnumerable<(string SourcePath, string DestinationPath)> fileCopies)
     {
-        var copyTasks = fileCopies.Select(async copy =>
+        IEnumerable<Task> copyTasks = fileCopies.Select(async copy =>
         {
             try
             {
                 // Ensure destination directory exists
-                var destinationDirectory = Path.GetDirectoryName(copy.DestinationPath);
+                string? destinationDirectory = Path.GetDirectoryName(copy.DestinationPath);
                 if (!string.IsNullOrEmpty(destinationDirectory) && !Directory.Exists(destinationDirectory))
                 {
                     Directory.CreateDirectory(destinationDirectory);
@@ -171,7 +172,7 @@ public static class AsyncFileService
     /// </summary>
     public static async Task<Dictionary<string, FileInfo?>> GetFileInfoAsync(IEnumerable<string> filePaths)
     {
-        var infoTasks = filePaths.Select(async filePath =>
+        IEnumerable<Task<KeyValuePair<string, FileInfo?>>> infoTasks = filePaths.Select(async filePath =>
         {
             await Task.Yield(); // Allow for async behavior
             FileInfo? info = null;
@@ -189,7 +190,7 @@ public static class AsyncFileService
             return new KeyValuePair<string, FileInfo?>(filePath, info);
         });
 
-        var results = await Task.WhenAll(infoTasks);
+        KeyValuePair<string, FileInfo?>[] results = await Task.WhenAll(infoTasks);
         return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 
@@ -198,14 +199,14 @@ public static class AsyncFileService
     /// </summary>
     public static async Task<Dictionary<string, ValidationResult>> ValidateFilePathsAsync(IEnumerable<string> filePaths)
     {
-        var validationTasks = filePaths.Select(async filePath =>
+        IEnumerable<Task<KeyValuePair<string, ValidationResult>>> validationTasks = filePaths.Select(async filePath =>
         {
             await Task.Yield(); // Allow for async behavior
-            var validation = InputValidationService.ValidateFilePath(filePath, mustExist: false);
+            ValidationResult validation = InputValidationService.ValidateFilePath(filePath, mustExist: false);
             return new KeyValuePair<string, ValidationResult>(filePath, validation);
         });
 
-        var results = await Task.WhenAll(validationTasks);
+        KeyValuePair<string, ValidationResult>[] results = await Task.WhenAll(validationTasks);
         return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 
@@ -222,8 +223,8 @@ public static class AsyncFileService
 
         for (int i = 0; i < itemsList.Count; i += batchSize)
         {
-            var batch = itemsList.Skip(i).Take(batchSize);
-            var batchTasks = batch.Select(processor);
+            IEnumerable<T> batch = itemsList.Skip(i).Take(batchSize);
+            IEnumerable<Task> batchTasks = batch.Select(processor);
 
             await Task.WhenAll(batchTasks);
 
@@ -240,7 +241,7 @@ public static class AsyncFileService
     /// </summary>
     public static async Task DeleteFilesAsync(IEnumerable<string> filePaths, bool ignoreErrors = true)
     {
-        var deleteTasks = filePaths.Select(async filePath =>
+        IEnumerable<Task> deleteTasks = filePaths.Select(async filePath =>
         {
             try
             {

@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using AvaloniaUI.MCP.Services;
 
@@ -9,6 +9,8 @@ namespace AvaloniaUI.MCP.Tools;
 [McpServerToolType]
 public static class ProjectGeneratorTool
 {
+    private static readonly string[] toolOperation = ["desktop", "mobile", "all"];
+
     [McpServerTool, Description("Creates a new AvaloniaUI project with the specified template and configuration")]
     public static string CreateAvaloniaProject(
         [Description("Name of the project")] string projectName,
@@ -19,16 +21,18 @@ public static class ProjectGeneratorTool
         return ErrorHandlingService.SafeExecute("CreateAvaloniaProject", () =>
         {
             // Validate inputs
-            var validation = ErrorHandlingService.ValidateCommonParameters(
+            ValidationResult validation = ErrorHandlingService.ValidateCommonParameters(
                 projectName: projectName,
                 templateType: template.ToLowerInvariant()
             );
 
             if (!validation.IsValid)
+            {
                 return ErrorHandlingService.CreateValidationError("CreateAvaloniaProject", validation);
+            }
 
             // Additional platform validation
-            var validPlatforms = new[] { "desktop", "mobile", "all" };
+            string[] validPlatforms = toolOperation;
             if (!validPlatforms.Contains(platforms.ToLowerInvariant()))
             {
                 var platformValidation = ValidationResult.Failure($"Invalid platforms '{platforms}'. Valid platforms are: {string.Join(", ", validPlatforms)}");
@@ -38,7 +42,7 @@ public static class ProjectGeneratorTool
             // Use current directory if not specified
             outputDirectory ??= Directory.GetCurrentDirectory();
 
-            var projectPath = Path.Combine(outputDirectory, projectName);
+            string projectPath = Path.Combine(outputDirectory, projectName);
 
             // Check if directory already exists
             if (Directory.Exists(projectPath))
@@ -50,7 +54,7 @@ public static class ProjectGeneratorTool
             Directory.CreateDirectory(projectPath);
 
             // Generate project files based on template
-            var result = template.ToLowerInvariant() switch
+            string result = template.ToLowerInvariant() switch
             {
                 "mvvm" => GenerateMvvmProject(projectPath, projectName, platforms),
                 "basic" => GenerateBasicProject(projectPath, projectName, platforms),
@@ -76,7 +80,7 @@ public static class ProjectGeneratorTool
         };
 
         // Create ViewModels directory
-        var viewModelsDir = Path.Combine(projectPath, "ViewModels");
+        string viewModelsDir = Path.Combine(projectPath, "ViewModels");
 
         // Add ViewModel files
         filesToCreate.AddRange(new[]
@@ -86,7 +90,7 @@ public static class ProjectGeneratorTool
         });
 
         // Write all files asynchronously in parallel for better performance
-        var writeTask = AsyncFileService.WriteAllFilesAsync(filesToCreate);
+        Task writeTask = AsyncFileService.WriteAllFilesAsync(filesToCreate);
         writeTask.Wait(); // Wait for completion since MCP tools must be synchronous
 
         return $"Successfully created MVVM AvaloniaUI project '{projectName}' at '{projectPath}'\\n" +
@@ -106,27 +110,27 @@ public static class ProjectGeneratorTool
     private static string GenerateBasicProject(string projectPath, string projectName, string platforms)
     {
         // Create project file
-        var projectFile = GenerateProjectFile(projectName, platforms, false);
+        string projectFile = GenerateProjectFile(projectName, platforms, false);
         File.WriteAllText(Path.Combine(projectPath, $"{projectName}.csproj"), projectFile);
 
         // Create App.axaml
-        var appXaml = GenerateAppXaml(projectName);
+        string appXaml = GenerateAppXaml(projectName);
         File.WriteAllText(Path.Combine(projectPath, "App.axaml"), appXaml);
 
         // Create App.axaml.cs
-        var appCode = GenerateAppCode(projectName);
+        string appCode = GenerateAppCode(projectName);
         File.WriteAllText(Path.Combine(projectPath, "App.axaml.cs"), appCode);
 
         // Create MainWindow.axaml (basic version)
-        var mainWindowXaml = GenerateBasicMainWindowXaml(projectName);
+        string mainWindowXaml = GenerateBasicMainWindowXaml(projectName);
         File.WriteAllText(Path.Combine(projectPath, "MainWindow.axaml"), mainWindowXaml);
 
         // Create MainWindow.axaml.cs
-        var mainWindowCode = GenerateMainWindowCode(projectName);
+        string mainWindowCode = GenerateMainWindowCode(projectName);
         File.WriteAllText(Path.Combine(projectPath, "MainWindow.axaml.cs"), mainWindowCode);
 
         // Create Program.cs
-        var programCs = GenerateProgramCs(projectName);
+        string programCs = GenerateProgramCs(projectName);
         File.WriteAllText(Path.Combine(projectPath, "Program.cs"), programCs);
 
         return $"Successfully created basic AvaloniaUI project '{projectName}' at '{projectPath}'\\n" +
@@ -144,45 +148,45 @@ public static class ProjectGeneratorTool
     private static string GenerateCrossPlatformProject(string projectPath, string projectName, string platforms)
     {
         // For cross-platform, create multiple project files
-        var desktopProject = GenerateProjectFile($"{projectName}.Desktop", "desktop", true);
+        string desktopProject = GenerateProjectFile($"{projectName}.Desktop", "desktop", true);
         File.WriteAllText(Path.Combine(projectPath, $"{projectName}.Desktop.csproj"), desktopProject);
 
-        if (platforms == "mobile" || platforms == "all")
+        if (platforms is "mobile" or "all")
         {
-            var mobileProject = GenerateProjectFile($"{projectName}.Mobile", "mobile", true);
+            string mobileProject = GenerateProjectFile($"{projectName}.Mobile", "mobile", true);
             File.WriteAllText(Path.Combine(projectPath, $"{projectName}.Mobile.csproj"), mobileProject);
         }
 
         // Create shared UI files
-        var appXaml = GenerateAppXaml(projectName);
+        string appXaml = GenerateAppXaml(projectName);
         File.WriteAllText(Path.Combine(projectPath, "App.axaml"), appXaml);
 
-        var appCode = GenerateAppCode(projectName);
+        string appCode = GenerateAppCode(projectName);
         File.WriteAllText(Path.Combine(projectPath, "App.axaml.cs"), appCode);
 
-        var mainWindowXaml = GenerateMainWindowXaml(projectName);
+        string mainWindowXaml = GenerateMainWindowXaml(projectName);
         File.WriteAllText(Path.Combine(projectPath, "MainWindow.axaml"), mainWindowXaml);
 
-        var mainWindowCode = GenerateMainWindowCode(projectName);
+        string mainWindowCode = GenerateMainWindowCode(projectName);
         File.WriteAllText(Path.Combine(projectPath, "MainWindow.axaml.cs"), mainWindowCode);
 
         // Create ViewModels
-        var viewModelsDir = Path.Combine(projectPath, "ViewModels");
+        string viewModelsDir = Path.Combine(projectPath, "ViewModels");
         Directory.CreateDirectory(viewModelsDir);
 
-        var mainViewModel = GenerateMainWindowViewModel(projectName);
+        string mainViewModel = GenerateMainWindowViewModel(projectName);
         File.WriteAllText(Path.Combine(viewModelsDir, "MainWindowViewModel.cs"), mainViewModel);
 
-        var viewModelBase = GenerateViewModelBase(projectName);
+        string viewModelBase = GenerateViewModelBase(projectName);
         File.WriteAllText(Path.Combine(viewModelsDir, "ViewModelBase.cs"), viewModelBase);
 
         // Create platform-specific entry points
-        var desktopProgramCs = GenerateProgramCs($"{projectName}.Desktop");
+        string desktopProgramCs = GenerateProgramCs($"{projectName}.Desktop");
         File.WriteAllText(Path.Combine(projectPath, "Program.Desktop.cs"), desktopProgramCs);
 
         return $"Successfully created cross-platform AvaloniaUI project '{projectName}' at '{projectPath}'\\n" +
                $"Platform support: {platforms}\\n" +
-               $"Projects created: Desktop{(platforms == "mobile" || platforms == "all" ? ", Mobile" : "")}\\n\\n" +
+               $"Projects created: Desktop{(platforms is "mobile" or "all" ? ", Mobile" : "")}\\n\\n" +
                $"To build and run desktop:\\n" +
                $"cd \"{projectPath}\"\\n" +
                $"dotnet run --project {projectName}.Desktop.csproj";
@@ -190,7 +194,7 @@ public static class ProjectGeneratorTool
 
     private static string GenerateProjectFile(string projectName, string platforms, bool includeMvvm)
     {
-        var targetFramework = platforms switch
+        string targetFramework = platforms switch
         {
             "mobile" => "net9.0",
             "all" => "net9.0",
@@ -204,7 +208,7 @@ public static class ProjectGeneratorTool
             "    <PackageReference Include=\"Avalonia.Fonts.Inter\" Version=\"11.3.2\" />"
         };
 
-        if (platforms == "mobile" || platforms == "all")
+        if (platforms is "mobile" or "all")
         {
             packageReferences.Add("    <PackageReference Include=\"Avalonia.Android\" Version=\"11.3.2\" />");
             packageReferences.Add("    <PackageReference Include=\"Avalonia.iOS\" Version=\"11.3.2\" />");
@@ -237,15 +241,20 @@ public static class ProjectGeneratorTool
 </Project>";
     }
 
-    private static string GenerateAppXaml(string projectName) => $@"<Application xmlns=""https://github.com/avaloniaui""
+    private static string GenerateAppXaml(string projectName)
+    {
+        return $@"<Application xmlns=""https://github.com/avaloniaui""
              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
              x:Class=""{projectName}.App"">
   <Application.Styles>
     <FluentTheme />
   </Application.Styles>
 </Application>";
+    }
 
-    private static string GenerateAppCode(string projectName) => $@"using Avalonia;
+    private static string GenerateAppCode(string projectName)
+    {
+        return $@"using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
@@ -268,8 +277,11 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }}
 }}";
+    }
 
-    private static string GenerateMainWindowXaml(string projectName) => $@"<Window xmlns=""https://github.com/avaloniaui""
+    private static string GenerateMainWindowXaml(string projectName)
+    {
+        return $@"<Window xmlns=""https://github.com/avaloniaui""
         xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
         xmlns:vm=""using:{projectName}.ViewModels""
         x:Class=""{projectName}.MainWindow""
@@ -295,8 +307,11 @@ public partial class App : Application
         <TextBlock Text=""{{Binding GreetingMessage}}"" FontWeight=""Bold"" Foreground=""Blue""/>
     </StackPanel>
 </Window>";
+    }
 
-    private static string GenerateBasicMainWindowXaml(string projectName) => $@"<Window xmlns=""https://github.com/avaloniaui""
+    private static string GenerateBasicMainWindowXaml(string projectName)
+    {
+        return $@"<Window xmlns=""https://github.com/avaloniaui""
         xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
         x:Class=""{projectName}.MainWindow""
         Title=""{projectName}""
@@ -311,8 +326,11 @@ public partial class App : Application
         <TextBlock Name=""ResultText"" FontWeight=""Bold"" Foreground=""Blue""/>
     </StackPanel>
 </Window>";
+    }
 
-    private static string GenerateMainWindowCode(string projectName) => $@"using Avalonia.Controls;
+    private static string GenerateMainWindowCode(string projectName)
+    {
+        return $@"using Avalonia.Controls;
 using Avalonia.Interactivity;
 
 namespace {projectName};
@@ -332,8 +350,11 @@ public partial class MainWindow : Window
         }}
     }}
 }}";
+    }
 
-    private static string GenerateMainWindowViewModel(string projectName) => $@"using System.Reactive;
+    private static string GenerateMainWindowViewModel(string projectName)
+    {
+        return $@"using System.Reactive;
 using ReactiveUI;
 
 namespace {projectName}.ViewModels;
@@ -371,16 +392,22 @@ public class MainWindowViewModel : ViewModelBase
             : $""Hello, {{Name}}! Welcome to AvaloniaUI!"";
     }}
 }}";
+    }
 
-    private static string GenerateViewModelBase(string projectName) => $@"using ReactiveUI;
+    private static string GenerateViewModelBase(string projectName)
+    {
+        return $@"using ReactiveUI;
 
 namespace {projectName}.ViewModels;
 
 public class ViewModelBase : ReactiveObject
 {{
 }}";
+    }
 
-    private static string GenerateProgramCs(string projectName) => $@"using Avalonia;
+    private static string GenerateProgramCs(string projectName)
+    {
+        return $@"using Avalonia;
 using System;
 
 namespace {projectName};
@@ -401,4 +428,5 @@ class Program
             .WithInterFont()
             .LogToTrace();
 }}";
+    }
 }

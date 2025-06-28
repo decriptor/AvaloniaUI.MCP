@@ -1,4 +1,4 @@
-using AvaloniaUI.MCP.Tools;
+﻿using AvaloniaUI.MCP.Tools;
 
 namespace AvaloniaUI.MCP.Tests;
 
@@ -12,10 +12,10 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_ValidControlTypes_ReturnsCorrectPattern(string controlType)
     {
         // Arrange
-        var controlName = "TestControl";
+        string controlName = "TestControl";
 
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl(controlType, controlName);
+        string result = CustomControlGenerator.GenerateCustomControl(controlType, controlName);
 
         // Assert
         Assert.IsFalse(result.Contains("Error generating custom control"), "Result should not contain error message");
@@ -26,10 +26,10 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_AttachedProperty_RequiresPropertyName()
     {
         // Arrange
-        var controlName = "TestControl";
+        string controlName = "TestControl";
 
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("attached-property", controlName, "Control", "TestProperty");
+        string result = CustomControlGenerator.GenerateCustomControl("attached-property", controlName, "Control", "TestProperty");
 
         // Assert
         StringAssert.Contains(result, "TestProperty", "Result should contain the property name");
@@ -40,11 +40,11 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_TemplatedControl_ContainsExpectedElements()
     {
         // Arrange
-        var controlName = "MyTemplatedControl";
-        var properties = "Title,IsEnabled,Value";
+        string controlName = "MyTemplatedControl";
+        string properties = "Title,IsEnabled,Value";
 
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("templated", controlName, "Control", properties, "true");
+        string result = CustomControlGenerator.GenerateCustomControl("templated", controlName, "Control", properties, "true");
 
         // Assert
         StringAssert.Contains(result, $"# Templated Control: {controlName}", "Result should contain templated control header");
@@ -64,11 +64,11 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_UserControl_ContainsExpectedElements()
     {
         // Arrange
-        var controlName = "MyUserControl";
-        var properties = "Header,Content";
+        string controlName = "MyUserControl";
+        string properties = "Header,Content";
 
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("usercontrol", controlName, "UserControl", properties);
+        string result = CustomControlGenerator.GenerateCustomControl("usercontrol", controlName, "UserControl", properties);
 
         // Assert
         StringAssert.Contains(result, $"# User Control: {controlName}", "Result should contain user control header");
@@ -85,10 +85,10 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_Panel_ReturnsLayoutPanelPattern()
     {
         // Arrange
-        var controlName = "MyCustomPanel";
+        string controlName = "MyCustomPanel";
 
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("panel", controlName);
+        string result = CustomControlGenerator.GenerateCustomControl("panel", controlName);
 
         // Assert
         StringAssert.Contains(result, $"# Custom Layout Panel: {controlName}", "Result should contain panel header");
@@ -102,11 +102,11 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_AttachedProperty_ContainsExpectedElements()
     {
         // Arrange
-        var controlName = "MyAttachedProperty";
-        var properties = "IsSpecial";
+        string controlName = "MyAttachedProperty";
+        string properties = "IsSpecial";
 
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("attached-property", controlName, "Control", properties);
+        string result = CustomControlGenerator.GenerateCustomControl("attached-property", controlName, "Control", properties);
 
         // Assert
         StringAssert.Contains(result, $"# Attached Property: {properties}", "Result should contain attached property header");
@@ -122,7 +122,7 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_WithoutTemplate_ExcludesTemplateSection()
     {
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("templated", "TestControl", "Control", "", "false");
+        string result = CustomControlGenerator.GenerateCustomControl("templated", "TestControl", "Control", "", "false");
 
         // Assert
         Assert.IsFalse(result.Contains("## Default Template"), "Result should not contain Default Template section when template is disabled");
@@ -133,10 +133,10 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_WithProperties_IncludesPropertyBindings()
     {
         // Arrange
-        var properties = "Title,Value,IsEnabled";
+        string properties = "Title,Value,IsEnabled";
 
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("templated", "TestControl", "Control", properties);
+        string result = CustomControlGenerator.GenerateCustomControl("templated", "TestControl", "Control", properties);
 
         // Assert
         StringAssert.Contains(result, "Title=\"{Binding Title}\"", "Result should contain Title property binding");
@@ -148,12 +148,12 @@ public class CustomControlGeneratorTests
     public void GenerateControlTemplate_ValidInputs_ReturnsTemplate()
     {
         // Arrange
-        var targetControl = "Button";
-        var templateName = "CustomButtonTemplate";
-        var visualStates = "Normal,PointerOver,Pressed";
+        string targetControl = "Button";
+        string templateName = "CustomButtonTemplate";
+        string visualStates = "Normal,PointerOver,Pressed";
 
         // Act
-        var result = CustomControlGenerator.GenerateControlTemplate(targetControl, templateName, visualStates, "true");
+        string result = CustomControlGenerator.GenerateControlTemplate(targetControl, templateName, visualStates, "true");
 
         // Assert
         StringAssert.Contains(result, $"# Custom Control Template: {templateName} for {targetControl}", "Result should contain template header");
@@ -172,7 +172,7 @@ public class CustomControlGeneratorTests
     public void GenerateControlTemplate_WithAnimations_IncludesStoryboards()
     {
         // Act
-        var result = CustomControlGenerator.GenerateControlTemplate("Button", "AnimatedTemplate", "PointerOver,Pressed", "true");
+        string result = CustomControlGenerator.GenerateControlTemplate("Button", "AnimatedTemplate", "PointerOver,Pressed", "true");
 
         // Assert
         StringAssert.Contains(result, "Storyboard", "Result should contain Storyboard for animations");
@@ -184,7 +184,7 @@ public class CustomControlGeneratorTests
     public void GenerateControlTemplate_WithoutAnimations_ExcludesStoryboards()
     {
         // Act
-        var result = CustomControlGenerator.GenerateControlTemplate("Button", "StaticTemplate", "Normal,Pressed", "false");
+        string result = CustomControlGenerator.GenerateControlTemplate("Button", "StaticTemplate", "Normal,Pressed", "false");
 
         // Assert
         StringAssert.Contains(result, "VisualState x:Name=\"Normal\"", "Result should contain Normal visual state");
@@ -196,12 +196,12 @@ public class CustomControlGeneratorTests
     public void GenerateAttachedProperty_ValidInputs_ReturnsPattern()
     {
         // Arrange
-        var propertyName = "IsSpecial";
-        var propertyType = "bool";
-        var targetControls = "Button,TextBox";
+        string propertyName = "IsSpecial";
+        string propertyType = "bool";
+        string targetControls = "Button,TextBox";
 
         // Act
-        var result = CustomControlGenerator.GenerateAttachedProperty(propertyName, propertyType, targetControls, "true");
+        string result = CustomControlGenerator.GenerateAttachedProperty(propertyName, propertyType, targetControls, "true");
 
         // Assert
         StringAssert.Contains(result, $"# Attached Property: {propertyName}", "Result should contain property header");
@@ -220,7 +220,7 @@ public class CustomControlGeneratorTests
     public void GenerateAttachedProperty_WithHandler_IncludesChangeHandler()
     {
         // Act
-        var result = CustomControlGenerator.GenerateAttachedProperty("CustomProperty", "string", "Control", "true");
+        string result = CustomControlGenerator.GenerateAttachedProperty("CustomProperty", "string", "Control", "true");
 
         // Assert
         StringAssert.Contains(result, "coerce:", "Result should contain coerce callback");
@@ -232,7 +232,7 @@ public class CustomControlGeneratorTests
     public void GenerateAttachedProperty_WithoutHandler_ExcludesChangeHandler()
     {
         // Act
-        var result = CustomControlGenerator.GenerateAttachedProperty("SimpleProperty", "int", "Control", "false");
+        string result = CustomControlGenerator.GenerateAttachedProperty("SimpleProperty", "int", "Control", "false");
 
         // Assert
         Assert.IsFalse(result.Contains("coerce:"), "Result should not contain coerce callback when handler is disabled");
@@ -244,11 +244,11 @@ public class CustomControlGeneratorTests
     public void GenerateLayoutPanel_ValidInputs_ReturnsPanel()
     {
         // Arrange
-        var panelName = "FlowPanel";
-        var layoutStrategy = "flow";
+        string panelName = "FlowPanel";
+        string layoutStrategy = "flow";
 
         // Act
-        var result = CustomControlGenerator.GenerateLayoutPanel(panelName, layoutStrategy, "false", "true");
+        string result = CustomControlGenerator.GenerateLayoutPanel(panelName, layoutStrategy, "false", "true");
 
         // Assert
         StringAssert.Contains(result, $"# Custom Layout Panel: {panelName}", "Result should contain panel header");
@@ -265,7 +265,7 @@ public class CustomControlGeneratorTests
     public void GenerateLayoutPanel_CircularStrategy_IncludesCircularProperties()
     {
         // Act
-        var result = CustomControlGenerator.GenerateLayoutPanel("CircularPanel", "circular", "false", "true");
+        string result = CustomControlGenerator.GenerateLayoutPanel("CircularPanel", "circular", "false", "true");
 
         // Assert
         StringAssert.Contains(result, "RadiusOffsetProperty", "Result should contain RadiusOffsetProperty for circular layout");
@@ -278,7 +278,7 @@ public class CustomControlGeneratorTests
     public void GenerateLayoutPanel_MasonryStrategy_IncludesMasonryProperties()
     {
         // Act
-        var result = CustomControlGenerator.GenerateLayoutPanel("MasonryPanel", "masonry", "false", "true");
+        string result = CustomControlGenerator.GenerateLayoutPanel("MasonryPanel", "masonry", "false", "true");
 
         // Assert
         StringAssert.Contains(result, "ColumnSpanProperty", "Result should contain ColumnSpanProperty for masonry layout");
@@ -291,7 +291,7 @@ public class CustomControlGeneratorTests
     public void GenerateLayoutPanel_WithVirtualization_IncludesVirtualizationCode()
     {
         // Act
-        var result = CustomControlGenerator.GenerateLayoutPanel("VirtualPanel", "flow", "true", "false");
+        string result = CustomControlGenerator.GenerateLayoutPanel("VirtualPanel", "flow", "true", "false");
 
         // Assert
         StringAssert.Contains(result, "VirtualizingPanel", "Result should contain VirtualizingPanel base class");
@@ -305,7 +305,7 @@ public class CustomControlGeneratorTests
     public void GenerateLayoutPanel_WithoutVirtualization_ExcludesVirtualizationCode()
     {
         // Act
-        var result = CustomControlGenerator.GenerateLayoutPanel("SimplePanel", "flow", "false", "false");
+        string result = CustomControlGenerator.GenerateLayoutPanel("SimplePanel", "flow", "false", "false");
 
         // Assert
         Assert.IsFalse(result.Contains("VirtualizingPanel"), "Result should not contain VirtualizingPanel when virtualization is disabled");
@@ -318,7 +318,7 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_InvalidControlType_ReturnsError()
     {
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("invalid-type", "TestControl");
+        string result = CustomControlGenerator.GenerateCustomControl("invalid-type", "TestControl");
 
         // Assert
         StringAssert.Contains(result, "Error generating custom control", "Result should contain error message for invalid control type");
@@ -329,7 +329,7 @@ public class CustomControlGeneratorTests
     public void GenerateCustomControl_EmptyControlName_HandlesGracefully()
     {
         // Act
-        var result = CustomControlGenerator.GenerateCustomControl("templated", "");
+        string result = CustomControlGenerator.GenerateCustomControl("templated", "");
 
         // Assert
         // Should handle empty name gracefully without crashing
@@ -345,7 +345,7 @@ public class CustomControlGeneratorTests
     public void GenerateAttachedProperty_DifferentPropertyTypes_ReturnsCorrectExamples(string propertyType, string expectedExample)
     {
         // Act
-        var result = CustomControlGenerator.GenerateAttachedProperty("TestProperty", propertyType, "Control", "false");
+        string result = CustomControlGenerator.GenerateAttachedProperty("TestProperty", propertyType, "Control", "false");
 
         // Assert
         StringAssert.Contains(result, $"AttachedProperty<{propertyType}>", "Result should contain correct AttachedProperty type declaration");

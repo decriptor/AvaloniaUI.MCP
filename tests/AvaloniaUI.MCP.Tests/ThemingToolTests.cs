@@ -1,4 +1,4 @@
-using AvaloniaUI.MCP.Tools;
+﻿using AvaloniaUI.MCP.Tools;
 
 namespace AvaloniaUI.MCP.Tests;
 
@@ -9,12 +9,12 @@ public class ThemingToolTests
     public void GenerateTheme_ValidInputs_ReturnsTheme()
     {
         // Arrange
-        var themeName = "BlueTheme";
-        var primaryColor = "#007ACC";
-        var secondaryColor = "#FF6B35";
+        string themeName = "BlueTheme";
+        string primaryColor = "#007ACC";
+        string secondaryColor = "#FF6B35";
 
         // Act
-        var result = ThemingTool.GenerateTheme(themeName, primaryColor, secondaryColor);
+        string result = ThemingTool.GenerateTheme(themeName, primaryColor, secondaryColor);
 
         // Assert
         Assert.IsTrue(result.Contains($"# Custom AvaloniaUI Theme: {themeName}"), "Should contain theme name in title");
@@ -32,7 +32,7 @@ public class ThemingToolTests
     public void GenerateTheme_ContainsThemeConfiguration()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "#FF6B35", "#FFFFFF", "light", "true");
+        string result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "#FF6B35", "#FFFFFF", "light", "true");
 
         // Assert
         Assert.IsTrue(result.Contains("**Type**: light"), "Should contain theme type");
@@ -49,7 +49,7 @@ public class ThemingToolTests
     public void GenerateTheme_DifferentThemeTypes_ReturnsCorrectType(string themeType)
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", themeType);
+        string result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", themeType);
 
         // Assert
         Assert.IsTrue(result.Contains($"**Type**: {themeType}"), $"Should contain correct theme type: {themeType}");
@@ -59,7 +59,7 @@ public class ThemingToolTests
     public void GenerateTheme_LightTheme_ContainsLightColors()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("LightTheme", "#007ACC", "", "#FFFFFF", "light");
+        string result = ThemingTool.GenerateTheme("LightTheme", "#007ACC", "", "#FFFFFF", "light");
 
         // Assert
         Assert.IsTrue(result.Contains("**Text**: #000000"), "Should contain light theme text color");
@@ -71,7 +71,7 @@ public class ThemingToolTests
     public void GenerateTheme_DarkTheme_ContainsDarkColors()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("DarkTheme", "#007ACC", "", "#2D2D30", "dark");
+        string result = ThemingTool.GenerateTheme("DarkTheme", "#007ACC", "", "#2D2D30", "dark");
 
         // Assert
         Assert.IsTrue(result.Contains("**Text**: #FFFFFF"), "Should contain dark theme text color");
@@ -83,7 +83,7 @@ public class ThemingToolTests
     public void GenerateTheme_EmptySecondaryColor_GeneratesSecondaryColor()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "");
+        string result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "");
 
         // Assert
         Assert.IsTrue(result.Contains("**Secondary Color**:"), "Should contain secondary color field");
@@ -95,7 +95,7 @@ public class ThemingToolTests
     public void GenerateTheme_ContainsXAMLImplementation()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC");
+        string result = ThemingTool.GenerateTheme("TestTheme", "#007ACC");
 
         // Assert
         Assert.IsTrue(result.Contains("xmlns=\"https://github.com/avaloniaui\""), "Should contain AvaloniaUI namespace");
@@ -116,10 +116,10 @@ public class ThemingToolTests
     public void GenerateTheme_ContainsCSharpImplementation()
     {
         // Arrange
-        var themeName = "CustomTheme";
+        string themeName = "CustomTheme";
 
         // Act
-        var result = ThemingTool.GenerateTheme(themeName, "#007ACC");
+        string result = ThemingTool.GenerateTheme(themeName, "#007ACC");
 
         // Assert
         Assert.IsTrue(result.Contains("using Avalonia.Styling;"), "Should contain Avalonia.Styling using statement");
@@ -135,10 +135,10 @@ public class ThemingToolTests
     public void GenerateTheme_ContainsUsageInstructions()
     {
         // Arrange
-        var themeName = "MyTheme";
+        string themeName = "MyTheme";
 
         // Act
-        var result = ThemingTool.GenerateTheme(themeName, "#007ACC");
+        string result = ThemingTool.GenerateTheme(themeName, "#007ACC");
 
         // Assert
         Assert.IsTrue(result.Contains("## Usage Instructions"), "Should contain usage instructions section");
@@ -153,7 +153,7 @@ public class ThemingToolTests
     public void GenerateTheme_ContainsColorPalette()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "#FF6B35", "#FFFFFF", "light");
+        string result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "#FF6B35", "#FFFFFF", "light");
 
         // Assert
         Assert.IsTrue(result.Contains("## Color Palette Generated"), "Should contain color palette section");
@@ -168,7 +168,7 @@ public class ThemingToolTests
     public void GenerateTheme_ContainsCustomizationTips()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC");
+        string result = ThemingTool.GenerateTheme("TestTheme", "#007ACC");
 
         // Assert
         Assert.IsTrue(result.Contains("## Customization Tips"), "Should contain customization tips section");
@@ -186,7 +186,7 @@ public class ThemingToolTests
     public void GenerateTheme_ValidHexColors_AcceptsColors(string color)
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", color);
+        string result = ThemingTool.GenerateTheme("TestTheme", color);
 
         // Assert
         Assert.IsFalse(result.Contains("Error generating theme"), "Should not contain error message for valid color");
@@ -200,7 +200,7 @@ public class ThemingToolTests
     public void GenerateTheme_DifferentColorFormats_HandlesCorrectly(string color)
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", color);
+        string result = ThemingTool.GenerateTheme("TestTheme", color);
 
         // Assert
         // Should either accept the color or convert it properly
@@ -211,7 +211,7 @@ public class ThemingToolTests
     public void GenerateTheme_InvalidColor_ReturnsError()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", "invalid-color");
+        string result = ThemingTool.GenerateTheme("TestTheme", "invalid-color");
 
         // Assert
         Assert.IsTrue(result.Contains("Error generating theme"), "Should contain error message for invalid color");
@@ -221,7 +221,7 @@ public class ThemingToolTests
     public void GenerateTheme_EmptyThemeName_HandlesGracefully()
     {
         // Act
-        var result = ThemingTool.GenerateTheme("", "#007ACC");
+        string result = ThemingTool.GenerateTheme("", "#007ACC");
 
         // Assert
         Assert.IsTrue(result.Contains("# Custom AvaloniaUI Theme:"), "Should handle empty theme name gracefully");
@@ -231,12 +231,12 @@ public class ThemingToolTests
     public void GenerateSelectors_ValidInputs_ReturnsSelectors()
     {
         // Arrange
-        var controlType = "Button";
-        var styleClasses = "primary,large";
-        var pseudoClasses = "pointerover,pressed";
+        string controlType = "Button";
+        string styleClasses = "primary,large";
+        string pseudoClasses = "pointerover,pressed";
 
         // Act
-        var result = ThemingTool.GenerateSelectors(controlType, styleClasses, pseudoClasses, "true");
+        string result = ThemingTool.GenerateSelectors(controlType, styleClasses, pseudoClasses, "true");
 
         // Assert
         Assert.IsTrue(result.Contains($"# AvaloniaUI CSS-like Selectors for {controlType}"), "Should contain selector title for control type");
@@ -251,7 +251,7 @@ public class ThemingToolTests
     public void GenerateSelectors_ContainsBasicSelector()
     {
         // Act
-        var result = ThemingTool.GenerateSelectors("Button");
+        string result = ThemingTool.GenerateSelectors("Button");
 
         // Assert
         Assert.IsTrue(result.Contains("- `Button`"), "Should contain basic Button selector");
@@ -261,7 +261,7 @@ public class ThemingToolTests
     public void GenerateSelectors_WithStyleClasses_ContainsClassSelectors()
     {
         // Act
-        var result = ThemingTool.GenerateSelectors("Button", "primary,secondary");
+        string result = ThemingTool.GenerateSelectors("Button", "primary,secondary");
 
         // Assert
         Assert.IsTrue(result.Contains("- `Button.primary.secondary`"), "Should contain combined style class selectors");
@@ -271,7 +271,7 @@ public class ThemingToolTests
     public void GenerateSelectors_WithPseudoClasses_ContainsPseudoSelectors()
     {
         // Act
-        var result = ThemingTool.GenerateSelectors("Button", "primary", "pointerover,pressed");
+        string result = ThemingTool.GenerateSelectors("Button", "primary", "pointerover,pressed");
 
         // Assert
         Assert.IsTrue(result.Contains("- `Button.primary:pointerover`"), "Should contain pointer over pseudo selector");
@@ -282,7 +282,7 @@ public class ThemingToolTests
     public void GenerateSelectors_WithChildSelectors_ContainsChildSelectors()
     {
         // Act
-        var result = ThemingTool.GenerateSelectors("Button", "", "", "true");
+        string result = ThemingTool.GenerateSelectors("Button", "", "", "true");
 
         // Assert
         Assert.IsTrue(result.Contains("- `StackPanel > Button`"), "Should contain direct child selector");
@@ -294,7 +294,7 @@ public class ThemingToolTests
     public void GenerateSelectors_WithoutChildSelectors_ExcludesChildSelectors()
     {
         // Act
-        var result = ThemingTool.GenerateSelectors("Button", "", "", "false");
+        string result = ThemingTool.GenerateSelectors("Button", "", "", "false");
 
         // Assert
         Assert.IsFalse(result.Contains("StackPanel > Button"), "Should not contain direct child selector");
@@ -306,7 +306,7 @@ public class ThemingToolTests
     public void GenerateSelectors_ContainsXAMLExamples()
     {
         // Act
-        var result = ThemingTool.GenerateSelectors("Button", "primary");
+        string result = ThemingTool.GenerateSelectors("Button", "primary");
 
         // Assert
         Assert.IsTrue(result.Contains("<Window.Styles>"), "Should contain Window.Styles example");
@@ -318,11 +318,11 @@ public class ThemingToolTests
     public void GenerateColorScheme_ValidInputs_ReturnsColorScheme()
     {
         // Arrange
-        var baseColor = "#007ACC";
-        var schemeType = "monochromatic";
+        string baseColor = "#007ACC";
+        string schemeType = "monochromatic";
 
         // Act
-        var result = ThemingTool.GenerateColorScheme(baseColor, schemeType, 5);
+        string result = ThemingTool.GenerateColorScheme(baseColor, schemeType, 5);
 
         // Assert
         Assert.IsTrue(result.Contains($"# Color Scheme: {schemeType} ({baseColor})"), "Should contain color scheme title");
@@ -343,7 +343,7 @@ public class ThemingToolTests
     public void GenerateColorScheme_DifferentSchemeTypes_ReturnsScheme(string schemeType)
     {
         // Act
-        var result = ThemingTool.GenerateColorScheme("#007ACC", schemeType);
+        string result = ThemingTool.GenerateColorScheme("#007ACC", schemeType);
 
         // Assert
         Assert.IsTrue(result.Contains($"# Color Scheme: {schemeType}"), $"Should contain color scheme title with type: {schemeType}");
@@ -353,7 +353,7 @@ public class ThemingToolTests
     public void GenerateColorScheme_ContainsResourceDictionary()
     {
         // Act
-        var result = ThemingTool.GenerateColorScheme("#007ACC");
+        string result = ThemingTool.GenerateColorScheme("#007ACC");
 
         // Assert
         Assert.IsTrue(result.Contains("<ResourceDictionary>"), "Should contain ResourceDictionary element");
@@ -366,7 +366,7 @@ public class ThemingToolTests
     public void GenerateColorScheme_ContainsAccessibilityNotes()
     {
         // Act
-        var result = ThemingTool.GenerateColorScheme("#007ACC");
+        string result = ThemingTool.GenerateColorScheme("#007ACC");
 
         // Assert
         Assert.IsTrue(result.Contains("## Accessibility Notes"), "Should contain accessibility notes section");
@@ -385,12 +385,12 @@ public class ThemingToolTests
     public void GenerateColorScheme_DifferentColorCounts_ReturnsCorrectCount(int colorCount)
     {
         // Act
-        var result = ThemingTool.GenerateColorScheme("#007ACC", "monochromatic", colorCount);
+        string result = ThemingTool.GenerateColorScheme("#007ACC", "monochromatic", colorCount);
 
         // Assert
         // Should contain the requested number of colors
-        var lines = result.Split('\n');
-        var colorLines = lines.Where(l => l.Contains(". **") && l.Contains("**: `#")).Count();
+        string[] lines = result.Split('\n');
+        int colorLines = lines.Count(l => l.Contains(". **") && l.Contains("**: `#"));
         Assert.AreEqual(Math.Min(colorCount, 5), colorLines, "Should contain the correct number of color lines (limited by implementation)"); // Limited by current implementation
     }
 
@@ -398,7 +398,7 @@ public class ThemingToolTests
     public void GenerateColorScheme_InvalidColor_ReturnsError()
     {
         // Act
-        var result = ThemingTool.GenerateColorScheme("invalid-color");
+        string result = ThemingTool.GenerateColorScheme("invalid-color");
 
         // Assert
         Assert.IsTrue(result.Contains("Error generating color scheme"), "Should contain error message for invalid color");
@@ -410,7 +410,7 @@ public class ThemingToolTests
     public void GenerateTheme_IncludeEffectsParameter_HandlesCorrectly(string includeEffects, bool expected)
     {
         // Act
-        var result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "light", includeEffects);
+        string result = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "light", includeEffects);
 
         // Assert
         Assert.IsTrue(result.Contains($"**Modern Effects**: {expected}"), $"Should contain correct modern effects setting: {expected}");
@@ -420,8 +420,8 @@ public class ThemingToolTests
     public void GenerateTheme_CaseInsensitiveThemeType_HandlesCorrectly()
     {
         // Act
-        var result1 = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "LIGHT");
-        var result2 = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "Light");
+        string result1 = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "LIGHT");
+        string result2 = ThemingTool.GenerateTheme("TestTheme", "#007ACC", "", "#FFFFFF", "Light");
 
         // Assert
         Assert.IsTrue(result1.Contains("**Type**: light"), "Should handle uppercase theme type correctly");

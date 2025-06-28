@@ -1,45 +1,61 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
 root = true
 
 # All files
 [*]
 indent_style = space
 end_of_line = crlf
+charset = utf-8-bom
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# Xml files
-[*.xml]
-indent_size = 2
-
-# C# files
-[*.cs]
-
-#### Core EditorConfig Options ####
-
-# Indentation and spacing
+# Code files
+[*.{cs,csx,vb,vbx}]
 indent_size = 4
 tab_width = 4
 
-# New line preferences
-insert_final_newline = true
+# XML project files
+[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
+indent_size = 2
+
+# XML config files
+[*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
+indent_size = 2
+
+# JSON files
+[*.{json,json5,webmanifest}]
+indent_size = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_size = 2
+
+# Markdown files
+[*.{md,mdx}]
+trim_trailing_whitespace = false
+
+# Web files
+[*.{htm,html,js,jsm,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,svg}]
+indent_size = 2
 
 #### .NET Coding Conventions ####
-[*.{cs,vb}]
 
 # Organize usings
-dotnet_separate_import_directive_groups = true
+[*.{cs,csx,vb,vbx}]
 dotnet_sort_system_directives_first = true
-file_header_template = unset
+dotnet_separate_import_directive_groups = false
 
 # this. and Me. preferences
-dotnet_style_qualification_for_event = false:silent
-dotnet_style_qualification_for_field = false:silent
-dotnet_style_qualification_for_method = false:silent
-dotnet_style_qualification_for_property = false:silent
+dotnet_style_qualification_for_event = false:suggestion
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
 
 # Language keywords vs BCL types preferences
-dotnet_style_predefined_type_for_locals_parameters_members = true:silent
-dotnet_style_predefined_type_for_member_access = true:silent
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
 
 # Parentheses preferences
 dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:silent
@@ -61,8 +77,8 @@ dotnet_style_operator_placement_when_wrapping = beginning_of_line
 dotnet_style_prefer_auto_properties = true:suggestion
 dotnet_style_prefer_collection_expression = when_types_loosely_match:suggestion
 dotnet_style_prefer_compound_assignment = true:suggestion
-dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
-dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_return = true:silent
 dotnet_style_prefer_foreach_explicit_cast_in_source = when_strongly_typed:suggestion
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 dotnet_style_prefer_inferred_tuple_names = true:suggestion
@@ -80,12 +96,13 @@ dotnet_code_quality_unused_parameters = all:suggestion
 dotnet_remove_unnecessary_suppression_exclusions = none
 
 #### C# Coding Conventions ####
-[*.cs]
+
+[*.{cs,csx}]
 
 # var preferences
 csharp_style_var_elsewhere = false:silent
 csharp_style_var_for_built_in_types = false:silent
-csharp_style_var_when_type_is_apparent = false:silent
+csharp_style_var_when_type_is_apparent = true:suggestion
 
 # Expression-bodied members
 csharp_style_expression_bodied_accessors = true:silent
@@ -121,7 +138,7 @@ csharp_prefer_simple_using_statement = true:suggestion
 csharp_style_namespace_declarations = file_scoped:suggestion
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_prefer_primary_constructors = true:suggestion
-csharp_style_prefer_top_level_statements = true:silent
+csharp_style_prefer_top_level_statements = false:silent
 
 # Expression-level preferences
 csharp_prefer_simple_default_expression = true:suggestion
@@ -188,8 +205,9 @@ csharp_space_between_square_brackets = false
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
-#### Naming styles ####
-[*.{cs,vb}]
+#### Naming Conventions ####
+
+[*.{cs,csx,vb,vbx}]
 
 # Naming rules
 
@@ -311,7 +329,7 @@ dotnet_naming_symbols.non_field_members.applicable_kinds = property, event, meth
 dotnet_naming_symbols.non_field_members.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
 dotnet_naming_symbols.non_field_members.required_modifiers = 
 
-dotnet_naming_symbols.type_parameters.applicable_kinds = namespace
+dotnet_naming_symbols.type_parameters.applicable_kinds = type_parameter
 dotnet_naming_symbols.type_parameters.applicable_accessibilities = *
 dotnet_naming_symbols.type_parameters.required_modifiers = 
 
@@ -379,3 +397,22 @@ dotnet_naming_style.s_camelcase.required_suffix =
 dotnet_naming_style.s_camelcase.word_separator = 
 dotnet_naming_style.s_camelcase.capitalization = camel_case
 
+#### Code Analysis Rules ####
+
+# Enable all rules by default
+dotnet_analyzer_diagnostic.category-style.severity = warning
+dotnet_analyzer_diagnostic.category-design.severity = warning
+dotnet_analyzer_diagnostic.category-documentation.severity = suggestion
+dotnet_analyzer_diagnostic.category-globalization.severity = warning
+dotnet_analyzer_diagnostic.category-performance.severity = warning
+dotnet_analyzer_diagnostic.category-reliability.severity = warning
+dotnet_analyzer_diagnostic.category-security.severity = warning
+
+# Specific rule overrides
+dotnet_diagnostic.IDE0058.severity = none # Expression value is never used
+dotnet_diagnostic.IDE0040.severity = warning # Add accessibility modifiers
+dotnet_diagnostic.IDE0036.severity = warning # Order modifiers
+dotnet_diagnostic.IDE0017.severity = suggestion # Simplify object initialization
+dotnet_diagnostic.IDE0028.severity = suggestion # Simplify collection initialization
+dotnet_diagnostic.IDE0090.severity = suggestion # Use 'new(...)'
+dotnet_diagnostic.IDE1006.severity = warning # Naming rule violations

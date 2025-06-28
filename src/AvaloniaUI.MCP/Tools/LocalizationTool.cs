@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -19,16 +19,15 @@ public static class LocalizationTool
             var config = new LocalizationConfiguration
             {
                 PrimaryLanguage = primaryLanguage,
-                AdditionalLanguages = additionalLanguages.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(lang => lang.Trim()).ToList(),
+                AdditionalLanguages = [.. additionalLanguages.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(lang => lang.Trim())],
                 IncludePluralization = bool.Parse(includePluralization),
                 IncludeFormatting = bool.Parse(includeFormatting)
             };
 
-            var localizationService = GenerateLocalizationService(config);
-            var resourceFiles = GenerateResourceFiles(config);
-            var markupExtension = GenerateMarkupExtension(config);
-            var setupInstructions = GenerateSetupInstructions(config);
+            string localizationService = GenerateLocalizationService(config);
+            string resourceFiles = GenerateResourceFiles(config);
+            string markupExtension = GenerateMarkupExtension(config);
+            string setupInstructions = GenerateSetupInstructions(config);
 
             return $@"# Localization System for AvaloniaUI
 
@@ -91,13 +90,13 @@ public string WelcomeText => _localizationService.GetString(""WelcomeMessage"");
             var cultureList = cultures.Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(c => c.Trim()).ToList();
 
-            var formattingService = GenerateFormattingService(cultureList,
+            string formattingService = GenerateFormattingService(cultureList,
                 bool.Parse(includeDateTimeFormatting),
                 bool.Parse(includeNumberFormatting),
                 bool.Parse(includeCurrencyFormatting));
 
-            var validators = GenerateCultureValidators(cultureList);
-            var converters = GenerateCultureConverters(cultureList);
+            string validators = GenerateCultureValidators(cultureList);
+            string converters = GenerateCultureConverters(cultureList);
 
             return $@"# Culture-Specific Formatting
 
@@ -136,7 +135,7 @@ var date_ja = _formattingService.FormatDate(DateTime.Now, ""ja-JP""); // 2024年
         }
     }
 
-    private class LocalizationConfiguration
+    private sealed class LocalizationConfiguration
     {
         public string PrimaryLanguage { get; set; } = "";
         public List<string> AdditionalLanguages { get; set; } = new();
@@ -146,8 +145,8 @@ var date_ja = _formattingService.FormatDate(DateTime.Now, ""ja-JP""); // 2024年
 
     private static string GenerateLocalizationService(LocalizationConfiguration config)
     {
-        var pluralizationCode = config.IncludePluralization ? GeneratePluralizationCode() : "";
-        var formattingCode = config.IncludeFormatting ? GenerateFormattingHelpers() : "";
+        string pluralizationCode = config.IncludePluralization ? GeneratePluralizationCode() : "";
+        string formattingCode = config.IncludeFormatting ? GenerateFormattingHelpers() : "";
 
         return $@"public interface ILocalizationService
 {{
@@ -179,7 +178,7 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
 
     public IEnumerable<string> AvailableCultures => new[]
     {{
-        ""{config.PrimaryLanguage}""{(config.AdditionalLanguages.Any() ? ",\n        " + string.Join(",\n        ", config.AdditionalLanguages.Select(lang => $"\"{lang}\"")) : "")}
+        ""{config.PrimaryLanguage}""{(config.AdditionalLanguages.Count != 0 ? ",\n        " + string.Join(",\n        ", config.AdditionalLanguages.Select(lang => $"\"{lang}\"")) : "")}
     }};
 
     public event EventHandler<CultureChangedEventArgs>? CultureChanged;
@@ -392,11 +391,11 @@ public class DefaultPluralRules : IPluralRules
         var allLanguages = new List<string> { config.PrimaryLanguage };
         allLanguages.AddRange(config.AdditionalLanguages);
 
-        var resourceStructure = $@"```
+        string resourceStructure = $@"```
 Resources/
 ├── Strings.resx                    // {config.PrimaryLanguage} (default)";
 
-        foreach (var lang in config.AdditionalLanguages)
+        foreach (string lang in config.AdditionalLanguages)
         {
             resourceStructure += $@"
 ├── Strings.{lang}.resx             // {lang}";

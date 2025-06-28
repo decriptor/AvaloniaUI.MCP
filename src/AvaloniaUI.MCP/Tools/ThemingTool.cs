@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -28,8 +28,8 @@ public static class ThemingTool
                 IncludeEffects = bool.Parse(includeEffects)
             };
 
-            var xamlContent = GenerateThemeXaml(theme);
-            var codeContent = GenerateThemeCode(theme);
+            string xamlContent = GenerateThemeXaml(theme);
+            string codeContent = GenerateThemeCode(theme);
 
             return $@"# Custom AvaloniaUI Theme: {themeName}
 
@@ -99,15 +99,15 @@ Application.Current.Styles.Add(new {themeName}Theme());
             var pseudos = pseudoClasses.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim()).ToList();
 
             // Basic selector
-            var baseSelector = controlType;
-            if (classes.Any())
+            string baseSelector = controlType;
+            if (classes.Count != 0)
             {
                 baseSelector += "." + string.Join(".", classes);
             }
             selectors.Add(baseSelector);
 
             // Pseudo-class selectors
-            foreach (var pseudo in pseudos)
+            foreach (string? pseudo in pseudos)
             {
                 selectors.Add($"{baseSelector}:{pseudo}");
             }
@@ -120,9 +120,9 @@ Application.Current.Styles.Add(new {themeName}Theme());
                 selectors.Add($"{controlType} /template/ ContentPresenter");
             }
 
-            var xamlExamples = GenerateSelectorXaml(selectors, controlType);
+            string xamlExamples = GenerateSelectorXaml(selectors, controlType);
 
-            var classesExample = classes.Any() ? string.Join(" ", classes) : "primary secondary";
+            string classesExample = classes.Count != 0 ? string.Join(" ", classes) : "primary secondary";
 
             return $@"# AvaloniaUI CSS-like Selectors for {controlType}
 
@@ -138,7 +138,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
 
 ### Basic Selectors
 - `{controlType}` - Targets all {controlType} controls
-- `{controlType}.{(classes.Any() ? classes.First() : "class")}` - Targets {controlType} with specific class
+- `{controlType}.{(classes.Count != 0 ? classes.First() : "class")}` - Targets {controlType} with specific class
 
 ### Pseudo-class Selectors
 - `:pointerover` - When mouse hovers over control
@@ -176,10 +176,10 @@ Application.Current.Styles.Add(new {themeName}Theme());
     {
         try
         {
-            var normalizedColor = ValidateColor(baseColor);
-            var colors = GenerateColorSchemeColors(normalizedColor, schemeType, colorCount);
+            string normalizedColor = ValidateColor(baseColor);
+            List<ColorInfo> colors = GenerateColorSchemeColors(normalizedColor, schemeType, colorCount);
 
-            var result = $@"# Color Scheme: {schemeType} ({baseColor})
+            string result = $@"# Color Scheme: {schemeType} ({baseColor})
 
 ## Generated Colors
 {string.Join("\n", colors.Select((c, i) => $"{i + 1}. **{c.Name}**: `{c.Hex}` - {c.Description}"))}
@@ -221,7 +221,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
         }
     }
 
-    private class ThemeConfiguration
+    private sealed class ThemeConfiguration
     {
         public string Name { get; set; } = "";
         public string Type { get; set; } = "light";
@@ -231,7 +231,7 @@ Application.Current.Styles.Add(new {themeName}Theme());
         public bool IncludeEffects { get; set; } = true;
     }
 
-    private class ColorInfo
+    private sealed class ColorInfo
     {
         public string Name { get; set; } = "";
         public string Hex { get; set; } = "";
@@ -241,20 +241,25 @@ Application.Current.Styles.Add(new {themeName}Theme());
     private static string ValidateColor(string color)
     {
         if (string.IsNullOrEmpty(color))
+        {
             throw new ArgumentException("Color cannot be empty");
+        }
 
         color = color.Trim();
 
         // Handle hex colors
         if (color.StartsWith("#"))
         {
-            if (color.Length == 7 || color.Length == 9) // #RRGGBB or #AARRGGBB
+            if (color.Length is 7 or 9) // #RRGGBB or #AARRGGBB
+            {
                 return color.ToUpperInvariant();
+            }
+
             if (color.Length == 4) // #RGB -> #RRGGBB
             {
-                var r = color[1];
-                var g = color[2];
-                var b = color[3];
+                char r = color[1];
+                char g = color[2];
+                char b = color[3];
                 return $"#{r}{r}{g}{g}{b}{b}";
             }
         }
@@ -267,10 +272,9 @@ Application.Current.Styles.Add(new {themeName}Theme());
             {"orange", "#FFA500"}, {"purple", "#800080"}, {"yellow", "#FFFF00"}
         };
 
-        if (namedColors.TryGetValue(color.ToLowerInvariant(), out var hexValue))
-            return hexValue;
-
-        throw new ArgumentException($"Invalid color format: {color}");
+        return namedColors.TryGetValue(color.ToLowerInvariant(), out string? hexValue)
+            ? hexValue
+            : throw new ArgumentException($"Invalid color format: {color}");
     }
 
     private static string GenerateSecondaryColor(string primaryColor)
@@ -287,10 +291,10 @@ Application.Current.Styles.Add(new {themeName}Theme());
 
     private static string GenerateThemeXaml(ThemeConfiguration theme)
     {
-        var isDark = theme.Type == "dark";
-        var textColor = isDark ? "#FFFFFF" : "#000000";
-        var surfaceColor = isDark ? "#2D2D30" : "#F5F5F5";
-        var borderColor = isDark ? "#464647" : "#CCCCCC";
+        bool isDark = theme.Type == "dark";
+        string textColor = isDark ? "#FFFFFF" : "#000000";
+        string surfaceColor = isDark ? "#2D2D30" : "#F5F5F5";
+        string borderColor = isDark ? "#464647" : "#CCCCCC";
 
         return $@"<Styles xmlns=""https://github.com/avaloniaui""
         xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
@@ -378,14 +382,14 @@ public class {theme.Name}Theme : Styles
     private static List<ColorInfo> GenerateColorSchemeColors(string baseColor, string schemeType, int colorCount)
     {
         // Simplified color scheme generation
-        return new List<ColorInfo>
+        return [.. new List<ColorInfo>
         {
             new() { Name = "Primary", Hex = baseColor, Description = "Base color" },
             new() { Name = "Secondary", Hex = GenerateSecondaryColor(baseColor), Description = "Secondary color" },
             new() { Name = "Accent", Hex = "#FFD23F", Description = "Accent color" },
             new() { Name = "Neutral", Hex = "#808080", Description = "Neutral gray" },
             new() { Name = "Surface", Hex = "#F5F5F5", Description = "Surface color" }
-        }.Take(colorCount).ToList();
+        }.Take(colorCount)];
     }
 
     private static string GenerateSelectorXaml(List<string> selectors, string controlType)

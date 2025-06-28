@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -14,7 +14,7 @@ public static class AvaloniaPrompts
         [Description("Brief description of what the app should do")] string appDescription,
         [Description("Target platforms: desktop, mobile, or all")] string targetPlatforms = "desktop")
     {
-        var prompt = $@"# Create AvaloniaUI Application: {appName}
+        string prompt = $@"# Create AvaloniaUI Application: {appName}
 
 ## Project Requirements
 - **Application Name:** {appName}
@@ -84,7 +84,7 @@ Please proceed with creating this AvaloniaUI application following these guideli
         [Description("Key features of the WPF application")] string wpfFeatures,
         [Description("Known WPF-specific components used")] string wpfComponents = "")
     {
-        var prompt = $@"# Migrate WPF Application to AvaloniaUI: {wpfAppName}
+        string prompt = $@"# Migrate WPF Application to AvaloniaUI: {wpfAppName}
 
 ## Migration Overview
 - **Source:** WPF Application '{wpfAppName}'
@@ -208,7 +208,7 @@ Please proceed with the migration following this structured approach.";
         [Description("Description of the issue being experienced")] string issueDescription,
         [Description("Type of issue: binding, layout, styling, performance, or platform")] string issueType = "binding")
     {
-        var prompt = $@"# Debug AvaloniaUI Issue
+        string prompt = $@"# Debug AvaloniaUI Issue
 
 ## Issue Details
 - **Problem:** {issueDescription}
@@ -260,7 +260,7 @@ Please provide more details about your specific issue for targeted assistance.";
         [Description("Target screen sizes or device types")] string targetDevices,
         [Description("Layout requirements or constraints")] string layoutRequirements)
     {
-        var prompt = $@"# Implement Responsive Design in AvaloniaUI
+        string prompt = $@"# Implement Responsive Design in AvaloniaUI
 
 ## Design Requirements
 - **Target Devices:** {targetDevices}
@@ -322,7 +322,7 @@ Please proceed with implementing responsive design following these guidelines.";
 
     private static string GetPlatformConsiderations(string targetPlatforms)
     {
-        return targetPlatforms.ToLower() switch
+        return targetPlatforms.ToLower(System.Globalization.CultureInfo.CurrentCulture) switch
         {
             "desktop" => @"
 **Desktop Platforms:**
@@ -349,7 +349,7 @@ Please proceed with implementing responsive design following these guidelines.";
 
     private static string GetDiagnosticSteps(string issueType)
     {
-        return issueType.ToLower() switch
+        return issueType.ToLower(System.Globalization.CultureInfo.CurrentCulture) switch
         {
             "binding" => @"
 1. Check binding syntax for typos
@@ -394,7 +394,7 @@ Please proceed with implementing responsive design following these guidelines.";
 
     private static string GetCommonSolutions(string issueType)
     {
-        return issueType.ToLower() switch
+        return issueType.ToLower(System.Globalization.CultureInfo.CurrentCulture) switch
         {
             "binding" => @"
 - Use x:DataType for compiled bindings
@@ -435,7 +435,7 @@ Please proceed with implementing responsive design following these guidelines.";
 
     private static string GetPlatformSpecificConsiderations(string targetDevices)
     {
-        return targetDevices.ToLower() switch
+        return targetDevices.ToLower(System.Globalization.CultureInfo.CurrentCulture) switch
         {
             var devices when devices.Contains("mobile") => @"
 **Mobile Considerations:**
@@ -470,7 +470,7 @@ Please proceed with implementing responsive design following these guidelines.";
     {
         var breakpointList = breakpoints.Split(',').Select(b => b.Trim()).ToList();
 
-        var prompt = $@"# Implement Container Queries for {componentName}
+        string prompt = $@"# Implement Container Queries for {componentName}
 
 ## Responsive Design with Container Queries (AvaloniaUI 11.3+)
 
@@ -512,7 +512,7 @@ Please implement container queries for {componentName} following these guideline
         [Description("Performance area to focus on: 'startup', 'rendering', 'memory', 'binding', 'collections'")] string focusArea = "general",
         [Description("Target platforms: 'desktop', 'mobile', 'all'")] string targetPlatforms = "desktop")
     {
-        var prompt = $@"# AvaloniaUI Performance Optimization Strategy
+        string prompt = $@"# AvaloniaUI Performance Optimization Strategy
 
 ## Focus Area: {focusArea.ToUpperInvariant()}
 ## Target Platforms: {targetPlatforms}

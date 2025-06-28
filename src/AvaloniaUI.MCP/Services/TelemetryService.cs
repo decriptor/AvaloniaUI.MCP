@@ -1,6 +1,5 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
-
 using Microsoft.Extensions.Logging;
 
 namespace AvaloniaUI.MCP.Services;
@@ -41,7 +40,7 @@ public interface ITelemetryService
     Dictionary<string, object> GetMetricsSnapshot();
 }
 
-public class TelemetryService : ITelemetryService
+public class TelemetryService : ITelemetryService, IDisposable
 {
     private readonly ILogger<TelemetryService> _logger;
     private readonly Meter _meter;
@@ -63,7 +62,7 @@ public class TelemetryService : ITelemetryService
     private long _cacheHits;
     private long _totalValidations;
     private long _successfulValidations;
-    private readonly object _metricsLock = new();
+    private readonly Lock _metricsLock = new();
 
     public TelemetryService(ILogger<TelemetryService> logger)
     {
@@ -102,7 +101,10 @@ public class TelemetryService : ITelemetryService
         lock (_metricsLock)
         {
             _totalToolExecutions++;
-            if (success) _successfulToolExecutions++;
+            if (success)
+            {
+                _successfulToolExecutions++;
+            }
         }
 
         var tags = new KeyValuePair<string, object?>[]
@@ -116,11 +118,11 @@ public class TelemetryService : ITelemetryService
 
         if (!success && !string.IsNullOrEmpty(errorMessage))
         {
-            _errorCounter.Add(1, new KeyValuePair<string, object?>[]
-            {
+            _errorCounter.Add(1,
+            [
                 new("tool_name", toolName),
                 new("error_type", "tool_execution")
-            });
+            ]);
         }
 
         _logger.LogInformation("Tool execution: {ToolName} - Success: {Success}, Duration: {Duration}ms",
@@ -138,7 +140,10 @@ public class TelemetryService : ITelemetryService
         lock (_metricsLock)
         {
             _totalResourceAccesses++;
-            if (cacheHit) _cacheHits++;
+            if (cacheHit)
+            {
+                _cacheHits++;
+            }
         }
 
         var tags = new KeyValuePair<string, object?>[]
@@ -158,7 +163,10 @@ public class TelemetryService : ITelemetryService
         lock (_metricsLock)
         {
             _totalValidations++;
-            if (success) _successfulValidations++;
+            if (success)
+            {
+                _successfulValidations++;
+            }
         }
 
         var tags = new KeyValuePair<string, object?>[]
@@ -171,11 +179,11 @@ public class TelemetryService : ITelemetryService
 
         if (!success)
         {
-            _errorCounter.Add(1, new KeyValuePair<string, object?>[]
-            {
+            _errorCounter.Add(1,
+            [
                 new("validation_type", validationType),
                 new("error_type", "validation")
-            });
+            ]);
         }
 
         _logger.LogDebug("Validation: {ValidationType} - Success: {Success}",
@@ -190,7 +198,7 @@ public class TelemetryService : ITelemetryService
 
     public void RecordServerEvent(string eventType, Dictionary<string, object>? properties = null)
     {
-        var logLevel = eventType.ToLowerInvariant() switch
+        LogLevel logLevel = eventType.ToLowerInvariant() switch
         {
             "startup" => LogLevel.Information,
             "shutdown" => LogLevel.Information,
@@ -212,7 +220,7 @@ public class TelemetryService : ITelemetryService
 
     public Activity? StartActivity(string activityName, string? parentId = null)
     {
-        var activity = _activitySource.StartActivity(activityName);
+        Activity? activity = _activitySource.StartActivity(activityName);
 
         if (activity != null && !string.IsNullOrEmpty(parentId))
         {
@@ -229,15 +237,15 @@ public class TelemetryService : ITelemetryService
     {
         lock (_metricsLock)
         {
-            var cacheHitRate = _totalResourceAccesses > 0
+            double cacheHitRate = _totalResourceAccesses > 0
                 ? (double)_cacheHits / _totalResourceAccesses
                 : 0.0;
 
-            var toolSuccessRate = _totalToolExecutions > 0
+            double toolSuccessRate = _totalToolExecutions > 0
                 ? (double)_successfulToolExecutions / _totalToolExecutions
                 : 0.0;
 
-            var validationSuccessRate = _totalValidations > 0
+            double validationSuccessRate = _totalValidations > 0
                 ? (double)_successfulValidations / _totalValidations
                 : 0.0;
 
@@ -286,22 +294,14 @@ public static class TelemetryExtensions
     }
 }
 
-internal class ToolExecutionScope : IDisposable
+internal sealed class ToolExecutionScope(ITelemetryService telemetry, string toolName) : IDisposable
 {
-    private readonly ITelemetryService _telemetry;
-    private readonly string _toolName;
-    private readonly Stopwatch _stopwatch;
-    private readonly Activity? _activity;
+    private readonly ITelemetryService _telemetry = telemetry;
+    private readonly string _toolName = toolName;
+    private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+    private readonly Activity? _activity = telemetry.StartActivity($"tool_execution_{toolName}");
     private bool _success = true;
     private string? _errorMessage;
-
-    public ToolExecutionScope(ITelemetryService telemetry, string toolName)
-    {
-        _telemetry = telemetry;
-        _toolName = toolName;
-        _stopwatch = Stopwatch.StartNew();
-        _activity = telemetry.StartActivity($"tool_execution_{toolName}");
-    }
 
     public void MarkFailure(string errorMessage)
     {
@@ -317,18 +317,12 @@ internal class ToolExecutionScope : IDisposable
     }
 }
 
-internal class ValidationScope : IDisposable
+internal sealed class ValidationScope(ITelemetryService telemetry, string validationType) : IDisposable
 {
-    private readonly ITelemetryService _telemetry;
-    private readonly string _validationType;
+    private readonly ITelemetryService _telemetry = telemetry;
+    private readonly string _validationType = validationType;
     private bool _success = true;
     private string? _errorDetails;
-
-    public ValidationScope(ITelemetryService telemetry, string validationType)
-    {
-        _telemetry = telemetry;
-        _validationType = validationType;
-    }
 
     public void MarkFailure(string errorDetails)
     {

@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -24,10 +24,10 @@ public static class AccessibilityTool
                 IncludeScreenReaderSupport = bool.Parse(includeScreenReader)
             };
 
-            var componentXaml = GenerateAccessibleComponentXaml(config);
-            var accessibilityHelpers = GenerateAccessibilityHelpers(config);
-            var keyboardHandler = config.IncludeKeyboardNavigation ? GenerateKeyboardNavigationCode(config) : "";
-            var testingChecklist = GenerateAccessibilityTestingChecklist(config);
+            string componentXaml = GenerateAccessibleComponentXaml(config);
+            string accessibilityHelpers = GenerateAccessibilityHelpers(config);
+            string keyboardHandler = config.IncludeKeyboardNavigation ? GenerateKeyboardNavigationCode(config) : "";
+            string testingChecklist = GenerateAccessibilityTestingChecklist(config);
 
             return $@"# Accessible Component: {componentType}
 
@@ -67,7 +67,7 @@ public static class AccessibilityTool
         }
     }
 
-    private class AccessibilityConfiguration
+    private sealed class AccessibilityConfiguration
     {
         public string ComponentType { get; set; } = "";
         public string WcagLevel { get; set; } = "";
@@ -1114,7 +1114,7 @@ public class KeyboardNavigationHandler
 
     private static string GenerateWcagRequirements(string level)
     {
-        var baseRequirements = @"
+        string baseRequirements = @"
 #### Level A Requirements
 - Images have alternative text
 - Videos have captions

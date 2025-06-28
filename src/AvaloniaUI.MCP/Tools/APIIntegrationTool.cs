@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -24,10 +24,10 @@ public static class APIIntegrationTool
                 IncludeRetryPolicies = bool.Parse(includeRetry)
             };
 
-            var clientService = GenerateClientService(config);
-            var authService = config.IncludeAuthentication ? GenerateAuthenticationService(config) : "";
-            var retryPolicy = config.IncludeRetryPolicies ? GenerateRetryPolicyCode() : "";
-            var setupInstructions = GenerateSetupInstructions(config);
+            string clientService = GenerateClientService(config);
+            string authService = config.IncludeAuthentication ? GenerateAuthenticationService(config) : "";
+            string retryPolicy = config.IncludeRetryPolicies ? GenerateRetryPolicyCode() : "";
+            string setupInstructions = GenerateSetupInstructions(config);
 
             return $@"# API Integration: {apiType}
 
@@ -86,9 +86,9 @@ public static class APIIntegrationTool
                 IncludeJsonSerialization = bool.Parse(includeJsonSerialization)
             };
 
-            var modelClasses = GenerateModelClasses(config);
-            var validationCode = config.IncludeValidation ? GenerateValidationCode(config) : "";
-            var serializationConfig = config.IncludeJsonSerialization ? GenerateSerializationConfig() : "";
+            string modelClasses = GenerateModelClasses(config);
+            string validationCode = config.IncludeValidation ? GenerateValidationCode(config) : "";
+            string serializationConfig = config.IncludeJsonSerialization ? GenerateSerializationConfig() : "";
 
             return $@"# API Models: {entityName}
 
@@ -143,7 +143,7 @@ else
         }
     }
 
-    private class ApiConfiguration
+    private sealed class ApiConfiguration
     {
         public string ApiType { get; set; } = "";
         public string BaseUrl { get; set; } = "";
@@ -151,7 +151,7 @@ else
         public bool IncludeRetryPolicies { get; set; }
     }
 
-    private class ModelConfiguration
+    private sealed class ModelConfiguration
     {
         public string ModelType { get; set; } = "";
         public string EntityName { get; set; } = "";
@@ -1309,8 +1309,8 @@ public static class ServiceCollectionExtensions
 
     private static string GenerateRequestModels(ModelConfiguration config)
     {
-        var validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
-        var jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
+        string validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
+        string jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
 
         return $@"// Request Models for {config.EntityName}
 
@@ -1395,7 +1395,7 @@ public class Delete{config.EntityName}Request
 
     private static string GenerateResponseModels(ModelConfiguration config)
     {
-        var jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
+        string jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
 
         return $@"// Response Models for {config.EntityName}
 
@@ -1514,8 +1514,8 @@ public class ErrorResponse
 
     private static string GenerateEntityModels(ModelConfiguration config)
     {
-        var validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
-        var jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
+        string validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
+        string jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
 
         return $@"// Entity Models for {config.EntityName}
 
@@ -1602,8 +1602,8 @@ public class {config.EntityName}Filter
 
     private static string GenerateDtoModels(ModelConfiguration config)
     {
-        var validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
-        var jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
+        string validationAttributes = config.IncludeValidation ? GetValidationAttributes() : "";
+        string jsonAttributes = config.IncludeJsonSerialization ? GetJsonAttributes() : "";
 
         return $@"// Data Transfer Objects for {config.EntityName}
 

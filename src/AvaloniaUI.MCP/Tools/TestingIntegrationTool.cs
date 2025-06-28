@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -24,9 +24,9 @@ public static class TestingIntegrationTool
                 Framework = framework.ToLowerInvariant()
             };
 
-            var testCode = GenerateTestClass(config);
-            var dependencies = GenerateTestDependencies(config);
-            var setupInstructions = GenerateSetupInstructions(config);
+            string testCode = GenerateTestClass(config);
+            string dependencies = GenerateTestDependencies(config);
+            string setupInstructions = GenerateSetupInstructions(config);
 
             return $@"# Unit Tests for {className}
 
@@ -85,11 +85,11 @@ public static class TestingIntegrationTool
         try
         {
             var scenarioList = scenarios.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
-            var accessibility = bool.Parse(includeAccessibility);
+            bool accessibility = bool.Parse(includeAccessibility);
 
-            var testCode = GenerateUITestClass(targetName, scenarioList, accessibility, testRunner);
-            var pageObjects = GeneratePageObjects(targetName, scenarioList);
-            var helpers = GenerateTestHelpers(testRunner);
+            string testCode = GenerateUITestClass(targetName, scenarioList, accessibility, testRunner);
+            string pageObjects = GeneratePageObjects(targetName, scenarioList);
+            string helpers = GenerateTestHelpers(testRunner);
 
             return $@"# UI Automation Tests for {targetName}
 
@@ -164,9 +164,9 @@ dotnet test --logger:console
     {
         try
         {
-            var mockCode = GenerateMockImplementation(targetInterface, mockFramework);
-            var builderCode = bool.Parse(includeBuilder) ? GenerateTestDataBuilder(targetInterface) : "";
-            var assertionExamples = bool.Parse(includeAssertions) ? GenerateFluentAssertions() : "";
+            string mockCode = GenerateMockImplementation(targetInterface, mockFramework);
+            string builderCode = bool.Parse(includeBuilder) ? GenerateTestDataBuilder(targetInterface) : "";
+            string assertionExamples = bool.Parse(includeAssertions) ? GenerateFluentAssertions() : "";
 
             return $@"# Mocks and Test Builders for {targetInterface}
 
@@ -250,11 +250,11 @@ Assert.True(executed);
         try
         {
             var metricsList = metrics.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(m => m.Trim()).ToList();
-            var profiling = bool.Parse(includeProfiling);
+            bool profiling = bool.Parse(includeProfiling);
 
-            var testCode = GeneratePerformanceTestClass(componentName, performanceType, metricsList, profiling);
-            var benchmarks = GenerateBenchmarkCode(componentName, performanceType);
-            var profilingSetup = profiling ? GenerateProfilingSetup() : "";
+            string testCode = GeneratePerformanceTestClass(componentName, performanceType, metricsList, profiling);
+            string benchmarks = GenerateBenchmarkCode(componentName, performanceType);
+            string profilingSetup = profiling ? GenerateProfilingSetup() : "";
 
             return $@"# Performance Tests for {componentName}
 
@@ -346,7 +346,7 @@ public class PerformanceMonitor
         }
     }
 
-    private class TestConfiguration
+    private sealed class TestConfiguration
     {
         public string ClassName { get; set; } = "";
         public string TestType { get; set; } = "";
@@ -356,9 +356,9 @@ public class PerformanceMonitor
 
     private static string GenerateTestClass(TestConfiguration config)
     {
-        var frameworkUsing = GetFrameworkUsings(config.Framework);
-        var testAttribute = GetTestAttribute(config.Framework);
-        var factAttribute = GetFactAttribute(config.Framework);
+        string frameworkUsing = GetFrameworkUsings(config.Framework);
+        string testAttribute = GetTestAttribute(config.Framework);
+        string factAttribute = GetFactAttribute(config.Framework);
 
         return config.TestType switch
         {
@@ -372,7 +372,7 @@ public class PerformanceMonitor
 
     private static string GenerateViewModelTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
     {
-        var mockSetup = config.IncludeMocks ? GenerateViewModelMockSetup() : "";
+        string mockSetup = config.IncludeMocks ? GenerateViewModelMockSetup() : "";
 
         return $@"{frameworkUsing}
 using Avalonia.Threading;
@@ -580,7 +580,7 @@ public class TestViewModel : ReactiveObject
 
     private static string GenerateServiceTests(TestConfiguration config, string frameworkUsing, string testAttribute, string factAttribute)
     {
-        var mockSetup = config.IncludeMocks ? GenerateServiceMockSetup() : "";
+        string mockSetup = config.IncludeMocks ? GenerateServiceMockSetup() : "";
 
         return $@"{frameworkUsing}
 {(config.IncludeMocks ? "using Moq;" : "")}
@@ -1113,7 +1113,7 @@ public class {targetInterface}MockSetup
 
     private static string GenerateTestDataBuilder(string targetInterface)
     {
-        var className = targetInterface.StartsWith("I") ? targetInterface.Substring(1) : targetInterface;
+        string className = targetInterface.StartsWith("I") ? targetInterface[1..] : targetInterface;
 
         return $@"public class {className}TestDataBuilder
 {{

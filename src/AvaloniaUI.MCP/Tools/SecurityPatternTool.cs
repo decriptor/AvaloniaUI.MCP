@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -37,10 +37,10 @@ public static class SecurityPatternTool
                 SecurityLevel = securityLevel.ToLowerInvariant()
             };
 
-            var authService = GenerateAuthenticationService(config);
-            var encryptionCode = config.IncludeEncryption ? GenerateEncryptionService() : "";
-            var validationCode = config.IncludeValidation ? GenerateInputValidation() : "";
-            var securityGuidelines = GenerateSecurityGuidelines(config);
+            string authService = GenerateAuthenticationService(config);
+            string encryptionCode = config.IncludeEncryption ? GenerateEncryptionService() : "";
+            string validationCode = config.IncludeValidation ? GenerateInputValidation() : "";
+            string securityGuidelines = GenerateSecurityGuidelines(config);
 
             return $@"# Security Pattern: {authType}
 
@@ -101,10 +101,10 @@ public static class SecurityPatternTool
                 IncludeAuditLog = bool.Parse(includeAuditLog)
             };
 
-            var dataService = GenerateSecureDataService(config);
-            var sanitizationCode = config.IncludeSanitization ? GenerateDataSanitization() : "";
-            var auditCode = config.IncludeAuditLog ? GenerateAuditLogging() : "";
-            var complianceInfo = GenerateComplianceInformation(config);
+            string dataService = GenerateSecureDataService(config);
+            string sanitizationCode = config.IncludeSanitization ? GenerateDataSanitization() : "";
+            string auditCode = config.IncludeAuditLog ? GenerateAuditLogging() : "";
+            string complianceInfo = GenerateComplianceInformation(config);
 
             return $@"# Data Security Pattern: {dataType}
 
@@ -147,7 +147,7 @@ public static class SecurityPatternTool
         }
     }
 
-    private class SecurityConfiguration
+    private sealed class SecurityConfiguration
     {
         public string AuthType { get; set; } = "";
         public bool IncludeEncryption { get; set; }
@@ -155,7 +155,7 @@ public static class SecurityPatternTool
         public string SecurityLevel { get; set; } = "";
     }
 
-    private class DataSecurityConfiguration
+    private sealed class DataSecurityConfiguration
     {
         public string DataType { get; set; } = "";
         public string EncryptionMethod { get; set; } = "";

@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -27,10 +27,10 @@ public static class UIUXDesignTool
                 BreakpointStrategy = breakpointStrategy.ToLowerInvariant()
             };
 
-            var responsiveXaml = GenerateResponsiveLayout(config);
-            var breakpoints = GenerateBreakpointSystem(config);
-            var touchHandlers = config.IncludeTouchGestures ? GenerateTouchGestureHandlers() : "";
-            var deviceAdaptation = GenerateDeviceAdaptation(config);
+            string responsiveXaml = GenerateResponsiveLayout(config);
+            string breakpoints = GenerateBreakpointSystem(config);
+            string touchHandlers = config.IncludeTouchGestures ? GenerateTouchGestureHandlers() : "";
+            string deviceAdaptation = GenerateDeviceAdaptation(config);
 
             return $@"# Responsive Design: {layoutType}
 
@@ -90,10 +90,10 @@ public static class UIUXDesignTool
                 FeedbackTiming = feedbackTiming.ToLowerInvariant()
             };
 
-            var patternImplementation = GenerateUXPatternImplementation(config);
-            var userGuidance = config.IncludeUserGuidance ? GenerateUserGuidanceSystem(config) : "";
-            var microInteractions = GenerateMicroInteractions(config);
-            var usabilityGuidelines = GenerateUsabilityGuidelines(config);
+            string patternImplementation = GenerateUXPatternImplementation(config);
+            string userGuidance = config.IncludeUserGuidance ? GenerateUserGuidanceSystem(config) : "";
+            string microInteractions = GenerateMicroInteractions(config);
+            string usabilityGuidelines = GenerateUsabilityGuidelines(config);
 
             return $@"# UX Pattern: {patternType}
 
@@ -151,10 +151,10 @@ public static class UIUXDesignTool
                 IncludeComponents = bool.Parse(includeComponents)
             };
 
-            var colorSystem = GenerateColorSystem(config);
-            var typography = GenerateTypographySystem(config);
-            var spacing = GenerateSpacingSystem(config);
-            var components = config.IncludeComponents ? GenerateComponentLibrary(config) : "";
+            string colorSystem = GenerateColorSystem(config);
+            string typography = GenerateTypographySystem(config);
+            string spacing = GenerateSpacingSystem(config);
+            string components = config.IncludeComponents ? GenerateComponentLibrary(config) : "";
 
             return $@"# Design System: {brandStyle}
 
@@ -197,7 +197,7 @@ public static class UIUXDesignTool
         }
     }
 
-    private class ResponsiveConfiguration
+    private sealed class ResponsiveConfiguration
     {
         public string LayoutType { get; set; } = "";
         public List<string> TargetDevices { get; set; } = new();
@@ -205,7 +205,7 @@ public static class UIUXDesignTool
         public string BreakpointStrategy { get; set; } = "";
     }
 
-    private class UXConfiguration
+    private sealed class UXConfiguration
     {
         public string PatternType { get; set; } = "";
         public string AnimationStyle { get; set; } = "";
@@ -213,7 +213,7 @@ public static class UIUXDesignTool
         public string FeedbackTiming { get; set; } = "";
     }
 
-    private class DesignSystemConfiguration
+    private sealed class DesignSystemConfiguration
     {
         public string BrandStyle { get; set; } = "";
         public string ColorPalette { get; set; } = "";
@@ -1750,7 +1750,7 @@ public class MicroInteractionsService
 
     private static string GenerateTypographySystem(DesignSystemConfiguration config)
     {
-        var baseSize = config.TypographyScale switch
+        int baseSize = config.TypographyScale switch
         {
             "compact" => 14,
             "large" => 18,

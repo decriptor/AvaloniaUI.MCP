@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Text.Json;
 
 using ModelContextProtocol.Server;
@@ -14,16 +14,16 @@ public static class MigrationGuideResource
     {
         try
         {
-            var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "migration-guide.json");
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "migration-guide.json");
             if (!File.Exists(dataPath))
             {
                 return Task.FromResult("Error: Migration guide data not found");
             }
 
-            var jsonContent = File.ReadAllText(dataPath);
-            var migrationData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
+            string jsonContent = File.ReadAllText(dataPath);
+            JsonElement migrationData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
 
-            var formattedContent = FormatMigrationGuide(migrationData);
+            string formattedContent = FormatMigrationGuide(migrationData);
             return Task.FromResult(formattedContent);
         }
         catch (Exception ex)
@@ -38,16 +38,16 @@ public static class MigrationGuideResource
     {
         try
         {
-            var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "migration-guide.json");
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "migration-guide.json");
             if (!File.Exists(dataPath))
             {
                 return Task.FromResult("Error: Migration guide data not found");
             }
 
-            var jsonContent = File.ReadAllText(dataPath);
-            var migrationData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
+            string jsonContent = File.ReadAllText(dataPath);
+            JsonElement migrationData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
 
-            var controlMappings = ExtractControlMappings(migrationData);
+            string controlMappings = ExtractControlMappings(migrationData);
             return Task.FromResult(controlMappings);
         }
         catch (Exception ex)
@@ -62,16 +62,16 @@ public static class MigrationGuideResource
     {
         try
         {
-            var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "migration-guide.json");
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "migration-guide.json");
             if (!File.Exists(dataPath))
             {
                 return Task.FromResult("Error: Migration guide data not found");
             }
 
-            var jsonContent = File.ReadAllText(dataPath);
-            var migrationData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
+            string jsonContent = File.ReadAllText(dataPath);
+            JsonElement migrationData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
 
-            var changes = ExtractNamespaceAndBindingChanges(migrationData);
+            string changes = ExtractNamespaceAndBindingChanges(migrationData);
             return Task.FromResult(changes);
         }
         catch (Exception ex)
@@ -86,16 +86,16 @@ public static class MigrationGuideResource
     {
         try
         {
-            var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "migration-guide.json");
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "migration-guide.json");
             if (!File.Exists(dataPath))
             {
                 return Task.FromResult("Error: Migration guide data not found");
             }
 
-            var jsonContent = File.ReadAllText(dataPath);
-            var migrationData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
+            string jsonContent = File.ReadAllText(dataPath);
+            JsonElement migrationData = JsonSerializer.Deserialize<JsonElement>(jsonContent);
 
-            var steps = ExtractMigrationSteps(migrationData);
+            string steps = ExtractMigrationSteps(migrationData);
             return Task.FromResult(steps);
         }
         catch (Exception ex)
@@ -106,13 +106,13 @@ public static class MigrationGuideResource
 
     private static string FormatMigrationGuide(JsonElement migrationData)
     {
-        var result = "# WPF to AvaloniaUI Migration Guide\\n\\n";
+        string result = "# WPF to AvaloniaUI Migration Guide\\n\\n";
         result += "This comprehensive guide will help you migrate your WPF applications to AvaloniaUI.\\n\\n";
 
-        if (migrationData.TryGetProperty("wpf_to_avalonia_migration", out var migration))
+        if (migrationData.TryGetProperty("wpf_to_avalonia_migration", out JsonElement migration))
         {
             // Namespace changes
-            if (migration.TryGetProperty("namespace_changes", out var namespaceChanges))
+            if (migration.TryGetProperty("namespace_changes", out JsonElement namespaceChanges))
             {
                 result += "## Namespace Changes\\n\\n";
                 result += FormatNamespaceChanges(namespaceChanges);
@@ -120,7 +120,7 @@ public static class MigrationGuideResource
             }
 
             // File extensions
-            if (migration.TryGetProperty("file_extensions", out var fileExtensions))
+            if (migration.TryGetProperty("file_extensions", out JsonElement fileExtensions))
             {
                 result += "## File Extension Changes\\n\\n";
                 result += FormatFileExtensions(fileExtensions);
@@ -128,7 +128,7 @@ public static class MigrationGuideResource
             }
 
             // Control mappings
-            if (migration.TryGetProperty("control_mappings", out var controlMappings))
+            if (migration.TryGetProperty("control_mappings", out JsonElement controlMappings))
             {
                 result += "## Control Compatibility\\n\\n";
                 result += FormatControlMappings(controlMappings);
@@ -136,7 +136,7 @@ public static class MigrationGuideResource
             }
 
             // Binding changes
-            if (migration.TryGetProperty("binding_changes", out var bindingChanges))
+            if (migration.TryGetProperty("binding_changes", out JsonElement bindingChanges))
             {
                 result += "## Data Binding Changes\\n\\n";
                 result += FormatBindingChanges(bindingChanges);
@@ -144,7 +144,7 @@ public static class MigrationGuideResource
             }
 
             // Styling changes
-            if (migration.TryGetProperty("styling_changes", out var stylingChanges))
+            if (migration.TryGetProperty("styling_changes", out JsonElement stylingChanges))
             {
                 result += "## Styling System Changes\\n\\n";
                 result += FormatStylingChanges(stylingChanges);
@@ -152,7 +152,7 @@ public static class MigrationGuideResource
             }
 
             // Migration steps
-            if (migration.TryGetProperty("common_migration_steps", out var migrationSteps))
+            if (migration.TryGetProperty("common_migration_steps", out JsonElement migrationSteps))
             {
                 result += "## Migration Process\\n\\n";
                 result += FormatMigrationSteps(migrationSteps);
@@ -165,10 +165,10 @@ public static class MigrationGuideResource
 
     private static string ExtractControlMappings(JsonElement migrationData)
     {
-        var result = "# WPF to AvaloniaUI Control Mappings\\n\\n";
+        string result = "# WPF to AvaloniaUI Control Mappings\\n\\n";
 
-        if (migrationData.TryGetProperty("wpf_to_avalonia_migration", out var migration) &&
-            migration.TryGetProperty("control_mappings", out var controlMappings))
+        if (migrationData.TryGetProperty("wpf_to_avalonia_migration", out JsonElement migration) &&
+            migration.TryGetProperty("control_mappings", out JsonElement controlMappings))
         {
             result += FormatControlMappings(controlMappings);
         }
@@ -178,18 +178,18 @@ public static class MigrationGuideResource
 
     private static string ExtractNamespaceAndBindingChanges(JsonElement migrationData)
     {
-        var result = "# Namespace and Binding Changes\\n\\n";
+        string result = "# Namespace and Binding Changes\\n\\n";
 
-        if (migrationData.TryGetProperty("wpf_to_avalonia_migration", out var migration))
+        if (migrationData.TryGetProperty("wpf_to_avalonia_migration", out JsonElement migration))
         {
-            if (migration.TryGetProperty("namespace_changes", out var namespaceChanges))
+            if (migration.TryGetProperty("namespace_changes", out JsonElement namespaceChanges))
             {
                 result += "## Namespace Changes\\n\\n";
                 result += FormatNamespaceChanges(namespaceChanges);
                 result += "\\n";
             }
 
-            if (migration.TryGetProperty("binding_changes", out var bindingChanges))
+            if (migration.TryGetProperty("binding_changes", out JsonElement bindingChanges))
             {
                 result += "## Binding Changes\\n\\n";
                 result += FormatBindingChanges(bindingChanges);
@@ -201,10 +201,10 @@ public static class MigrationGuideResource
 
     private static string ExtractMigrationSteps(JsonElement migrationData)
     {
-        var result = "# Migration Process Steps\\n\\n";
+        string result = "# Migration Process Steps\\n\\n";
 
-        if (migrationData.TryGetProperty("wpf_to_avalonia_migration", out var migration) &&
-            migration.TryGetProperty("common_migration_steps", out var migrationSteps))
+        if (migrationData.TryGetProperty("wpf_to_avalonia_migration", out JsonElement migration) &&
+            migration.TryGetProperty("common_migration_steps", out JsonElement migrationSteps))
         {
             result += FormatMigrationSteps(migrationSteps);
         }
@@ -214,20 +214,20 @@ public static class MigrationGuideResource
 
     private static string FormatNamespaceChanges(JsonElement namespaceChanges)
     {
-        var result = "";
+        string result = "";
 
-        if (namespaceChanges.TryGetProperty("description", out var description))
+        if (namespaceChanges.TryGetProperty("description", out JsonElement description))
         {
             result += $"{description.GetString()}\\n\\n";
         }
 
-        if (namespaceChanges.TryGetProperty("changes", out var changes))
+        if (namespaceChanges.TryGetProperty("changes", out JsonElement changes))
         {
-            foreach (var change in changes.EnumerateArray())
+            foreach (JsonElement change in changes.EnumerateArray())
             {
-                if (change.TryGetProperty("from", out var from) &&
-                    change.TryGetProperty("to", out var to) &&
-                    change.TryGetProperty("description", out var desc))
+                if (change.TryGetProperty("from", out JsonElement from) &&
+                    change.TryGetProperty("to", out JsonElement to) &&
+                    change.TryGetProperty("description", out JsonElement desc))
                 {
                     result += $"**{desc.GetString()}**\\n";
                     result += $"- From: `{from.GetString()}`\\n";
@@ -241,26 +241,26 @@ public static class MigrationGuideResource
 
     private static string FormatFileExtensions(JsonElement fileExtensions)
     {
-        var result = "";
+        string result = "";
 
-        if (fileExtensions.TryGetProperty("description", out var description))
+        if (fileExtensions.TryGetProperty("description", out JsonElement description))
         {
             result += $"{description.GetString()}\\n\\n";
         }
 
-        if (fileExtensions.TryGetProperty("changes", out var changes))
+        if (fileExtensions.TryGetProperty("changes", out JsonElement changes))
         {
-            foreach (var change in changes.EnumerateArray())
+            foreach (JsonElement change in changes.EnumerateArray())
             {
-                if (change.TryGetProperty("from", out var from) &&
-                    change.TryGetProperty("to", out var to) &&
-                    change.TryGetProperty("description", out var desc))
+                if (change.TryGetProperty("from", out JsonElement from) &&
+                    change.TryGetProperty("to", out JsonElement to) &&
+                    change.TryGetProperty("description", out JsonElement desc))
                 {
                     result += $"**{desc.GetString()}**\\n";
                     result += $"- From: `{from.GetString()}`\\n";
                     result += $"- To: `{to.GetString()}`\\n";
 
-                    if (change.TryGetProperty("note", out var note))
+                    if (change.TryGetProperty("note", out JsonElement note))
                     {
                         result += $"- Note: {note.GetString()}\\n";
                     }
@@ -274,34 +274,34 @@ public static class MigrationGuideResource
 
     private static string FormatControlMappings(JsonElement controlMappings)
     {
-        var result = "";
+        string result = "";
 
-        if (controlMappings.TryGetProperty("available_controls", out var availableControls))
+        if (controlMappings.TryGetProperty("available_controls", out JsonElement availableControls))
         {
             result += "### Available Controls\\n\\n";
             result += "| WPF Control | AvaloniaUI Control | Compatibility | Notes |\\n";
             result += "|-------------|-------------------|---------------|-------|\\n";
 
-            foreach (var control in availableControls.EnumerateArray())
+            foreach (JsonElement control in availableControls.EnumerateArray())
             {
-                var wpfControl = control.TryGetProperty("wpf_control", out var wpf) ? wpf.GetString() : "";
-                var avaloniaControl = control.TryGetProperty("avalonia_control", out var avalonia) ? avalonia.GetString() : "";
-                var compatibility = control.TryGetProperty("compatibility", out var compat) ? compat.GetString() : "";
-                var notes = control.TryGetProperty("notes", out var note) ? note.GetString() : "";
+                string? wpfControl = control.TryGetProperty("wpf_control", out JsonElement wpf) ? wpf.GetString() : "";
+                string? avaloniaControl = control.TryGetProperty("avalonia_control", out JsonElement avalonia) ? avalonia.GetString() : "";
+                string? compatibility = control.TryGetProperty("compatibility", out JsonElement compat) ? compat.GetString() : "";
+                string? notes = control.TryGetProperty("notes", out JsonElement note) ? note.GetString() : "";
 
                 result += $"| {wpfControl} | {avaloniaControl} | {compatibility} | {notes} |\\n";
             }
             result += "\\n";
         }
 
-        if (controlMappings.TryGetProperty("unavailable_controls", out var unavailableControls))
+        if (controlMappings.TryGetProperty("unavailable_controls", out JsonElement unavailableControls))
         {
             result += "### Unavailable Controls\\n\\n";
-            foreach (var control in unavailableControls.EnumerateArray())
+            foreach (JsonElement control in unavailableControls.EnumerateArray())
             {
-                var wpfControl = control.TryGetProperty("wpf_control", out var wpf) ? wpf.GetString() : "";
-                var alternative = control.TryGetProperty("alternative", out var alt) ? alt.GetString() : "";
-                var notes = control.TryGetProperty("notes", out var note) ? note.GetString() : "";
+                string? wpfControl = control.TryGetProperty("wpf_control", out JsonElement wpf) ? wpf.GetString() : "";
+                string? alternative = control.TryGetProperty("alternative", out JsonElement alt) ? alt.GetString() : "";
+                string? notes = control.TryGetProperty("notes", out JsonElement note) ? note.GetString() : "";
 
                 result += $"**{wpfControl}**\\n";
                 result += $"- Alternative: {alternative}\\n";
@@ -314,27 +314,27 @@ public static class MigrationGuideResource
 
     private static string FormatBindingChanges(JsonElement bindingChanges)
     {
-        var result = "";
+        string result = "";
 
-        if (bindingChanges.TryGetProperty("compatible_bindings", out var compatibleBindings))
+        if (bindingChanges.TryGetProperty("compatible_bindings", out JsonElement compatibleBindings))
         {
             result += "### Compatible Bindings\\n\\n";
             result += "The following WPF binding syntaxes work in AvaloniaUI:\\n\\n";
-            foreach (var binding in compatibleBindings.EnumerateArray())
+            foreach (JsonElement binding in compatibleBindings.EnumerateArray())
             {
                 result += $"- `{binding.GetString()}`\\n";
             }
             result += "\\n";
         }
 
-        if (bindingChanges.TryGetProperty("unsupported_bindings", out var unsupportedBindings))
+        if (bindingChanges.TryGetProperty("unsupported_bindings", out JsonElement unsupportedBindings))
         {
             result += "### Changed Bindings\\n\\n";
-            foreach (var binding in unsupportedBindings.EnumerateArray())
+            foreach (JsonElement binding in unsupportedBindings.EnumerateArray())
             {
-                var wpfSyntax = binding.TryGetProperty("wpf_syntax", out var wpf) ? wpf.GetString() : "";
-                var avaloniaAlternative = binding.TryGetProperty("avalonia_alternative", out var avalonia) ? avalonia.GetString() : "";
-                var notes = binding.TryGetProperty("notes", out var note) ? note.GetString() : "";
+                string? wpfSyntax = binding.TryGetProperty("wpf_syntax", out JsonElement wpf) ? wpf.GetString() : "";
+                string? avaloniaAlternative = binding.TryGetProperty("avalonia_alternative", out JsonElement avalonia) ? avalonia.GetString() : "";
+                string? notes = binding.TryGetProperty("notes", out JsonElement note) ? note.GetString() : "";
 
                 result += $"**WPF:** `{wpfSyntax}`\\n";
                 result += $"**AvaloniaUI:** `{avaloniaAlternative}`\\n";
@@ -347,24 +347,24 @@ public static class MigrationGuideResource
 
     private static string FormatStylingChanges(JsonElement stylingChanges)
     {
-        var result = "";
+        string result = "";
 
-        if (stylingChanges.TryGetProperty("description", out var description))
+        if (stylingChanges.TryGetProperty("description", out JsonElement description))
         {
             result += $"{description.GetString()}\\n\\n";
         }
 
-        if (stylingChanges.TryGetProperty("wpf_style", out var wpfStyle) &&
-            stylingChanges.TryGetProperty("avalonia_style", out var avaloniaStyle))
+        if (stylingChanges.TryGetProperty("wpf_style", out JsonElement wpfStyle) &&
+            stylingChanges.TryGetProperty("avalonia_style", out JsonElement avaloniaStyle))
         {
             result += $"**WPF:** `{wpfStyle.GetString()}`\\n";
             result += $"**AvaloniaUI:** `{avaloniaStyle.GetString()}`\\n\\n";
         }
 
-        if (stylingChanges.TryGetProperty("selector_examples", out var selectorExamples))
+        if (stylingChanges.TryGetProperty("selector_examples", out JsonElement selectorExamples))
         {
             result += "**Selector Examples:**\\n";
-            foreach (var example in selectorExamples.EnumerateArray())
+            foreach (JsonElement example in selectorExamples.EnumerateArray())
             {
                 result += $"- `{example.GetString()}`\\n";
             }
@@ -376,13 +376,13 @@ public static class MigrationGuideResource
 
     private static string FormatMigrationSteps(JsonElement migrationSteps)
     {
-        var result = "";
+        string result = "";
 
-        foreach (var step in migrationSteps.EnumerateArray())
+        foreach (JsonElement step in migrationSteps.EnumerateArray())
         {
-            var stepNumber = step.TryGetProperty("step", out var num) ? num.GetInt32() : 0;
-            var action = step.TryGetProperty("action", out var act) ? act.GetString() : "";
-            var description = step.TryGetProperty("description", out var desc) ? desc.GetString() : "";
+            int stepNumber = step.TryGetProperty("step", out JsonElement num) ? num.GetInt32() : 0;
+            string? action = step.TryGetProperty("action", out JsonElement act) ? act.GetString() : "";
+            string? description = step.TryGetProperty("description", out JsonElement desc) ? desc.GetString() : "";
 
             result += $"{stepNumber}. **{action}**\\n";
             result += $"   {description}\\n\\n";

@@ -1,4 +1,4 @@
-using AvaloniaUI.MCP.Tools;
+﻿using AvaloniaUI.MCP.Tools;
 
 namespace AvaloniaUI.MCP.Tests;
 
@@ -11,13 +11,13 @@ public class XamlValidationDebugTest
     public void Debug_XamlValidation_Result()
     {
         // Arrange
-        var validXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+        string validXaml = @"<Window xmlns=""https://github.com/avaloniaui""
                                  xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
                              <TextBlock Text=""Hello World"" />
                           </Window>";
 
         // Act
-        var result = XamlValidationTool.ValidateXaml(validXaml);
+        string result = XamlValidationTool.ValidateXaml(validXaml);
 
         // Assert
         TestContext.WriteLine($"Validation result: {result}");

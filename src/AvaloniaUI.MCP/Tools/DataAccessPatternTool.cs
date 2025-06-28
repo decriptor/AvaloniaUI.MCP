@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -24,11 +24,11 @@ public static class DataAccessPatternTool
                 DatabaseProvider = dbProvider.ToLowerInvariant()
             };
 
-            var entityCode = GenerateEntity(config);
-            var repositoryInterface = GenerateRepositoryInterface(config);
-            var repositoryImplementation = GenerateRepositoryImplementation(config);
-            var dbContextCode = GenerateDbContext(config);
-            var setupInstructions = GenerateEFSetupInstructions(config);
+            string entityCode = GenerateEntity(config);
+            string repositoryInterface = GenerateRepositoryInterface(config);
+            string repositoryImplementation = GenerateRepositoryImplementation(config);
+            string dbContextCode = GenerateDbContext(config);
+            string setupInstructions = GenerateEFSetupInstructions(config);
 
             return $@"# Entity Framework Core Repository Pattern: {entityName}
 
@@ -84,10 +84,10 @@ public static class DataAccessPatternTool
                 CachingProvider = cachingProvider.ToLowerInvariant()
             };
 
-            var serviceInterface = GenerateAsyncServiceInterface(config);
-            var serviceImplementation = GenerateAsyncServiceImplementation(config);
-            var cachingCode = config.IncludeCaching ? GenerateCachingImplementation(config) : "";
-            var retryCode = config.IncludeRetry ? GenerateRetryPolicyCode() : "";
+            string serviceInterface = GenerateAsyncServiceInterface(config);
+            string serviceImplementation = GenerateAsyncServiceImplementation(config);
+            string cachingCode = config.IncludeCaching ? GenerateCachingImplementation(config) : "";
+            string retryCode = config.IncludeRetry ? GenerateRetryPolicyCode() : "";
 
             return $@"# Async Data Access Service: {serviceName}
 
@@ -128,7 +128,7 @@ public static class DataAccessPatternTool
         }
     }
 
-    private class RepositoryConfiguration
+    private sealed class RepositoryConfiguration
     {
         public string EntityName { get; set; } = "";
         public bool IncludeUnitOfWork { get; set; }
@@ -136,7 +136,7 @@ public static class DataAccessPatternTool
         public string DatabaseProvider { get; set; } = "";
     }
 
-    private class DataAccessConfiguration
+    private sealed class DataAccessConfiguration
     {
         public string ServiceName { get; set; } = "";
         public bool IncludeCaching { get; set; }
@@ -208,7 +208,7 @@ public class {config.EntityName}Configuration : IEntityTypeConfiguration<{config
 
     private static string GenerateRepositoryInterface(RepositoryConfiguration config)
     {
-        var specificationsCode = config.IncludeSpecifications ? GenerateSpecificationsInterface(config.EntityName) : "";
+        string specificationsCode = config.IncludeSpecifications ? GenerateSpecificationsInterface(config.EntityName) : "";
 
         return $@"public interface I{config.EntityName}Repository : IRepository<{config.EntityName}>
 {{
@@ -264,10 +264,10 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
 
     private static string GenerateRepositoryImplementation(RepositoryConfiguration config)
     {
-        var unitOfWorkField = config.IncludeUnitOfWork ? "private readonly IUnitOfWork _unitOfWork;" : "";
-        var unitOfWorkParam = config.IncludeUnitOfWork ? ", IUnitOfWork unitOfWork" : "";
-        var unitOfWorkAssignment = config.IncludeUnitOfWork ? "_unitOfWork = unitOfWork;" : "";
-        var specificationsMethod = config.IncludeSpecifications ? GenerateSpecificationsMethod(config.EntityName) : "";
+        string unitOfWorkField = config.IncludeUnitOfWork ? "private readonly IUnitOfWork _unitOfWork;" : "";
+        string unitOfWorkParam = config.IncludeUnitOfWork ? ", IUnitOfWork unitOfWork" : "";
+        string unitOfWorkAssignment = config.IncludeUnitOfWork ? "_unitOfWork = unitOfWork;" : "";
+        string specificationsMethod = config.IncludeSpecifications ? GenerateSpecificationsMethod(config.EntityName) : "";
 
         return $@"public class {config.EntityName}Repository : I{config.EntityName}Repository
 {{
@@ -435,7 +435,7 @@ public class {entityName}ByNameSpecification : Specification<{entityName}>
 
     private static string GenerateDbContext(RepositoryConfiguration config)
     {
-        var connectionString = GetConnectionString(config.DatabaseProvider);
+        string connectionString = GetConnectionString(config.DatabaseProvider);
 
         return $@"public class ApplicationDbContext : DbContext
 {{
@@ -539,7 +539,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
 
     private static string GenerateEFSetupInstructions(RepositoryConfiguration config)
     {
-        var packageReference = GetPackageReference(config.DatabaseProvider);
+        string packageReference = GetPackageReference(config.DatabaseProvider);
 
         return $@"### 1. Install Required Packages
 ```xml
@@ -614,9 +614,9 @@ dotnet ef database update
 
     private static string GenerateAsyncServiceImplementation(DataAccessConfiguration config)
     {
-        var cachingField = config.IncludeCaching ? GenerateCachingField(config.CachingProvider) : "";
-        var cachingParam = config.IncludeCaching ? GenerateCachingParameter(config.CachingProvider) : "";
-        var cachingAssignment = config.IncludeCaching ? GenerateCachingAssignment(config.CachingProvider) : "";
+        string cachingField = config.IncludeCaching ? GenerateCachingField(config.CachingProvider) : "";
+        string cachingParam = config.IncludeCaching ? GenerateCachingParameter(config.CachingProvider) : "";
+        string cachingAssignment = config.IncludeCaching ? GenerateCachingAssignment(config.CachingProvider) : "";
 
         return $@"public class {config.ServiceName} : I{config.ServiceName}
 {{

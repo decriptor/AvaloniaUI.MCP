@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Text.Json;
 
 using AvaloniaUI.MCP.Services;
@@ -16,14 +16,14 @@ public static class AvaloniaControlsResource
     {
         return await ErrorHandlingService.SafeExecuteAsync("GetControlsReference", async () =>
         {
-            var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "controls.json");
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "controls.json");
 
             // Use cache for both the JSON data and the formatted result
-            var cacheKey = "formatted_controls_reference";
+            string cacheKey = "formatted_controls_reference";
 
             return await ResourceCacheService.GetOrLoadResourceAsync(cacheKey, async () =>
             {
-                var controlsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
+                JsonElement controlsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
                 return FormatControlsReference(controlsData);
             }, TimeSpan.FromMinutes(30));
         });
@@ -36,17 +36,19 @@ public static class AvaloniaControlsResource
         return await ErrorHandlingService.SafeExecuteAsync("GetControlInfo", async () =>
         {
             // Validate input
-            var validation = InputValidationService.ValidateIdentifier(controlName, "control name");
+            ValidationResult validation = InputValidationService.ValidateIdentifier(controlName, "control name");
             if (!validation.IsValid)
+            {
                 return ErrorHandlingService.CreateValidationError("GetControlInfo", validation);
+            }
 
-            var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "controls.json");
-            var cacheKey = $"control_info_{controlName.ToLowerInvariant()}";
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "controls.json");
+            string cacheKey = $"control_info_{controlName.ToLowerInvariant()}";
 
             return await ResourceCacheService.GetOrLoadResourceAsync(cacheKey, async () =>
             {
-                var controlsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
-                var controlInfo = FindControlInfo(controlsData, controlName);
+                JsonElement controlsData = await ResourceCacheService.GetOrLoadJsonResourceAsync(dataPath, TimeSpan.FromHours(1));
+                string? controlInfo = FindControlInfo(controlsData, controlName);
                 return controlInfo ?? $"Control '{controlName}' not found in the reference";
             }, TimeSpan.FromMinutes(15));
         });
@@ -54,15 +56,15 @@ public static class AvaloniaControlsResource
 
     private static string FormatControlsReference(JsonElement controlsData)
     {
-        var result = "# AvaloniaUI Controls Reference\\n\\n";
+        string result = "# AvaloniaUI Controls Reference\\n\\n";
 
-        if (controlsData.TryGetProperty("avaloniaui_controls", out var controls))
+        if (controlsData.TryGetProperty("avaloniaui_controls", out JsonElement controls))
         {
-            foreach (var category in controls.EnumerateObject())
+            foreach (JsonProperty category in controls.EnumerateObject())
             {
                 result += $"## {FormatCategoryName(category.Name)}\\n\\n";
 
-                foreach (var control in category.Value.EnumerateObject())
+                foreach (JsonProperty control in category.Value.EnumerateObject())
                 {
                     result += FormatControlInfo(control.Name, control.Value);
                     result += "\\n---\\n\\n";
@@ -75,11 +77,11 @@ public static class AvaloniaControlsResource
 
     private static string? FindControlInfo(JsonElement controlsData, string controlName)
     {
-        if (controlsData.TryGetProperty("avaloniaui_controls", out var controls))
+        if (controlsData.TryGetProperty("avaloniaui_controls", out JsonElement controls))
         {
-            foreach (var category in controls.EnumerateObject())
+            foreach (JsonProperty category in controls.EnumerateObject())
             {
-                foreach (var control in category.Value.EnumerateObject())
+                foreach (JsonProperty control in category.Value.EnumerateObject())
                 {
                     if (string.Equals(control.Name, controlName, StringComparison.OrdinalIgnoreCase))
                     {
@@ -93,29 +95,29 @@ public static class AvaloniaControlsResource
 
     private static string FormatControlInfo(string controlName, JsonElement controlData)
     {
-        var result = $"### {controlName}\\n\\n";
+        string result = $"### {controlName}\\n\\n";
 
-        if (controlData.TryGetProperty("description", out var description))
+        if (controlData.TryGetProperty("description", out JsonElement description))
         {
             result += $"**Description:** {description.GetString()}\\n\\n";
         }
 
-        if (controlData.TryGetProperty("usage", out var usage))
+        if (controlData.TryGetProperty("usage", out JsonElement usage))
         {
             result += $"**Usage:** {usage.GetString()}\\n\\n";
         }
 
-        if (controlData.TryGetProperty("properties", out var properties))
+        if (controlData.TryGetProperty("properties", out JsonElement properties))
         {
             result += "**Key Properties:**\\n";
-            foreach (var prop in properties.EnumerateArray())
+            foreach (JsonElement prop in properties.EnumerateArray())
             {
                 result += $"- {prop.GetString()}\\n";
             }
             result += "\\n";
         }
 
-        if (controlData.TryGetProperty("xaml_example", out var xamlExample))
+        if (controlData.TryGetProperty("xaml_example", out JsonElement xamlExample))
         {
             result += "**XAML Example:**\\n```xml\\n";
             result += xamlExample.GetString()?.Replace("\\n", "\\n") ?? "";
@@ -129,7 +131,7 @@ public static class AvaloniaControlsResource
     {
         return categoryName.Replace("_", " ")
             .Split(' ')
-            .Select(word => char.ToUpper(word[0]) + word.Substring(1))
+            .Select(word => char.ToUpper(word[0]) + word[1..])
             .Aggregate((a, b) => a + " " + b);
     }
 }

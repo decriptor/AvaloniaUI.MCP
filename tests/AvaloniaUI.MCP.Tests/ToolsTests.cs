@@ -1,4 +1,4 @@
-using AvaloniaUI.MCP.Tools;
+﻿using AvaloniaUI.MCP.Tools;
 
 namespace AvaloniaUI.MCP.Tests;
 
@@ -9,10 +9,10 @@ public class ToolsTests
     public void EchoTool_ReturnsCorrectMessage()
     {
         // Arrange
-        var message = "Hello World";
+        string message = "Hello World";
 
         // Act
-        var result = EchoTool.Echo(message);
+        string result = EchoTool.Echo(message);
 
         // Assert
         StringAssert.Contains(result, "Hello from AvaloniaUI MCP Server", "Result should contain server greeting");
@@ -23,7 +23,7 @@ public class ToolsTests
     public void EchoTool_GetServerInfo_ReturnsServerInformation()
     {
         // Act
-        var result = EchoTool.GetServerInfo();
+        string result = EchoTool.GetServerInfo();
 
         // Assert
         StringAssert.Contains(result, "AvaloniaUI MCP Server", "Result should contain server name");
@@ -35,10 +35,10 @@ public class ToolsTests
     public void ProjectGeneratorTool_CreateAvaloniaProject_ValidatesProjectName()
     {
         // Arrange
-        var emptyProjectName = "";
+        string emptyProjectName = "";
 
         // Act
-        var result = ProjectGeneratorTool.CreateAvaloniaProject(emptyProjectName);
+        string result = ProjectGeneratorTool.CreateAvaloniaProject(emptyProjectName);
 
         // Assert
         StringAssert.Contains(result, "# ❌ Error", "Result should contain error header");
@@ -49,11 +49,11 @@ public class ToolsTests
     public void ProjectGeneratorTool_CreateAvaloniaProject_ValidatesTemplate()
     {
         // Arrange
-        var projectName = "TestProject";
-        var invalidTemplate = "invalid";
+        string projectName = "TestProject";
+        string invalidTemplate = "invalid";
 
         // Act
-        var result = ProjectGeneratorTool.CreateAvaloniaProject(projectName, invalidTemplate);
+        string result = ProjectGeneratorTool.CreateAvaloniaProject(projectName, invalidTemplate);
 
         // Assert
         StringAssert.Contains(result, "# ❌ Error", "Result should contain error header");
@@ -65,10 +65,10 @@ public class ToolsTests
     public void XamlValidationTool_ValidateXaml_RejectsEmptyContent()
     {
         // Arrange
-        var emptyXaml = "";
+        string emptyXaml = "";
 
         // Act
-        var result = XamlValidationTool.ValidateXaml(emptyXaml);
+        string result = XamlValidationTool.ValidateXaml(emptyXaml);
 
         // Assert
         StringAssert.Contains(result, "# ❌ Error", "Result should contain error header");
@@ -79,13 +79,13 @@ public class ToolsTests
     public void XamlValidationTool_ValidateXaml_AcceptsValidXaml()
     {
         // Arrange
-        var validXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+        string validXaml = @"<Window xmlns=""https://github.com/avaloniaui""
                                  xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
                              <TextBlock Text=""Hello World"" />
                           </Window>";
 
         // Act
-        var result = XamlValidationTool.ValidateXaml(validXaml);
+        string result = XamlValidationTool.ValidateXaml(validXaml);
 
         // Assert
         StringAssert.Contains(result, "✅ XAML Validation Passed", "Result should contain validation success message");
@@ -96,10 +96,10 @@ public class ToolsTests
     public void XamlValidationTool_ConvertWpfXamlToAvalonia_RejectsEmptyContent()
     {
         // Arrange
-        var emptyXaml = "";
+        string emptyXaml = "";
 
         // Act
-        var result = XamlValidationTool.ConvertWpfXamlToAvalonia(emptyXaml);
+        string result = XamlValidationTool.ConvertWpfXamlToAvalonia(emptyXaml);
 
         // Assert
         StringAssert.Contains(result, "Error: WPF XAML content cannot be empty", "Result should contain empty content error message");
@@ -109,13 +109,13 @@ public class ToolsTests
     public void XamlValidationTool_ConvertWpfXamlToAvalonia_ConvertsNamespaces()
     {
         // Arrange
-        var wpfXaml = @"<Window xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
+        string wpfXaml = @"<Window xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
                                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
                            <TextBlock Text=""Hello World"" />
                         </Window>";
 
         // Act
-        var result = XamlValidationTool.ConvertWpfXamlToAvalonia(wpfXaml);
+        string result = XamlValidationTool.ConvertWpfXamlToAvalonia(wpfXaml);
 
         // Assert
         StringAssert.Contains(result, "🔄 WPF to AvaloniaUI XAML Conversion Complete", "Result should contain conversion completion message");

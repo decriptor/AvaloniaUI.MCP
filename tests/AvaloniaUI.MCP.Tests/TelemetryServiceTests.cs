@@ -1,12 +1,11 @@
-using AvaloniaUI.MCP.Services;
+﻿using AvaloniaUI.MCP.Services;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AvaloniaUI.MCP.Tests;
 
 [TestClass]
-public class TelemetryServiceTests
+public class TelemetryServiceTests : IDisposable
 {
     private TelemetryService _telemetryService = null!;
 
@@ -21,14 +20,14 @@ public class TelemetryServiceTests
     public void RecordToolExecution_Should_UpdateMetrics()
     {
         // Arrange
-        var toolName = "TestTool";
+        string toolName = "TestTool";
         var duration = TimeSpan.FromMilliseconds(100);
 
         // Act
         _telemetryService.RecordToolExecution(toolName, true, duration);
 
         // Assert
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
         Assert.AreEqual(1L, metrics["total_tool_executions"], "Total tool executions should be 1");
         Assert.AreEqual(1L, metrics["successful_tool_executions"], "Successful tool executions should be 1");
         Assert.AreEqual(1.0, (double)metrics["tool_success_rate"], "Tool success rate should be 1.0");
@@ -38,15 +37,15 @@ public class TelemetryServiceTests
     public void RecordToolExecution_WithFailure_Should_UpdateErrorMetrics()
     {
         // Arrange
-        var toolName = "TestTool";
+        string toolName = "TestTool";
         var duration = TimeSpan.FromMilliseconds(50);
-        var errorMessage = "Test error";
+        string errorMessage = "Test error";
 
         // Act
         _telemetryService.RecordToolExecution(toolName, false, duration, errorMessage);
 
         // Assert
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
         Assert.AreEqual(1L, metrics["total_tool_executions"], "Total tool executions should be 1");
         Assert.AreEqual(0L, metrics["successful_tool_executions"], "Successful tool executions should be 0");
         Assert.AreEqual(0.0, (double)metrics["tool_success_rate"], "Tool success rate should be 0.0");
@@ -56,14 +55,14 @@ public class TelemetryServiceTests
     public void RecordResourceAccess_Should_UpdateCacheMetrics()
     {
         // Arrange
-        var resourceName = "TestResource";
+        string resourceName = "TestResource";
 
         // Act
         _telemetryService.RecordResourceAccess(resourceName, true);
         _telemetryService.RecordResourceAccess(resourceName, false);
 
         // Assert
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
         Assert.AreEqual(2L, metrics["total_resource_accesses"], "Total resource accesses should be 2");
         Assert.AreEqual(1L, metrics["cache_hits"], "Cache hits should be 1");
         Assert.AreEqual(0.5, (double)metrics["cache_hit_rate"], "Cache hit rate should be 0.5");
@@ -73,13 +72,13 @@ public class TelemetryServiceTests
     public void RecordValidation_Should_UpdateValidationMetrics()
     {
         // Arrange
-        var validationType = "InputValidation";
+        string validationType = "InputValidation";
 
         // Act
         _telemetryService.RecordValidation(validationType, true);
 
         // Assert
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
         Assert.AreEqual(1L, metrics["total_validations"], "Total validations should be 1");
         Assert.AreEqual(1L, metrics["successful_validations"], "Successful validations should be 1");
         Assert.AreEqual(1.0, (double)metrics["validation_success_rate"], "Validation success rate should be 1.0");
@@ -89,14 +88,14 @@ public class TelemetryServiceTests
     public void RecordValidation_WithFailure_Should_UpdateErrorMetrics()
     {
         // Arrange
-        var validationType = "InputValidation";
-        var errorDetails = "Invalid input format";
+        string validationType = "InputValidation";
+        string errorDetails = "Invalid input format";
 
         // Act
         _telemetryService.RecordValidation(validationType, false, errorDetails);
 
         // Assert
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
         Assert.AreEqual(1L, metrics["total_validations"], "Total validations should be 1");
         Assert.AreEqual(0L, metrics["successful_validations"], "Successful validations should be 0");
         Assert.AreEqual(0.0, (double)metrics["validation_success_rate"], "Validation success rate should be 0.0");
@@ -106,10 +105,10 @@ public class TelemetryServiceTests
     public void StartActivity_Should_CreateActivityOrNull()
     {
         // Arrange
-        var activityName = "TestActivity";
+        string activityName = "TestActivity";
 
         // Act
-        using var activity = _telemetryService.StartActivity(activityName);
+        using System.Diagnostics.Activity? activity = _telemetryService.StartActivity(activityName);
 
         // Assert
         // Activity can be null if no listeners are registered, which is expected in unit tests
@@ -125,7 +124,7 @@ public class TelemetryServiceTests
     public void GetMetricsSnapshot_Should_ReturnCurrentMetrics()
     {
         // Arrange & Act
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
 
         // Assert
         Assert.IsNotNull(metrics, "Metrics should not be null");
@@ -145,7 +144,7 @@ public class TelemetryServiceTests
     public void RecordServerEvent_Should_NotThrow()
     {
         // Arrange
-        var eventType = "startup";
+        string eventType = "startup";
         var properties = new Dictionary<string, object>
         {
             ["version"] = "1.0.0",
@@ -168,17 +167,17 @@ public class TelemetryServiceTests
     public void CreateToolExecutionScope_Should_RecordMetricsOnDispose()
     {
         // Arrange
-        var toolName = "ScopeTestTool";
+        string toolName = "ScopeTestTool";
 
         // Act
-        using (var scope = _telemetryService.CreateToolExecutionScope(toolName))
+        using (IDisposable scope = _telemetryService.CreateToolExecutionScope(toolName))
         {
             // Simulate some work
             Thread.Sleep(10);
         }
 
         // Assert
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
         Assert.AreEqual(1L, metrics["total_tool_executions"], "Total tool executions should be 1");
         Assert.AreEqual(1L, metrics["successful_tool_executions"], "Successful tool executions should be 1");
     }
@@ -187,16 +186,16 @@ public class TelemetryServiceTests
     public void CreateValidationScope_Should_RecordMetricsOnDispose()
     {
         // Arrange
-        var validationType = "ScopeValidation";
+        string validationType = "ScopeValidation";
 
         // Act
-        using (var scope = _telemetryService.CreateValidationScope(validationType))
+        using (IDisposable scope = _telemetryService.CreateValidationScope(validationType))
         {
             // Validation logic would go here
         }
 
         // Assert
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
         Assert.AreEqual(1L, metrics["total_validations"], "Total validations should be 1");
         Assert.AreEqual(1L, metrics["successful_validations"], "Successful validations should be 1");
     }
@@ -217,7 +216,7 @@ public class TelemetryServiceTests
         _telemetryService.RecordValidation("Validation2", false, "Validation error");
 
         // Assert
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
 
         // Tool execution metrics
         Assert.AreEqual(3L, metrics["total_tool_executions"], "Total tool executions should be 3");
@@ -239,7 +238,7 @@ public class TelemetryServiceTests
     public void MetricsSnapshot_Should_IncludeTimestamp()
     {
         // Act
-        var metrics = _telemetryService.GetMetricsSnapshot();
+        Dictionary<string, object> metrics = _telemetryService.GetMetricsSnapshot();
 
         // Assert
         CollectionAssert.Contains(metrics.Keys, "snapshot_timestamp", "Should contain snapshot_timestamp key");
@@ -247,20 +246,32 @@ public class TelemetryServiceTests
         Assert.IsTrue(timestamp <= DateTimeOffset.UtcNow, "Timestamp should be less than or equal to current time");
         Assert.IsTrue(timestamp > DateTimeOffset.UtcNow.AddMinutes(-1), "Timestamp should be within the last minute");
     }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 // Test logger implementation for testing
 public class TestLogger<T> : ILogger<T>
 {
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => new TestScope();
-    public bool IsEnabled(LogLevel logLevel) => true;
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+    {
+        return new TestScope();
+    }
+
+    public bool IsEnabled(LogLevel logLevel)
+    {
+        return true;
+    }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         // Store log messages if needed for testing
     }
 
-    private class TestScope : IDisposable
+    private sealed class TestScope : IDisposable
     {
         public void Dispose() { }
     }

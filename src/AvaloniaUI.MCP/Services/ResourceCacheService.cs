@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text.Json;
 
 namespace AvaloniaUI.MCP.Services;
@@ -9,24 +9,17 @@ namespace AvaloniaUI.MCP.Services;
 public static class ResourceCacheService
 {
     private static readonly ConcurrentDictionary<string, CachedResource> _cache = new();
-    private static readonly object _cacheLock = new();
+    private static readonly Lock _cacheLock = new();
 
     // Cache configuration
     private static readonly TimeSpan DefaultCacheExpiry = TimeSpan.FromMinutes(30);
     private static readonly int MaxCacheSize = 50;
 
-    private class CachedResource
+    private sealed class CachedResource(string content, TimeSpan cacheExpiry)
     {
-        public string Content { get; }
-        public DateTime ExpiryTime { get; }
-        public DateTime LastAccessed { get; set; }
-
-        public CachedResource(string content, TimeSpan cacheExpiry)
-        {
-            Content = content;
-            ExpiryTime = DateTime.UtcNow.Add(cacheExpiry);
-            LastAccessed = DateTime.UtcNow;
-        }
+        public string Content { get; } = content;
+        public DateTime ExpiryTime { get; } = DateTime.UtcNow.Add(cacheExpiry);
+        public DateTime LastAccessed { get; set; } = DateTime.UtcNow;
 
         public bool IsExpired => DateTime.UtcNow > ExpiryTime;
     }
@@ -36,10 +29,10 @@ public static class ResourceCacheService
     /// </summary>
     public static async Task<string> GetOrLoadResourceAsync(string resourceKey, Func<Task<string>> loader, TimeSpan? cacheExpiry = null)
     {
-        var expiry = cacheExpiry ?? DefaultCacheExpiry;
+        TimeSpan expiry = cacheExpiry ?? DefaultCacheExpiry;
 
         // Try to get from cache first
-        if (_cache.TryGetValue(resourceKey, out var cachedResource))
+        if (_cache.TryGetValue(resourceKey, out CachedResource? cachedResource))
         {
             if (!cachedResource.IsExpired)
             {
@@ -54,7 +47,7 @@ public static class ResourceCacheService
         }
 
         // Load the resource
-        var content = await loader();
+        string content = await loader();
 
         // Cache the result
         await CacheResourceAsync(resourceKey, content, expiry);
@@ -67,10 +60,10 @@ public static class ResourceCacheService
     /// </summary>
     public static string GetOrLoadResource(string resourceKey, Func<string> loader, TimeSpan? cacheExpiry = null)
     {
-        var expiry = cacheExpiry ?? DefaultCacheExpiry;
+        TimeSpan expiry = cacheExpiry ?? DefaultCacheExpiry;
 
         // Try to get from cache first
-        if (_cache.TryGetValue(resourceKey, out var cachedResource))
+        if (_cache.TryGetValue(resourceKey, out CachedResource? cachedResource))
         {
             if (!cachedResource.IsExpired)
             {
@@ -85,7 +78,7 @@ public static class ResourceCacheService
         }
 
         // Load the resource
-        var content = loader();
+        string content = loader();
 
         // Cache the result
         CacheResource(resourceKey, content, expiry);
@@ -98,15 +91,9 @@ public static class ResourceCacheService
     /// </summary>
     public static JsonElement GetOrLoadJsonResource(string filePath, TimeSpan? cacheExpiry = null)
     {
-        var cacheKey = $"json:{filePath}";
+        string cacheKey = $"json:{filePath}";
 
-        var jsonString = GetOrLoadResource(cacheKey, () =>
-        {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException($"Resource file not found: {filePath}");
-
-            return File.ReadAllText(filePath);
-        }, cacheExpiry);
+        string jsonString = GetOrLoadResource(cacheKey, () => !File.Exists(filePath) ? throw new FileNotFoundException($"Resource file not found: {filePath}") : File.ReadAllText(filePath), cacheExpiry);
 
         return JsonSerializer.Deserialize<JsonElement>(jsonString);
     }
@@ -116,15 +103,11 @@ public static class ResourceCacheService
     /// </summary>
     public static async Task<JsonElement> GetOrLoadJsonResourceAsync(string filePath, TimeSpan? cacheExpiry = null)
     {
-        var cacheKey = $"json:{filePath}";
+        string cacheKey = $"json:{filePath}";
 
-        var jsonString = await GetOrLoadResourceAsync(cacheKey, async () =>
-        {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException($"Resource file not found: {filePath}");
-
-            return await File.ReadAllTextAsync(filePath);
-        }, cacheExpiry);
+        string jsonString = await GetOrLoadResourceAsync(cacheKey, async () => !File.Exists(filePath)
+                ? throw new FileNotFoundException($"Resource file not found: {filePath}")
+                : await File.ReadAllTextAsync(filePath), cacheExpiry);
 
         return JsonSerializer.Deserialize<JsonElement>(jsonString);
     }
@@ -182,7 +165,7 @@ public static class ResourceCacheService
                 .Select(kvp => kvp.Key)
                 .ToList();
 
-            foreach (var key in expiredKeys)
+            foreach (string? key in expiredKeys)
             {
                 _cache.TryRemove(key, out _);
             }
@@ -191,7 +174,7 @@ public static class ResourceCacheService
 
     private static void RemoveLeastRecentlyUsed()
     {
-        var lruEntry = _cache
+        KeyValuePair<string, CachedResource> lruEntry = _cache
             .OrderBy(kvp => kvp.Value.LastAccessed)
             .FirstOrDefault();
 
@@ -227,13 +210,13 @@ public static class ResourceCacheService
     {
         lock (_cacheLock)
         {
-            var now = DateTime.UtcNow;
-            var totalEntries = _cache.Count;
-            var expiredEntries = _cache.Count(kvp => kvp.Value.IsExpired);
-            var validEntries = totalEntries - expiredEntries;
+            DateTime now = DateTime.UtcNow;
+            int totalEntries = _cache.Count;
+            int expiredEntries = _cache.Count(kvp => kvp.Value.IsExpired);
+            int validEntries = totalEntries - expiredEntries;
 
-            var oldestEntry = _cache.Values.MinBy(v => v.LastAccessed);
-            var newestEntry = _cache.Values.MaxBy(v => v.LastAccessed);
+            CachedResource? oldestEntry = _cache.Values.MinBy(v => v.LastAccessed);
+            CachedResource? newestEntry = _cache.Values.MaxBy(v => v.LastAccessed);
 
             return new CacheStatistics
             {
@@ -242,7 +225,7 @@ public static class ResourceCacheService
                 ExpiredEntries = expiredEntries,
                 OldestEntryAge = oldestEntry != null ? now - oldestEntry.LastAccessed : TimeSpan.Zero,
                 NewestEntryAge = newestEntry != null ? now - newestEntry.LastAccessed : TimeSpan.Zero,
-                CacheKeys = _cache.Keys.ToList()
+                CacheKeys = [.. _cache.Keys]
             };
         }
     }
@@ -252,20 +235,22 @@ public static class ResourceCacheService
     /// </summary>
     public static async Task PreloadCommonResourcesAsync()
     {
-        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        var dataDirectory = Path.Combine(baseDirectory, "Data");
+        string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        string dataDirectory = Path.Combine(baseDirectory, "Data");
 
         if (!Directory.Exists(dataDirectory))
-            return;
-
-        var commonFiles = new[]
         {
+            return;
+        }
+
+        string[] commonFiles =
+        [
             "controls.json",
             "xaml-patterns.json",
             "migration-guide.json"
-        };
+        ];
 
-        var loadTasks = commonFiles
+        IEnumerable<Task> loadTasks = commonFiles
             .Select(fileName => Path.Combine(dataDirectory, fileName))
             .Where(File.Exists)
             .Select(async filePath =>

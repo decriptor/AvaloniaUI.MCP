@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 namespace AvaloniaUI.MCP.Services;
 
@@ -216,10 +216,7 @@ public static class ErrorHandlingService
     /// </summary>
     public static string CreateValidationError(string toolName, ValidationResult validationResult)
     {
-        if (validationResult.IsValid)
-            return string.Empty;
-
-        return CreateUserFriendlyError(toolName, "Validation Error", validationResult.ErrorMessage);
+        return validationResult.IsValid ? string.Empty : CreateUserFriendlyError(toolName, "Validation Error", validationResult.ErrorMessage);
     }
 
     /// <summary>
@@ -228,11 +225,15 @@ public static class ErrorHandlingService
     public static string CreateValidationErrors(string toolName, params ValidationResult[] validationResults)
     {
         var failures = validationResults.Where(v => !v.IsValid).ToList();
-        if (!failures.Any())
+        if (failures.Count == 0)
+        {
             return string.Empty;
+        }
 
         if (failures.Count == 1)
+        {
             return CreateValidationError(toolName, failures[0]);
+        }
 
         var sb = new StringBuilder();
         sb.AppendLine("# ❌ Validation Errors");
@@ -264,21 +265,27 @@ public static class ErrorHandlingService
     {
         // In a real application, this would write to a proper logging system
         // For this MCP server, we'll use console output
-        var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC");
+        string timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC");
 
         Console.WriteLine($"[{timestamp}] ERROR in {toolName}:");
         Console.WriteLine($"  Type: {exception.GetType().Name}");
         Console.WriteLine($"  Message: {exception.Message}");
 
         if (!string.IsNullOrEmpty(additionalContext))
+        {
             Console.WriteLine($"  Context: {additionalContext}");
+        }
 
         if (exception.InnerException != null)
+        {
             Console.WriteLine($"  Inner Exception: {exception.InnerException.Message}");
+        }
 
         // Only log stack trace for unexpected errors
-        if (!(exception is ArgumentException || exception is InvalidOperationException || exception is FormatException))
+        if (exception is not (ArgumentException or InvalidOperationException or FormatException))
+        {
             Console.WriteLine($"  Stack Trace: {exception.StackTrace}");
+        }
     }
 
     /// <summary>
@@ -325,47 +332,76 @@ public static class ErrorHandlingService
         var validations = new List<ValidationResult>();
 
         if (projectName != null)
+        {
             validations.Add(InputValidationService.ValidateProjectName(projectName));
+        }
 
         if (templateType != null)
+        {
             validations.Add(InputValidationService.ValidateTemplateType(templateType));
+        }
 
         if (controlType != null)
+        {
             validations.Add(InputValidationService.ValidateControlType(controlType));
+        }
 
         if (componentType != null)
+        {
             validations.Add(InputValidationService.ValidateComponentType(componentType));
+        }
 
         if (themeType != null)
+        {
             validations.Add(InputValidationService.ValidateThemeType(themeType));
+        }
 
         if (colorHex != null)
+        {
             validations.Add(InputValidationService.ValidateColorHex(colorHex));
+        }
 
         if (identifier != null)
+        {
             validations.Add(InputValidationService.ValidateIdentifier(identifier));
+        }
 
         if (xamlContent != null)
+        {
             validations.Add(InputValidationService.ValidateXamlContent(xamlContent));
+        }
 
         if (booleanValue != null)
+        {
             validations.Add(InputValidationService.ValidateBooleanString(booleanValue));
+        }
 
         if (integerValue != null)
+        {
             validations.Add(InputValidationService.ValidateIntegerString(integerValue));
+        }
 
         if (properties != null)
+        {
             validations.Add(InputValidationService.ValidatePropertyList(properties));
+        }
 
         if (cssClasses != null)
+        {
             validations.Add(InputValidationService.ValidateCssClasses(cssClasses));
+        }
 
         if (filePath != null)
+        {
             validations.Add(InputValidationService.ValidateFilePath(filePath));
+        }
 
         if (url != null)
+        {
             validations.Add(InputValidationService.ValidateUrl(url));
+        }
 
-        return InputValidationService.ValidateAll(validations.ToArray());
+        return InputValidationService.ValidateAll([.. validations]);
     }
 }
+

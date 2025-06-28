@@ -1,4 +1,4 @@
-using AvaloniaUI.MCP.Tools;
+﻿using AvaloniaUI.MCP.Tools;
 
 namespace AvaloniaUI.MCP.Tests;
 
@@ -13,7 +13,7 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_ValidAuthTypes_ReturnsSecurePattern(string authType)
     {
         // Act
-        var result = SecurityPatternTool.GenerateAuthenticationPattern(authType);
+        string result = SecurityPatternTool.GenerateAuthenticationPattern(authType);
 
         // Assert
         StringAssert.Contains(result, $"# Security Pattern: {authType}", "Result should contain security pattern header for the auth type");
@@ -29,7 +29,7 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_JWT_ContainsJWTSpecificElements()
     {
         // Act
-        var result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "standard");
+        string result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "standard");
 
         // Assert
         StringAssert.Contains(result, "JWT Authentication Service", "Result should contain JWT authentication service");
@@ -45,7 +45,7 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_OAuth_ContainsOAuthSpecificElements()
     {
         // Act
-        var result = SecurityPatternTool.GenerateAuthenticationPattern("oauth");
+        string result = SecurityPatternTool.GenerateAuthenticationPattern("oauth");
 
         // Assert
         StringAssert.Contains(result, "OAuth 2.0 Authentication Service", "Result should contain OAuth 2.0 authentication service");
@@ -60,7 +60,7 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_BasicAuth_ContainsTimingAttackPrevention()
     {
         // Act
-        var result = SecurityPatternTool.GenerateAuthenticationPattern("basic");
+        string result = SecurityPatternTool.GenerateAuthenticationPattern("basic");
 
         // Assert
         StringAssert.Contains(result, "Basic Authentication Service", "Result should contain basic authentication service");
@@ -72,7 +72,7 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_MultiFactor_ContainsMFAElements()
     {
         // Act
-        var result = SecurityPatternTool.GenerateAuthenticationPattern("multi-factor");
+        string result = SecurityPatternTool.GenerateAuthenticationPattern("multi-factor");
 
         // Assert
         StringAssert.Contains(result, "Multi-Factor Authentication Service", "Result should contain multi-factor authentication service");
@@ -87,7 +87,7 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_WithEncryption_IncludesEncryptionService()
     {
         // Act
-        var result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true");
+        string result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true");
 
         // Assert
         StringAssert.Contains(result, "## Encryption Service", "Result should contain encryption service section");
@@ -103,7 +103,7 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_WithValidation_IncludesInputValidation()
     {
         // Act
-        var result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "false", "true");
+        string result = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "false", "true");
 
         // Assert
         StringAssert.Contains(result, "## Input Validation", "Result should contain input validation section");
@@ -122,7 +122,7 @@ public class SecurityPatternToolTests
     public void GenerateDataSecurityPattern_ValidDataTypes_ReturnsSecurePattern(string dataType)
     {
         // Act
-        var result = SecurityPatternTool.GenerateDataSecurityPattern(dataType);
+        string result = SecurityPatternTool.GenerateDataSecurityPattern(dataType);
 
         // Assert
         StringAssert.Contains(result, $"# Data Security Pattern: {dataType}", "Result should contain data security pattern header for the data type");
@@ -136,7 +136,7 @@ public class SecurityPatternToolTests
     public void GenerateDataSecurityPattern_PersonalData_IncludesGDPRCompliance()
     {
         // Act
-        var result = SecurityPatternTool.GenerateDataSecurityPattern("personal");
+        string result = SecurityPatternTool.GenerateDataSecurityPattern("personal");
 
         // Assert
         StringAssert.Contains(result, "GDPR Compliance Requirements", "Result should contain GDPR compliance requirements");
@@ -150,7 +150,7 @@ public class SecurityPatternToolTests
     public void GenerateDataSecurityPattern_FinancialData_IncludesPCIDSSCompliance()
     {
         // Act
-        var result = SecurityPatternTool.GenerateDataSecurityPattern("financial");
+        string result = SecurityPatternTool.GenerateDataSecurityPattern("financial");
 
         // Assert
         StringAssert.Contains(result, "PCI DSS Compliance Requirements", "Result should contain PCI DSS compliance requirements");
@@ -164,7 +164,7 @@ public class SecurityPatternToolTests
     public void GenerateDataSecurityPattern_MedicalData_IncludesHIPAACompliance()
     {
         // Act
-        var result = SecurityPatternTool.GenerateDataSecurityPattern("medical");
+        string result = SecurityPatternTool.GenerateDataSecurityPattern("medical");
 
         // Assert
         StringAssert.Contains(result, "HIPAA Compliance Requirements", "Result should contain HIPAA compliance requirements");
@@ -179,7 +179,7 @@ public class SecurityPatternToolTests
     public void GenerateDataSecurityPattern_WithSanitization_IncludesDataSanitization()
     {
         // Act
-        var result = SecurityPatternTool.GenerateDataSecurityPattern("general", "aes", "true");
+        string result = SecurityPatternTool.GenerateDataSecurityPattern("general", "aes", "true");
 
         // Assert
         StringAssert.Contains(result, "## Data Sanitization", "Result should contain data sanitization section");
@@ -195,7 +195,7 @@ public class SecurityPatternToolTests
     public void GenerateDataSecurityPattern_WithAuditLog_IncludesAuditLogging()
     {
         // Act
-        var result = SecurityPatternTool.GenerateDataSecurityPattern("general", "aes", "false", "true");
+        string result = SecurityPatternTool.GenerateDataSecurityPattern("general", "aes", "false", "true");
 
         // Assert
         StringAssert.Contains(result, "## Audit Logging", "Result should contain audit logging section");
@@ -210,7 +210,7 @@ public class SecurityPatternToolTests
     public void GenerateDataSecurityPattern_IncludesSecureDataService()
     {
         // Act
-        var result = SecurityPatternTool.GenerateDataSecurityPattern("general");
+        string result = SecurityPatternTool.GenerateDataSecurityPattern("general");
 
         // Assert
         StringAssert.Contains(result, "## Secure Data Service", "Result should contain secure data service section");
@@ -226,7 +226,7 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_InvalidAuthType_ReturnsGenericPattern()
     {
         // Act
-        var result = SecurityPatternTool.GenerateAuthenticationPattern("invalid-type");
+        string result = SecurityPatternTool.GenerateAuthenticationPattern("invalid-type");
 
         // Assert
         StringAssert.Contains(result, "# Security Pattern: invalid-type", "Result should contain security pattern header for invalid auth type");
@@ -240,7 +240,7 @@ public class SecurityPatternToolTests
     public void GenerateDataSecurityPattern_ValidEncryptionMethods_ReturnsPattern(string encryptionMethod)
     {
         // Act
-        var result = SecurityPatternTool.GenerateDataSecurityPattern("general", encryptionMethod);
+        string result = SecurityPatternTool.GenerateDataSecurityPattern("general", encryptionMethod);
 
         // Assert
         StringAssert.Contains(result, $"**Encryption Method**: {encryptionMethod}", "Result should contain the encryption method specification");
@@ -251,9 +251,9 @@ public class SecurityPatternToolTests
     public void GenerateAuthenticationPattern_ContainsSecurityLevelRequirements()
     {
         // Act
-        var basicResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "basic");
-        var standardResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "standard");
-        var highResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "high");
+        string basicResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "basic");
+        string standardResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "standard");
+        string highResult = SecurityPatternTool.GenerateAuthenticationPattern("jwt", "true", "true", "high");
 
         // Assert - Basic level
         StringAssert.Contains(basicResult, "Password complexity requirements", "Basic level result should contain password complexity requirements");

@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -15,10 +15,10 @@ public static class DebuggingAssistantTool
     {
         try
         {
-            var category = issueCategory.ToLowerInvariant();
-            var diagnostics = GenerateDiagnostics(category, problemDescription);
-            var solutions = GenerateSolutions(category, problemDescription);
-            var debugCode = bool.Parse(includeDiagnosticCode) ? GenerateDebugCode(category) : "";
+            string category = issueCategory.ToLowerInvariant();
+            string diagnostics = GenerateDiagnostics(category, problemDescription);
+            string solutions = GenerateSolutions(category, problemDescription);
+            string debugCode = bool.Parse(includeDiagnosticCode) ? GenerateDebugCode(category) : "";
 
             return $@"# AvaloniaUI Debugging Assistant: {issueCategory}
 
@@ -56,10 +56,10 @@ public static class DebuggingAssistantTool
     {
         try
         {
-            var utility = utilityType.ToLowerInvariant();
-            var utilityCode = GenerateUtilityCode(utility);
-            var devToolsCode = bool.Parse(includeDevTools) ? GenerateDevToolsIntegration() : "";
-            var telemetryCode = bool.Parse(includeTelemetry) ? GenerateTelemetryCode() : "";
+            string utility = utilityType.ToLowerInvariant();
+            string utilityCode = GenerateUtilityCode(utility);
+            string devToolsCode = bool.Parse(includeDevTools) ? GenerateDevToolsIntegration() : "";
+            string telemetryCode = bool.Parse(includeTelemetry) ? GenerateTelemetryCode() : "";
 
             return $@"# Debug Utilities: {utilityType}
 

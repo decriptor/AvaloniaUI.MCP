@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -28,9 +28,9 @@ public static class AnimationTool
                 Iterations = iterations
             };
 
-            var xamlContent = GenerateAnimationXaml(animationConfig);
-            var codeContent = GenerateAnimationCode(animationConfig);
-            var usageExamples = GenerateUsageExamples(animationConfig);
+            string xamlContent = GenerateAnimationXaml(animationConfig);
+            string codeContent = GenerateAnimationCode(animationConfig);
+            string usageExamples = GenerateUsageExamples(animationConfig);
 
             return $@"# AvaloniaUI Animation: {animationType} for {targetElement}
 
@@ -100,8 +100,8 @@ public static class AnimationTool
     {
         try
         {
-            var transition = GeneratePageTransitionXaml(transitionType, direction, duration, bool.Parse(includeReverse));
-            var implementation = GeneratePageTransitionImplementation(transitionType);
+            string transition = GeneratePageTransitionXaml(transitionType, direction, duration, bool.Parse(includeReverse));
+            string implementation = GeneratePageTransitionImplementation(transitionType);
 
             return $@"# Page Transition: {transitionType} ({direction})
 
@@ -173,9 +173,9 @@ public class ViewLocator : IDataTemplate
     {
         try
         {
-            var storyboard = GenerateStoryboardXaml(sequence, totalDuration, storyboardName);
-            var triggers = GenerateStoryboardTriggers(storyboardName);
-            var codeControl = GenerateStoryboardCodeControl(storyboardName);
+            string storyboard = GenerateStoryboardXaml(sequence, totalDuration, storyboardName);
+            string triggers = GenerateStoryboardTriggers(storyboardName);
+            string codeControl = GenerateStoryboardCodeControl(storyboardName);
 
             return $@"# Complex Storyboard Animation: {storyboardName}
 
@@ -269,9 +269,9 @@ public class ViewLocator : IDataTemplate
         try
         {
             var propertyList = properties.Split(',').Select(p => p.Trim()).ToList();
-            var customAnimation = GenerateCustomAnimationXaml(effectName, propertyList, pattern, complexity);
-            var easingFunctions = GenerateCustomEasingFunctions();
-            var implementationCode = GenerateCustomAnimationCode(effectName, pattern);
+            string customAnimation = GenerateCustomAnimationXaml(effectName, propertyList, pattern, complexity);
+            string easingFunctions = GenerateCustomEasingFunctions();
+            string implementationCode = GenerateCustomAnimationCode(effectName, pattern);
 
             return $@"# Custom Animation Effect: {effectName}
 
@@ -393,7 +393,7 @@ public class ReactiveAnimator
         }
     }
 
-    private class AnimationConfiguration
+    private sealed class AnimationConfiguration
     {
         public string Type { get; set; } = "";
         public string TargetElement { get; set; } = "";
@@ -405,8 +405,8 @@ public class ReactiveAnimator
 
     private static string GenerateAnimationXaml(AnimationConfiguration config)
     {
-        var easingFunction = GetEasingFunction(config.Easing);
-        var animationProperties = GetAnimationProperties(config.Type);
+        string easingFunction = GetEasingFunction(config.Easing);
+        string animationProperties = GetAnimationProperties(config.Type);
 
         return config.Type switch
         {

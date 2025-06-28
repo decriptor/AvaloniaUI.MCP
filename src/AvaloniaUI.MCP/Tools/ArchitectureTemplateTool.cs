@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -26,11 +26,11 @@ public static class ArchitectureTemplateTool
                 IncludeValidation = bool.Parse(includeValidation)
             };
 
-            var projectStructure = GenerateProjectStructure(config);
-            var baseClasses = GenerateBaseClasses(config);
-            var serviceLayer = GenerateServiceLayer(config);
-            var viewModels = GenerateViewModelTemplates(config);
-            var views = GenerateViewTemplates(config);
+            string projectStructure = GenerateProjectStructure(config);
+            string baseClasses = GenerateBaseClasses(config);
+            string serviceLayer = GenerateServiceLayer(config);
+            string viewModels = GenerateViewModelTemplates(config);
+            string views = GenerateViewTemplates(config);
 
             return $@"# Advanced MVVM Architecture: {projectName}
 
@@ -129,12 +129,12 @@ public static class ArchitectureTemplateTool
         try
         {
             var serviceList = services.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
-            var gateway = bool.Parse(includeGateway);
-            var eventSourcing = bool.Parse(includeEventSourcing);
+            bool gateway = bool.Parse(includeGateway);
+            bool eventSourcing = bool.Parse(includeEventSourcing);
 
-            var architecture = GenerateMicroservicesStructure(applicationName, serviceList, communicationPattern, gateway, eventSourcing);
-            var serviceTemplates = GenerateServiceTemplates(serviceList, communicationPattern);
-            var clientIntegration = GenerateClientIntegration(communicationPattern);
+            string architecture = GenerateMicroservicesStructure(applicationName, serviceList, communicationPattern, gateway, eventSourcing);
+            string serviceTemplates = GenerateServiceTemplates(serviceList, communicationPattern);
+            string clientIntegration = GenerateClientIntegration(communicationPattern);
 
             return $@"# Microservices Architecture: {applicationName}
 
@@ -211,14 +211,14 @@ public static class ArchitectureTemplateTool
         try
         {
             var contexts = boundedContexts.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
-            var cqrs = bool.Parse(includeCQRS);
-            var eventSourcing = bool.Parse(includeEventSourcing);
-            var domainEvents = bool.Parse(includeDomainEvents);
+            bool cqrs = bool.Parse(includeCQRS);
+            bool eventSourcing = bool.Parse(includeEventSourcing);
+            bool domainEvents = bool.Parse(includeDomainEvents);
 
-            var dddStructure = GenerateDDDStructure(domainName, contexts, cqrs, eventSourcing, domainEvents);
-            var domainLayer = GenerateDomainLayer(contexts.First(), domainEvents);
-            var applicationLayer = GenerateApplicationLayer(contexts.First(), cqrs);
-            var infrastructureLayer = GenerateInfrastructureLayer(contexts.First(), eventSourcing);
+            string dddStructure = GenerateDDDStructure(domainName, contexts, cqrs, eventSourcing, domainEvents);
+            string domainLayer = GenerateDomainLayer(contexts.First(), domainEvents);
+            string applicationLayer = GenerateApplicationLayer(contexts.First(), cqrs);
+            string infrastructureLayer = GenerateInfrastructureLayer(contexts.First(), eventSourcing);
 
             return $@"# Domain-Driven Design Architecture: {domainName}
 
@@ -302,13 +302,13 @@ public static class ArchitectureTemplateTool
         try
         {
             var types = pluginTypes.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
-            var mef = bool.Parse(includeMEF);
-            var hotReload = bool.Parse(includeHotReload);
+            bool mef = bool.Parse(includeMEF);
+            bool hotReload = bool.Parse(includeHotReload);
 
-            var pluginStructure = GeneratePluginStructure(applicationName, types, loadingStrategy, mef, hotReload);
-            var pluginInterface = GeneratePluginInterfaces(types);
-            var pluginHost = GeneratePluginHost(loadingStrategy, mef, hotReload);
-            var samplePlugin = GenerateSamplePlugin(types.First());
+            string pluginStructure = GeneratePluginStructure(applicationName, types, loadingStrategy, mef, hotReload);
+            string pluginInterface = GeneratePluginInterfaces(types);
+            string pluginHost = GeneratePluginHost(loadingStrategy, mef, hotReload);
+            string samplePlugin = GenerateSamplePlugin(types.First());
 
             return $@"# Plugin Architecture: {applicationName}
 
@@ -396,7 +396,7 @@ public static class ArchitectureTemplateTool
         }
     }
 
-    private class ArchitectureConfiguration
+    private sealed class ArchitectureConfiguration
     {
         public string ProjectName { get; set; } = "";
         public string Pattern { get; set; } = "";
@@ -531,8 +531,8 @@ public static class ArchitectureTemplateTool
 
     private static string GenerateBaseClasses(ArchitectureConfiguration config)
     {
-        var validationMixin = config.IncludeValidation ? GenerateValidationMixin() : "";
-        var reactiveMixin = config.IncludeReactive ? GenerateReactiveMixin() : "";
+        string validationMixin = config.IncludeValidation ? GenerateValidationMixin() : "";
+        string reactiveMixin = config.IncludeReactive ? GenerateReactiveMixin() : "";
 
         return $@"// Base ViewModel with common functionality
 public abstract class ViewModelBase : ReactiveObject{(config.IncludeValidation ? ", IValidatableObject" : "")}
@@ -720,7 +720,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
 
     private static string GenerateServiceLayer(ArchitectureConfiguration config)
     {
-        var diRegistration = config.IncludeDI ? GenerateDIRegistration() : "";
+        string diRegistration = config.IncludeDI ? GenerateDIRegistration() : "";
 
         return $@"// Service interfaces
 public interface IUserService
@@ -1184,11 +1184,11 @@ public class UserDetailsViewModel : ViewModelBase
 
     private static string GenerateMicroservicesStructure(string applicationName, List<string> services, string communicationPattern, bool gateway, bool eventSourcing)
     {
-        var structure = $@"{applicationName}/
+        string structure = $@"{applicationName}/
 ├── src/
 │   ├── Services/";
 
-        foreach (var service in services)
+        foreach (string service in services)
         {
             structure += $@"
 │   │   ├── {service.ToTitleCase()}Service/
@@ -1237,7 +1237,7 @@ public class UserDetailsViewModel : ViewModelBase
 
     private static string GenerateServiceTemplates(List<string> services, string communicationPattern)
     {
-        var firstService = services.First();
+        string firstService = services.First();
 
         return communicationPattern.ToLowerInvariant() switch
         {
@@ -1250,7 +1250,7 @@ public class UserDetailsViewModel : ViewModelBase
 
     private static string GenerateRestServiceTemplate(string serviceName)
     {
-        var className = serviceName.ToTitleCase();
+        string className = serviceName.ToTitleCase();
 
         return $@"// {className}Service REST API
 [ApiController]
@@ -1305,7 +1305,7 @@ public class {className}Controller : ControllerBase
 
     private static string GenerateGrpcServiceTemplate(string serviceName)
     {
-        var className = serviceName.ToTitleCase();
+        string className = serviceName.ToTitleCase();
 
         return $@"// {className}Service gRPC implementation
 public class {className}GrpcService : {className}Service.{className}ServiceBase
@@ -1393,7 +1393,7 @@ message Delete{className}Request {{
 
     private static string GenerateMessageBusServiceTemplate(string serviceName)
     {
-        var className = serviceName.ToTitleCase();
+        string className = serviceName.ToTitleCase();
 
         return $@"// {className}Service Message Bus implementation
 public class {className}MessageHandler : 
@@ -1695,11 +1695,11 @@ services.AddMassTransit(x =>
 
     private static string GenerateDDDStructure(string domainName, List<string> contexts, bool cqrs, bool eventSourcing, bool domainEvents)
     {
-        var structure = $@"{domainName}/
+        string structure = $@"{domainName}/
 ├── src/
 │   ├── Domain/";
 
-        foreach (var context in contexts)
+        foreach (string context in contexts)
         {
             structure += $@"
 │   │   ├── {context.ToTitleCase()}/
@@ -1758,8 +1758,8 @@ services.AddMassTransit(x =>
 
     private static string GenerateDomainLayer(string context, bool domainEvents)
     {
-        var className = context.ToTitleCase();
-        var eventsCode = domainEvents ? GenerateDomainEventsCode(className) : "";
+        string className = context.ToTitleCase();
+        string eventsCode = domainEvents ? GenerateDomainEventsCode(className) : "";
 
         return $@"// Aggregate Root
 public class {className} : AggregateRoot<{className}Id>
@@ -1930,14 +1930,9 @@ public class {className}ConfirmedEvent : DomainEvent
 
     private static string GenerateApplicationLayer(string context, bool cqrs)
     {
-        var className = context.ToTitleCase();
+        string className = context.ToTitleCase();
 
-        if (cqrs)
-        {
-            return GenerateCQRSApplicationLayer(className);
-        }
-
-        return GenerateTraditionalApplicationLayer(className);
+        return cqrs ? GenerateCQRSApplicationLayer(className) : GenerateTraditionalApplicationLayer(className);
     }
 
     private static string GenerateCQRSApplicationLayer(string className)
@@ -2125,8 +2120,8 @@ public class {className}Dto
 
     private static string GenerateInfrastructureLayer(string context, bool eventSourcing)
     {
-        var className = context.ToTitleCase();
-        var eventStoreCode = eventSourcing ? GenerateEventStoreCode(className) : "";
+        string className = context.ToTitleCase();
+        string eventStoreCode = eventSourcing ? GenerateEventStoreCode(className) : "";
 
         return $@"// Repository Implementation
 public class {className}Repository : I{className}Repository
@@ -2343,7 +2338,7 @@ public class EventSourced{className}Repository : I{className}Repository
 
     private static string GeneratePluginStructure(string applicationName, List<string> types, string loadingStrategy, bool mef, bool hotReload)
     {
-        var structure = $@"{applicationName}/
+        string structure = $@"{applicationName}/
 ├── src/
 │   ├── {applicationName}.Core/
 │   │   ├── Interfaces/
@@ -2364,7 +2359,7 @@ public class EventSourced{className}Repository : I{className}Repository
 │   │   └── Security/
 │   ├── Plugins/";
 
-        foreach (var type in types)
+        foreach (string type in types)
         {
             structure += $@"
 │   │   ├── {type.ToTitleCase()}Plugins/
@@ -2390,8 +2385,8 @@ public class EventSourced{className}Repository : I{className}Repository
 
     private static string GeneratePluginInterfaces(List<string> types)
     {
-        var firstType = types.First();
-        var className = firstType.ToTitleCase();
+        string firstType = types.First();
+        string className = firstType.ToTitleCase();
 
         return $@"// Base Plugin Interface
 public interface IPlugin
@@ -2467,8 +2462,8 @@ public class {className}Capability
 
     private static string GeneratePluginHost(string loadingStrategy, bool mef, bool hotReload)
     {
-        var mefCode = mef ? GenerateMEFPluginHost() : "";
-        var hotReloadCode = hotReload ? GenerateHotReloadCode() : "";
+        string mefCode = mef ? GenerateMEFPluginHost() : "";
+        string hotReloadCode = hotReload ? GenerateHotReloadCode() : "";
 
         return $@"// Plugin Manager
 public class PluginManager : IPluginManager, IDisposable
@@ -2772,7 +2767,7 @@ public class PluginHotReloader : IPluginHotReloader, IDisposable
 
     private static string GenerateSamplePlugin(string type)
     {
-        var className = type.ToTitleCase();
+        string className = type.ToTitleCase();
 
         return $@"// Sample {className} Plugin
 [PluginMetadata(
@@ -2938,9 +2933,6 @@ public static class StringExtensions
 {
     public static string ToTitleCase(this string input)
     {
-        if (string.IsNullOrEmpty(input))
-            return input;
-
-        return char.ToUpperInvariant(input[0]) + input.Substring(1).ToLowerInvariant();
+        return string.IsNullOrEmpty(input) ? input : char.ToUpperInvariant(input[0]) + input[1..].ToLowerInvariant();
     }
 }

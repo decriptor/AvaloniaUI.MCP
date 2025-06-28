@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
@@ -8,7 +8,7 @@ using ModelContextProtocol.Server;
 namespace AvaloniaUI.MCP.Tools;
 
 [McpServerToolType]
-public static class PerformanceAnalysisTool
+public static partial class PerformanceAnalysisTool
 {
     [McpServerTool, Description("Analyzes AvaloniaUI XAML and C# code for performance issues and optimization opportunities")]
     public static string AnalyzePerformance(
@@ -22,7 +22,7 @@ public static class PerformanceAnalysisTool
                 return "Error: Code content cannot be empty";
             }
 
-            var detectedType = analysisType == "auto" ? DetectCodeType(codeContent) : analysisType;
+            string detectedType = analysisType == "auto" ? DetectCodeType(codeContent) : analysisType;
             var issues = new List<string>();
             var recommendations = new List<string>();
 
@@ -62,15 +62,9 @@ public static class PerformanceAnalysisTool
 
     private static string DetectCodeType(string content)
     {
-        if (content.TrimStart().StartsWith("<") && (content.Contains("xmlns") || content.Contains("</")))
-        {
-            return "xaml";
-        }
-        if (content.Contains("namespace") || content.Contains("class") || content.Contains("using"))
-        {
-            return "csharp";
-        }
-        return "unknown";
+        return content.TrimStart().StartsWith("<") && (content.Contains("xmlns") || content.Contains("</"))
+            ? "xaml"
+            : content.Contains("namespace") || content.Contains("class") || content.Contains("using") ? "csharp" : "unknown";
     }
 
     private static void AnalyzeXamlPerformance(string xamlContent, List<string> issues, List<string> recommendations)
@@ -105,11 +99,11 @@ public static class PerformanceAnalysisTool
 
     private static void CheckForCompiledBindings(XDocument doc, List<string> issues, List<string> recommendations)
     {
-        var root = doc.Root;
+        XElement? root = doc.Root;
         if (root != null)
         {
-            var hasDataType = root.Attributes().Any(a => a.Name.LocalName == "DataType");
-            var hasBindings = doc.Descendants().Any(e =>
+            bool hasDataType = root.Attributes().Any(a => a.Name.LocalName == "DataType");
+            bool hasBindings = doc.Descendants().Any(e =>
                 e.Attributes().Any(a => a.Value.Contains("{Binding")));
 
             if (hasBindings && !hasDataType)
@@ -127,20 +121,20 @@ public static class PerformanceAnalysisTool
 
     private static void CheckBindingPatterns(XDocument doc, List<string> issues, List<string> recommendations)
     {
-        var elementsWithBindings = doc.Descendants().Where(e =>
+        IEnumerable<XElement> elementsWithBindings = doc.Descendants().Where(e =>
             e.Attributes().Any(a => a.Value.Contains("{Binding")));
 
-        foreach (var element in elementsWithBindings)
+        foreach (XElement? element in elementsWithBindings)
         {
-            var bindingAttrs = element.Attributes().Where(a => a.Value.Contains("{Binding"));
-            foreach (var attr in bindingAttrs)
+            IEnumerable<XAttribute> bindingAttrs = element.Attributes().Where(a => a.Value.Contains("{Binding"));
+            foreach (XAttribute? attr in bindingAttrs)
             {
-                var bindingValue = attr.Value;
+                string bindingValue = attr.Value;
 
                 // Check for complex binding expressions
                 if (bindingValue.Count(c => c == '.') > 2)
                 {
-                    issues.Add($"⚠️ Complex binding path detected: {bindingValue.Substring(0, Math.Min(50, bindingValue.Length))}...");
+                    issues.Add($"⚠️ Complex binding path detected: {bindingValue[..Math.Min(50, bindingValue.Length)]}...");
                     recommendations.Add("✅ Consider flattening complex binding paths or using converters");
                 }
 
@@ -163,12 +157,12 @@ public static class PerformanceAnalysisTool
     private static void CheckLayoutPerformance(XDocument doc, List<string> issues, List<string> recommendations)
     {
         // Check for nested layout containers
-        var layoutControls = new[] { "Grid", "StackPanel", "DockPanel", "Canvas", "WrapPanel" };
-        var nestedLayouts = doc.Descendants().Where(e =>
+        string[] layoutControls = ["Grid", "StackPanel", "DockPanel", "Canvas", "WrapPanel"];
+        IEnumerable<XElement> nestedLayouts = doc.Descendants().Where(e =>
             layoutControls.Contains(e.Name.LocalName) &&
             e.Descendants().Any(child => layoutControls.Contains(child.Name.LocalName)));
 
-        var nestedCount = nestedLayouts.Count();
+        int nestedCount = nestedLayouts.Count();
         if (nestedCount > 3)
         {
             issues.Add($"⚠️ Deep layout nesting detected ({nestedCount} levels) - may impact performance");
@@ -176,12 +170,12 @@ public static class PerformanceAnalysisTool
         }
 
         // Check for Grid without explicit row/column definitions
-        var gridsWithoutDefinitions = doc.Descendants("Grid").Where(g =>
+        IEnumerable<XElement> gridsWithoutDefinitions = doc.Descendants("Grid").Where(g =>
             !g.Elements().Any(e => e.Name.LocalName.Contains("Definition")));
 
-        foreach (var grid in gridsWithoutDefinitions)
+        foreach (XElement? grid in gridsWithoutDefinitions)
         {
-            var hasGridProperties = grid.Descendants().Any(e =>
+            bool hasGridProperties = grid.Descendants().Any(e =>
                 e.Attributes().Any(a => a.Name.LocalName.StartsWith("Grid.")));
 
             if (hasGridProperties)
@@ -192,7 +186,7 @@ public static class PerformanceAnalysisTool
         }
 
         // Check for Canvas overuse
-        var canvasElements = doc.Descendants("Canvas").Count();
+        int canvasElements = doc.Descendants("Canvas").Count();
         if (canvasElements > 2)
         {
             issues.Add($"⚠️ Multiple Canvas controls detected ({canvasElements}) - Canvas doesn't provide layout optimization");
@@ -202,8 +196,8 @@ public static class PerformanceAnalysisTool
 
     private static void CheckResourceUsage(XDocument doc, List<string> issues, List<string> recommendations)
     {
-        var resources = doc.Descendants().Where(e => e.Name.LocalName.EndsWith("Resources"));
-        var resourceCount = resources.SelectMany(r => r.Elements()).Count();
+        IEnumerable<XElement> resources = doc.Descendants().Where(e => e.Name.LocalName.EndsWith("Resources"));
+        int resourceCount = resources.SelectMany(r => r.Elements()).Count();
 
         if (resourceCount > 50)
         {
@@ -218,21 +212,21 @@ public static class PerformanceAnalysisTool
             .Where(k => k != null)
             .ToList();
 
-        var duplicateKeys = resourceKeys.GroupBy(k => k).Where(g => g.Count() > 1).Select(g => g.Key);
-        foreach (var key in duplicateKeys)
+        IEnumerable<string?> duplicateKeys = resourceKeys.GroupBy(k => k).Where(g => g.Count() > 1).Select(g => g.Key);
+        foreach (string? key in duplicateKeys)
         {
             issues.Add($"⚠️ Duplicate resource key: {key}");
         }
     }
+    private static readonly string[] virtualizationControlArray = ["ListBox", "ListView", "DataGrid", "TreeView"];
 
     private static void CheckVirtualization(XDocument doc, List<string> issues, List<string> recommendations)
     {
-        var listControls = doc.Descendants().Where(e =>
-            new[] { "ListBox", "ListView", "DataGrid", "TreeView" }.Contains(e.Name.LocalName));
+        IEnumerable<XElement> listControls = doc.Descendants().Where(e => virtualizationControlArray.Contains(e.Name.LocalName));
 
-        foreach (var control in listControls)
+        foreach (XElement? control in listControls)
         {
-            var hasVirtualization = control.Attributes().Any(a =>
+            bool hasVirtualization = control.Attributes().Any(a =>
                 a.Name.LocalName.Contains("Virtualization") ||
                 a.Value.Contains("VirtualizingStackPanel"));
 
@@ -243,14 +237,15 @@ public static class PerformanceAnalysisTool
             }
         }
     }
+    private static readonly string[] stylingAttributeArray = ["Background", "Foreground", "FontSize", "FontWeight"];
 
     private static void CheckStylingPerformance(XDocument doc, List<string> issues, List<string> recommendations)
     {
-        var styles = doc.Descendants("Style");
-        var complexSelectors = styles.Where(s =>
+        IEnumerable<XElement> styles = doc.Descendants("Style");
+        IEnumerable<XElement> complexSelectors = styles.Where(s =>
         {
-            var selector = s.Attribute("Selector")?.Value ?? "";
-            return selector.Count(c => c == ' ') > 3 || selector.Contains(">");
+            string selector = s.Attribute("Selector")?.Value ?? "";
+            return selector.Count(c => c == ' ') > 3 || selector.Contains('>');
         });
 
         if (complexSelectors.Any())
@@ -260,8 +255,8 @@ public static class PerformanceAnalysisTool
         }
 
         // Check for inline styles
-        var inlineStyles = doc.Descendants().Where(e =>
-            e.Attributes().Any(a => new[] { "Background", "Foreground", "FontSize", "FontWeight" }.Contains(a.Name.LocalName)));
+        IEnumerable<XElement> inlineStyles = doc.Descendants().Where(e =>
+            e.Attributes().Any(a => stylingAttributeArray.Contains(a.Name.LocalName)));
 
         if (inlineStyles.Count() > 10)
         {
@@ -290,9 +285,9 @@ public static class PerformanceAnalysisTool
 
     private static void CheckPropertyChangeNotification(string content, List<string> issues, List<string> recommendations)
     {
-        var hasINotifyPropertyChanged = content.Contains("INotifyPropertyChanged");
-        var hasPropertyChangedEvent = content.Contains("PropertyChanged");
-        var hasReactiveUI = content.Contains("ReactiveObject") || content.Contains("RaiseAndSetIfChanged");
+        bool hasINotifyPropertyChanged = content.Contains("INotifyPropertyChanged");
+        bool hasPropertyChangedEvent = content.Contains("PropertyChanged");
+        bool hasReactiveUI = content.Contains("ReactiveObject") || content.Contains("RaiseAndSetIfChanged");
 
         if (!hasINotifyPropertyChanged && !hasReactiveUI)
         {
@@ -302,7 +297,7 @@ public static class PerformanceAnalysisTool
 
         if (hasPropertyChangedEvent && !hasReactiveUI)
         {
-            var hasPropertyChangedInvocation = Regex.IsMatch(content, @"PropertyChanged\?.Invoke|OnPropertyChanged");
+            bool hasPropertyChangedInvocation = MyRegex().IsMatch(content);
             if (!hasPropertyChangedInvocation)
             {
                 issues.Add("⚠️ PropertyChanged event declared but not invoked");
@@ -313,15 +308,15 @@ public static class PerformanceAnalysisTool
 
     private static void CheckAsyncPatterns(string content, List<string> issues, List<string> recommendations)
     {
-        var hasAsyncVoid = Regex.IsMatch(content, @"async\s+void\s+(?!.*EventArgs)");
+        bool hasAsyncVoid = MyRegex1().IsMatch(content);
         if (hasAsyncVoid)
         {
             issues.Add("⚠️ async void methods detected (except event handlers)");
             recommendations.Add("✅ Use async Task instead of async void for non-event handlers");
         }
 
-        var hasConfigureAwaitFalse = content.Contains("ConfigureAwait(false)");
-        var hasAwait = content.Contains("await");
+        bool hasConfigureAwaitFalse = content.Contains("ConfigureAwait(false)");
+        bool hasAwait = content.Contains("await");
 
         if (hasAwait && !hasConfigureAwaitFalse && !content.Contains("UI") && !content.Contains("Dispatcher"))
         {
@@ -336,7 +331,7 @@ public static class PerformanceAnalysisTool
             recommendations.Add("✅ Consider using ObservableCollection for data-bound collections");
         }
 
-        var hasLinqInLoop = Regex.IsMatch(content, @"(for|foreach|while).*\{[^}]*\.(Where|Select|First|Single)");
+        bool hasLinqInLoop = Regex.IsMatch(content, @"(for|foreach|while).*\{[^}]*\.(Where|Select|First|Single)");
         if (hasLinqInLoop)
         {
             issues.Add("⚠️ LINQ operations inside loops detected");
@@ -346,8 +341,8 @@ public static class PerformanceAnalysisTool
 
     private static void CheckMemoryLeakPatterns(string content, List<string> issues, List<string> recommendations)
     {
-        var hasEventSubscription = content.Contains("+=") && (content.Contains("Event") || content.Contains("Changed"));
-        var hasEventUnsubscription = content.Contains("-=");
+        bool hasEventSubscription = content.Contains("+=") && (content.Contains("Event") || content.Contains("Changed"));
+        bool hasEventUnsubscription = content.Contains("-=");
 
         if (hasEventSubscription && !hasEventUnsubscription)
         {
@@ -355,7 +350,7 @@ public static class PerformanceAnalysisTool
             recommendations.Add("✅ Ensure proper event unsubscription to prevent memory leaks");
         }
 
-        var hasTimerOrDispatcher = content.Contains("Timer") || content.Contains("DispatcherTimer");
+        bool hasTimerOrDispatcher = content.Contains("Timer") || content.Contains("DispatcherTimer");
         if (hasTimerOrDispatcher && !content.Contains("Dispose"))
         {
             issues.Add("⚠️ Timer usage without disposal pattern");
@@ -365,8 +360,8 @@ public static class PerformanceAnalysisTool
 
     private static void CheckAvaloniaPropertyUsage(string content, List<string> issues, List<string> recommendations)
     {
-        var hasAvaloniaProperty = content.Contains("AvaloniaProperty");
-        var hasStyledProperty = content.Contains("StyledProperty");
+        bool hasAvaloniaProperty = content.Contains("AvaloniaProperty");
+        bool hasStyledProperty = content.Contains("StyledProperty");
 
         if (content.Contains("DependencyProperty"))
         {
@@ -382,12 +377,12 @@ public static class PerformanceAnalysisTool
 
     private static string FormatPerformanceReport(string codeType, List<string> issues, List<string> recommendations)
     {
-        var report = $"# AvaloniaUI Performance Analysis Report ({codeType.ToUpper()})\n\n";
+        string report = $"# AvaloniaUI Performance Analysis Report ({codeType.ToUpper(System.Globalization.CultureInfo.CurrentCulture)})\n\n";
 
-        if (issues.Any())
+        if (issues.Count != 0)
         {
             report += "## 🚨 Performance Issues Found\n\n";
-            foreach (var issue in issues)
+            foreach (string issue in issues)
             {
                 report += $"{issue}\n";
             }
@@ -398,10 +393,10 @@ public static class PerformanceAnalysisTool
             report += "## ✅ No Performance Issues Found\n\n";
         }
 
-        if (recommendations.Any())
+        if (recommendations.Count != 0)
         {
             report += "## 💡 Performance Recommendations\n\n";
-            foreach (var recommendation in recommendations)
+            foreach (string recommendation in recommendations)
             {
                 report += $"{recommendation}\n";
             }
@@ -409,17 +404,25 @@ public static class PerformanceAnalysisTool
         }
 
         report += "## 📊 Performance Score\n\n";
-        var score = Math.Max(0, 100 - (issues.Count * 10));
+        int score = Math.Max(0, 100 - (issues.Count * 10));
         report += $"**Score: {score}/100**\n\n";
 
         if (score >= 90)
+        {
             report += "🏆 Excellent performance optimization!\n";
+        }
         else if (score >= 70)
+        {
             report += "👍 Good performance with room for improvement\n";
+        }
         else if (score >= 50)
+        {
             report += "⚠️ Moderate performance issues - consider optimizations\n";
+        }
         else
+        {
             report += "🚨 Significant performance issues - optimization recommended\n";
+        }
 
         return report;
     }
@@ -639,4 +642,9 @@ using (collection.DeferRefresh())
 - Implement custom layout panels for specific scenarios
 - Use GPU acceleration where supported";
     }
+
+    [GeneratedRegex(@"PropertyChanged\?.Invoke|OnPropertyChanged")]
+    private static partial Regex MyRegex();
+    [GeneratedRegex(@"async\s+void\s+(?!.*EventArgs)")]
+    private static partial Regex MyRegex1();
 }

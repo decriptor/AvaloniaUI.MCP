@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using ModelContextProtocol.Server;
 
@@ -26,10 +26,10 @@ public static class ServiceLayerTool
                 IncludeCaching = bool.Parse(includeCaching)
             };
 
-            var serviceInterface = GenerateServiceInterface(config);
-            var serviceImplementation = GenerateServiceImplementation(config);
-            var dtoClasses = GenerateDataTransferObjects(config);
-            var validationCode = config.IncludeValidation ? GenerateValidationCode(config) : "";
+            string serviceInterface = GenerateServiceInterface(config);
+            string serviceImplementation = GenerateServiceImplementation(config);
+            string dtoClasses = GenerateDataTransferObjects(config);
+            string validationCode = config.IncludeValidation ? GenerateValidationCode(config) : "";
 
             return $@"# Business Service Layer: {serviceName}
 
@@ -112,9 +112,9 @@ public class {config.EntityName}ViewModel
                 IncludeRulesEngine = bool.Parse(includeRulesEngine)
             };
 
-            var domainServiceCode = GenerateDomainServiceCode(config);
-            var businessRulesCode = config.IncludeRulesEngine ? GenerateBusinessRulesEngine(config) : "";
-            var domainEventsCode = config.IncludeDomainEvents ? GenerateDomainEventsCode(config) : "";
+            string domainServiceCode = GenerateDomainServiceCode(config);
+            string businessRulesCode = config.IncludeRulesEngine ? GenerateBusinessRulesEngine(config) : "";
+            string domainEventsCode = config.IncludeDomainEvents ? GenerateDomainEventsCode(config) : "";
 
             return $@"# Domain Service: {serviceName}
 
@@ -151,7 +151,7 @@ public class {config.EntityName}ViewModel
         }
     }
 
-    private class ServiceConfiguration
+    private sealed class ServiceConfiguration
     {
         public string ServiceName { get; set; } = "";
         public string EntityName { get; set; } = "";
@@ -160,7 +160,7 @@ public class {config.EntityName}ViewModel
         public bool IncludeCaching { get; set; }
     }
 
-    private class DomainServiceConfiguration
+    private sealed class DomainServiceConfiguration
     {
         public string ServiceName { get; set; } = "";
         public string BusinessDomain { get; set; } = "";
@@ -227,12 +227,12 @@ public class ServiceResult<T>
 
     private static string GenerateServiceImplementation(ServiceConfiguration config)
     {
-        var cachingField = config.IncludeCaching ? "private readonly ICacheService _cacheService;" : "";
-        var cachingParam = config.IncludeCaching ? ", ICacheService cacheService" : "";
-        var cachingInit = config.IncludeCaching ? "_cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));" : "";
-        var validationField = config.IncludeValidation ? $"private readonly IValidator<Create{config.EntityName}Request> _createValidator;\n    private readonly IValidator<Update{config.EntityName}Request> _updateValidator;" : "";
-        var validationParam = config.IncludeValidation ? $", IValidator<Create{config.EntityName}Request> createValidator, IValidator<Update{config.EntityName}Request> updateValidator" : "";
-        var validationInit = config.IncludeValidation ? $"_createValidator = createValidator ?? throw new ArgumentNullException(nameof(createValidator));\n        _updateValidator = updateValidator ?? throw new ArgumentNullException(nameof(updateValidator));" : "";
+        string cachingField = config.IncludeCaching ? "private readonly ICacheService _cacheService;" : "";
+        string cachingParam = config.IncludeCaching ? ", ICacheService cacheService" : "";
+        string cachingInit = config.IncludeCaching ? "_cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));" : "";
+        string validationField = config.IncludeValidation ? $"private readonly IValidator<Create{config.EntityName}Request> _createValidator;\n    private readonly IValidator<Update{config.EntityName}Request> _updateValidator;" : "";
+        string validationParam = config.IncludeValidation ? $", IValidator<Create{config.EntityName}Request> createValidator, IValidator<Update{config.EntityName}Request> updateValidator" : "";
+        string validationInit = config.IncludeValidation ? $"_createValidator = createValidator ?? throw new ArgumentNullException(nameof(createValidator));\n        _updateValidator = updateValidator ?? throw new ArgumentNullException(nameof(updateValidator));" : "";
 
         return $@"public class {config.ServiceName} : I{config.ServiceName}
 {{
