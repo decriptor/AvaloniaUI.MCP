@@ -621,12 +621,9 @@ public partial class {config.Name} : UserControl
             return "int";
         }
 
-        if (lowerName.Contains("is") || lowerName.Contains("can") || lowerName.Contains("has"))
-        {
-            return "bool";
-        }
-
-        return lowerName.Contains("width") || lowerName.Contains("height") || lowerName.Contains("size")
+        return lowerName.Contains("is") || lowerName.Contains("can") || lowerName.Contains("has")
+            ? "bool"
+            : lowerName.Contains("width") || lowerName.Contains("height") || lowerName.Contains("size")
             ? "double"
             : lowerName.Contains("color") || lowerName.Contains("brush") ? "IBrush" : "object";
     }

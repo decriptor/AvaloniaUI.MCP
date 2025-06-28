@@ -9,7 +9,7 @@ public static partial class InputValidationService
 {
     private static readonly Regex ValidProjectNameRegex = MyRegex();
     private static readonly Regex ValidColorHexRegex = MyRegex1();
-    private static readonly Regex ValidIdentifierRegex = new(@"^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled);
+    private static readonly Regex ValidIdentifierRegex = MyRegex2();
     private static readonly Regex ValidCssClassRegex = new(@"^[a-zA-Z_-][a-zA-Z0-9_-]*$", RegexOptions.Compiled);
 
     private static readonly HashSet<string> ValidTemplateTypes = new(StringComparer.OrdinalIgnoreCase)
@@ -203,12 +203,9 @@ public static partial class InputValidationService
 
     public static ValidationResult ValidateIntegerString(string value, int min = int.MinValue, int max = int.MaxValue, string parameterName = "parameter")
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return ValidationResult.Failure($"{parameterName} cannot be empty");
-        }
-
-        return !int.TryParse(value, out int intValue)
+        return string.IsNullOrWhiteSpace(value)
+            ? ValidationResult.Failure($"{parameterName} cannot be empty")
+            : !int.TryParse(value, out int intValue)
             ? ValidationResult.Failure($"{parameterName} must be a valid integer")
             : intValue < min || intValue > max
             ? ValidationResult.Failure($"{parameterName} must be between {min} and {max}")
@@ -293,12 +290,9 @@ public static partial class InputValidationService
 
     public static ValidationResult ValidateUrl(string url)
     {
-        if (string.IsNullOrWhiteSpace(url))
-        {
-            return ValidationResult.Failure("URL cannot be empty");
-        }
-
-        return !Uri.TryCreate(url, UriKind.Absolute, out Uri? uri)
+        return string.IsNullOrWhiteSpace(url)
+            ? ValidationResult.Failure("URL cannot be empty")
+            : !Uri.TryCreate(url, UriKind.Absolute, out Uri? uri)
             ? ValidationResult.Failure("URL is not a valid absolute URI")
             : uri.Scheme is not "http" and not "https"
             ? ValidationResult.Failure("URL must use HTTP or HTTPS protocol")
@@ -353,6 +347,8 @@ public static partial class InputValidationService
     private static partial Regex MyRegex();
     [GeneratedRegex(@"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})$", RegexOptions.Compiled)]
     private static partial Regex MyRegex1();
+    [GeneratedRegex(@"^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled)]
+    private static partial Regex MyRegex2();
 }
 
 /// <summary>

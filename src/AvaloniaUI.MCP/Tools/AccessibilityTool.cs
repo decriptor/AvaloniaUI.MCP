@@ -9,6 +9,14 @@ namespace AvaloniaUI.MCP.Tools;
 [McpServerToolType]
 public static class AccessibilityTool
 {
+    private static readonly string[] value = new[]
+                {
+                    "- **Contrast Ratio**: Minimum 4.5:1 for normal text, 3:1 for large text",
+                    "- **Keyboard Navigation**: All interactive elements must be keyboard accessible",
+                    "- **Screen Reader**: Proper ARIA labels and roles for assistive technology",
+                    "- **Focus Management**: Clear visual focus indicators and logical tab order"
+                };
+
     [McpServerTool, Description("Generates WCAG compliant accessible UI components with proper ARIA labels and keyboard support")]
     public static string GenerateAccessibleComponent(
         [Description("Component type: 'form', 'navigation', 'data-table', 'modal', 'notification'")] string componentType,
@@ -40,16 +48,10 @@ public static class AccessibilityTool
                     ("Screen Reader Support", config.IncludeScreenReaderSupport))
                 .AddCodeSection("Accessible Component XAML", "xml", componentXaml)
                 .AddCodeSection("Accessibility Helper Classes", "csharp", accessibilityHelpers)
-                .AddIf(config.IncludeKeyboardNavigation, builder => 
+                .AddIf(config.IncludeKeyboardNavigation, builder =>
                     builder.AddCodeSection("Keyboard Navigation Handler", "csharp", keyboardHandler))
                 .AddSection("Accessibility Testing Checklist", testingChecklist)
-                .AddSection($"WCAG {config.WcagLevel} Compliance Notes", string.Join("\n", new[]
-                {
-                    "- **Contrast Ratio**: Minimum 4.5:1 for normal text, 3:1 for large text",
-                    "- **Keyboard Navigation**: All interactive elements must be keyboard accessible", 
-                    "- **Screen Reader**: Proper ARIA labels and roles for assistive technology",
-                    "- **Focus Management**: Clear visual focus indicators and logical tab order"
-                }))
+                .AddSection($"WCAG {config.WcagLevel} Compliance Notes", string.Join("\n", value))
                 .Build();
         });
     }

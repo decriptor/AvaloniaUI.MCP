@@ -333,7 +333,7 @@ public static class XamlValidationTool
         }
     }
     private static readonly string[] sourceArray = ["ListBox", "ListView", "DataGrid", "TreeView"];
-    private static readonly string[] sourceArray0 = new[] { "Background", "Foreground", "FontSize", "FontWeight", "Margin", "Padding" };
+    private static readonly string[] sourceArray0 = ["Background", "Foreground", "FontSize", "FontWeight", "Margin", "Padding"];
 
     private static void ValidatePerformanceOptimizations(XDocument doc, List<string> validationResult, string validationLevel, ref bool hasErrors)
     {

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 namespace AvaloniaUI.MCP.Services;
 
@@ -113,11 +113,11 @@ public sealed class MarkdownOutputBuilder
         {
             // Add headers
             _builder.AppendLine($"| {string.Join(" | ", headers)} |");
-            
+
             // Add separator
             string separator = string.Join(" | ", headers.Select(_ => "---"));
             _builder.AppendLine($"| {separator} |");
-            
+
             // Add rows
             foreach (string[] row in rows)
             {
@@ -171,18 +171,18 @@ public sealed class MarkdownOutputBuilder
         if (exampleList.Count > 0)
         {
             AddHeader("Usage Examples");
-            
-            foreach ((string title, string description, string code) example in exampleList)
+
+            foreach ((string title, string description, string code) in exampleList)
             {
-                AddHeader(example.title, 3);
-                if (!string.IsNullOrWhiteSpace(example.description))
+                AddHeader(title, 3);
+                if (!string.IsNullOrWhiteSpace(description))
                 {
-                    _builder.AppendLine(example.description);
+                    _builder.AppendLine(description);
                     _builder.AppendLine();
                 }
-                if (!string.IsNullOrWhiteSpace(example.code))
+                if (!string.IsNullOrWhiteSpace(code))
                 {
-                    AddCodeBlock("csharp", example.code);
+                    AddCodeBlock("csharp", code);
                 }
             }
         }
