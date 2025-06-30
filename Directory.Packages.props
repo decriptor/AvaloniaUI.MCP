@@ -44,7 +44,7 @@
     
     <!-- Sentry Error Tracking -->
     <PackageVersion Include="Sentry" Version="5.11.2" />
-    <PackageVersion Include="Sentry.Extensions.Logging" Version="5.11.1" />
+    <PackageVersion Include="Sentry.Extensions.Logging" Version="5.11.2" />
     
     <!-- Testing - Using MSTest SDK 3.9.3 for modern MSTest experience -->
     <!-- MSTest.Sdk includes all necessary packages: TestFramework, TestAdapter, Analyzers, TRX, CodeCoverage -->

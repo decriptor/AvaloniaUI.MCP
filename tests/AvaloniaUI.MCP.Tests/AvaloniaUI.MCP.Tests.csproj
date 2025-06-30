@@ -12,4 +12,6 @@
     <ProjectReference Include="..\..\src\AvaloniaUI.MCP\AvaloniaUI.MCP.csproj" />
   </ItemGroup>
 
+  <ItemGroup />
+
 </Project>

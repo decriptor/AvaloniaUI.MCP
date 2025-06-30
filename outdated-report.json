@@ -1,0 +1,22 @@
+Discovering projects...
+Analyzing project(s)...
+Analyzing dependencies...
+» AvaloniaUI.MCP
+  [net9.0]
+  Sentry.Extensions.Logging  5.11.1 -> 5.11.2
+
+» AvaloniaUI.MCP.Tests
+  [net9.0]
+  Microsoft.NET.Test.Sdk  17.13.0 -> 17.14.1
+
+Version color legend:
+<red>   : Major version update or pre-release version. Possible breaking changes.
+<yellow>: Minor version update. Backwards-compatible features added.
+<green> : Patch version update. Backwards-compatible bug fixes.
+
+You can upgrade packages to the latest version by passing the -u or -u:prompt option.
+
+Generating JSON report...
+Report written to json
+
+Elapsed: 00:00:07.6998086

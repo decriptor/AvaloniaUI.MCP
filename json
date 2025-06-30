@@ -1,0 +1,38 @@
+{
+  "Projects": [
+    {
+      "Name": "AvaloniaUI.MCP",
+      "FilePath": "/home/runner/work/AvaloniaUI.MCP/AvaloniaUI.MCP/src/AvaloniaUI.MCP/AvaloniaUI.MCP.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Sentry.Extensions.Logging",
+              "ResolvedVersion": "5.11.1",
+              "LatestVersion": "5.11.2",
+              "UpgradeSeverity": "Patch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "AvaloniaUI.MCP.Tests",
+      "FilePath": "/home/runner/work/AvaloniaUI.MCP/AvaloniaUI.MCP/tests/AvaloniaUI.MCP.Tests/AvaloniaUI.MCP.Tests.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Microsoft.NET.Test.Sdk",
+              "ResolvedVersion": "17.13.0",
+              "LatestVersion": "17.14.1",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
